@@ -1,9 +1,11 @@
 import js from '@eslint/js'
-import globals from 'globals'
-import tseslint from 'typescript-eslint'
+import prettier from 'eslint-config-prettier'
 import i18next from 'eslint-plugin-i18next'
 import jsxA11y from 'eslint-plugin-jsx-a11y'
-import prettier from 'eslint-config-prettier'
+import simpleImportSort from 'eslint-plugin-simple-import-sort'
+import globals from 'globals'
+import tseslint from 'typescript-eslint'
+
 import noExplanatoryComments from './tools/eslint/no-explanatory-comments.js'
 
 const UI_TEXT_ATTRIBUTES = [
@@ -28,6 +30,19 @@ export default tseslint.config(
     },
     rules: {
       'local/no-explanatory-comments': 'error',
+    },
+  },
+
+  {
+    plugins: { 'simple-import-sort': simpleImportSort },
+    rules: {
+      'simple-import-sort/imports': [
+        'error',
+        {
+          groups: [['^\\u0000'], ['^node:'], ['^react', '^@?\\w'], ['^@/'], ['^\\.']],
+        },
+      ],
+      'simple-import-sort/exports': 'error',
     },
   },
 

@@ -646,6 +646,7 @@ One integrated chain; Prettier is the only formatter.
 | typescript-eslint   | TS/React correctness, rule violations  | —                                         |
 | eslint-plugin-i18next | `no-literal-string` (JSX-only, §8)   | —                                         |
 | eslint-plugin-jsx-a11y | accessibility floor (§16)           | —                                         |
+| eslint-plugin-simple-import-sort | import + export order (enforced, auto-fixed by `eslint --fix`; groups per §5: side-effects, `node:`, externals (react first), `@/` alias, relative) | — |
 | local/no-explanatory-comments | no comments / no JSDoc (§7)   | explicit `eslint-disable-next-line` for rare exceptions |
 | Prettier            | All formatting                         | `eslint-config-prettier` disables ESLint format rules |
 | Stylelint           | SCSS quality, SMACSS, prop order       | `stylelint-config-standard-scss` + `stylelint-order` + `stylelint-prettier` |

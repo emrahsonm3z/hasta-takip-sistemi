@@ -1,5 +1,7 @@
 import test from 'node:test'
+
 import { RuleTester } from 'eslint'
+
 import rule from './no-explanatory-comments.js'
 
 const ruleTester = new RuleTester({

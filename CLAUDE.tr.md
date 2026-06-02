@@ -657,6 +657,7 @@ Tek entegre zincir; Prettier tek formatter'dır.
 | typescript-eslint   | TS/React doğruluğu, kural ihlalleri    | —                                         |
 | eslint-plugin-i18next | `no-literal-string` (JSX-only, §8)   | —                                         |
 | eslint-plugin-jsx-a11y | erişilebilirlik zemini (§16)        | —                                         |
+| eslint-plugin-simple-import-sort | import + export sırası (zorunlu, `eslint --fix` ile otomatik düzeltilir; §5'e göre gruplar: side-effect'ler, `node:`, harici paketler (önce react), `@/` alias, göreli) | — |
 | local/no-explanatory-comments | yorum yok / JSDoc yok (§7)    | nadir istisnalar için açık `eslint-disable-next-line` |
 | Prettier            | Tüm formatlama                         | `eslint-config-prettier` ESLint format kurallarını kapatır |
 | Stylelint           | SCSS kalitesi, SMACSS, prop sırası     | `stylelint-config-standard-scss` + `stylelint-order` + `stylelint-prettier` |
