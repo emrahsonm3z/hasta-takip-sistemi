@@ -647,6 +647,9 @@ One integrated chain; Prettier is the only formatter.
 | eslint-plugin-i18next | `no-literal-string` (JSX-only, §8)   | —                                         |
 | eslint-plugin-jsx-a11y | accessibility floor (§16)           | —                                         |
 | eslint-plugin-simple-import-sort | import + export order (enforced, auto-fixed by `eslint --fix`; groups per §5: side-effects, `node:`, externals (react first), `@/` alias, relative) | — |
+| eslint-plugin-react-hooks | `rules-of-hooks` = error, `exhaustive-deps` = error (src only; justified `eslint-disable` for an intentionally-omitted dep) | — |
+| eslint-plugin-react-refresh | `only-export-components` = warn (HMR hint, `allowConstantExport`; off for barrels/`routes.tsx`/`*.constants.*`) | — |
+| eslint-plugin-react (core) | curated, src only: `jsx-key`, `no-array-index-key`, `no-unstable-nested-components`, `jsx-no-useless-fragment` = error; `react-in-jsx-scope` + `prop-types` off (new JSX transform + TS); `react.version: detect` | — |
 | local/no-explanatory-comments | no comments / no JSDoc (§7)   | explicit `eslint-disable-next-line` for rare exceptions |
 | Prettier            | All formatting                         | `eslint-config-prettier` disables ESLint format rules |
 | Stylelint           | SCSS quality, SMACSS, prop order       | `stylelint-config-standard-scss` + `stylelint-order` + `stylelint-prettier` |

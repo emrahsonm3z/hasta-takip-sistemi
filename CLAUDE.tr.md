@@ -658,6 +658,9 @@ Tek entegre zincir; Prettier tek formatter'dır.
 | eslint-plugin-i18next | `no-literal-string` (JSX-only, §8)   | —                                         |
 | eslint-plugin-jsx-a11y | erişilebilirlik zemini (§16)        | —                                         |
 | eslint-plugin-simple-import-sort | import + export sırası (zorunlu, `eslint --fix` ile otomatik düzeltilir; §5'e göre gruplar: side-effect'ler, `node:`, harici paketler (önce react), `@/` alias, göreli) | — |
+| eslint-plugin-react-hooks | `rules-of-hooks` = error, `exhaustive-deps` = error (yalnız src; kasıtlı atlanan bağımlılık için gerekçeli `eslint-disable`) | — |
+| eslint-plugin-react-refresh | `only-export-components` = warn (HMR ipucu, `allowConstantExport`; barrel'lar/`routes.tsx`/`*.constants.*` için kapalı) | — |
+| eslint-plugin-react (çekirdek) | seçilmiş, yalnız src: `jsx-key`, `no-array-index-key`, `no-unstable-nested-components`, `jsx-no-useless-fragment` = error; `react-in-jsx-scope` + `prop-types` kapalı (yeni JSX transform + TS); `react.version: detect` | — |
 | local/no-explanatory-comments | yorum yok / JSDoc yok (§7)    | nadir istisnalar için açık `eslint-disable-next-line` |
 | Prettier            | Tüm formatlama                         | `eslint-config-prettier` ESLint format kurallarını kapatır |
 | Stylelint           | SCSS kalitesi, SMACSS, prop sırası     | `stylelint-config-standard-scss` + `stylelint-order` + `stylelint-prettier` |

@@ -2,6 +2,9 @@ import js from '@eslint/js'
 import prettier from 'eslint-config-prettier'
 import i18next from 'eslint-plugin-i18next'
 import jsxA11y from 'eslint-plugin-jsx-a11y'
+import react from 'eslint-plugin-react'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
 import simpleImportSort from 'eslint-plugin-simple-import-sort'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
@@ -80,6 +83,34 @@ export default tseslint.config(
     ],
     rules: {
       'i18next/no-literal-string': 'off',
+    },
+  },
+
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    plugins: {
+      react,
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
+    },
+    settings: { react: { version: 'detect' } },
+    rules: {
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'error',
+      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      'react/react-in-jsx-scope': 'off',
+      'react/prop-types': 'off',
+      'react/jsx-key': 'error',
+      'react/no-array-index-key': 'error',
+      'react/no-unstable-nested-components': 'error',
+      'react/jsx-no-useless-fragment': 'error',
+    },
+  },
+
+  {
+    files: ['src/**/index.ts', 'src/**/routes.tsx', 'src/**/*.constants.{ts,tsx}'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
     },
   },
 
