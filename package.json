@@ -1,0 +1,38 @@
+{
+  "name": "hasta-takip-sistemi",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.100.14",
+    "dayjs": "^1.11.21",
+    "formik": "^2.4.9",
+    "i18next": "^26.3.0",
+    "primeicons": "7.0.0",
+    "primereact": "10.9.8",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-i18next": "^17.0.8",
+    "react-markdown": "^10.1.0",
+    "react-router-dom": "^7.16.0",
+    "remark-gfm": "^4.0.1",
+    "yup": "^1.7.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.19",
+    "@types/node": "^25.9.1",
+    "@types/react": "^18.3.30",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^6.0.2",
+    "autoprefixer": "^10.5.0",
+    "postcss": "^8.5.15",
+    "tailwindcss": "3.4.19",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16"
+  }
+}
