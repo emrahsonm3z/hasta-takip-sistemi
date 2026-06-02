@@ -1,6 +1,7 @@
 import js from '@eslint/js'
 import prettier from 'eslint-config-prettier'
 import i18next from 'eslint-plugin-i18next'
+import importX from 'eslint-plugin-import-x'
 import jsxA11y from 'eslint-plugin-jsx-a11y'
 import react from 'eslint-plugin-react'
 import reactHooks from 'eslint-plugin-react-hooks'
@@ -46,6 +47,16 @@ export default tseslint.config(
         },
       ],
       'simple-import-sort/exports': 'error',
+    },
+  },
+
+  {
+    plugins: { 'import-x': importX },
+    rules: {
+      'import-x/no-unresolved': 'off',
+      'import-x/no-duplicates': 'error',
+      'import-x/first': 'warn',
+      'import-x/newline-after-import': 'warn',
     },
   },
 
