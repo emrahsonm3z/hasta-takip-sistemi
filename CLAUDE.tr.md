@@ -407,8 +407,12 @@ kısaltmalar yasaktır (`submitNewPatientButton`, `sbmtBtn` değil).
 Bildirimler: varsayılan `const`, yalnızca yeniden atanınca `let`. `var` yok.
 
 **Açıklayıcı yorum ve JSDoc yok.** Niyet; isimler, yapı ve dokümanlarla taşınır.
-Özel lint kuralı `local/no-explanatory-comments` ile dayatılır (§12). Kaçınılmaz
-nadir yorum (ör. bir direktif) açık bir `eslint-disable-next-line
+Özel lint kuralı `local/no-explanatory-comments` ile dayatılır (§12). Kuralın izin
+verdiği tek yorumlar şunlardır: `eslint-disable*` / `eslint-enable`, `@ts-*`,
+`prettier-ignore`, `global` / `globals`, triple-slash `/// <reference>`
+direktifleri, Vite `@vite-ignore` magic yorumu (yalnızca Vite — webpack yok),
+shebang satırları ve boş yorumlar. Bu listede olmayan, kaçınılmaz nadir açıklayıcı
+yorum (ör. listede olmayan bir direktif) açık bir `eslint-disable-next-line
 local/no-explanatory-comments` ile yazılır; böylece asla alışkanlık olmaz ve
 review'da her zaman görünür.
 
@@ -661,9 +665,10 @@ Tek entegre zincir; Prettier tek formatter'dır.
 
 `no-literal-string` konfigü: JSX-only mod, `jsx-attributes` whitelist (§8 UI
 nitelikleri), `t`/`i18n.t`/`clsx`/`cn`'i dışlayan `callees`, test ve constants
-dosyalarında kapalı. `local/no-explanatory-comments` allowlist'i: `eslint-disable*`,
-`@ts-*`, `prettier-ignore`, `global`, triple-slash referansları, Vite/webpack magic
-yorumları, shebang. Kural yerel olarak `tools/eslint/no-explanatory-comments.js`'te
+dosyalarında kapalı. `local/no-explanatory-comments` allowlist'i: `eslint-disable*` /
+`eslint-enable`, `@ts-*`, `prettier-ignore`, `global` / `globals`, triple-slash
+referansları, Vite `@vite-ignore` magic yorumu (yalnızca Vite — webpack yok),
+shebang ve boş yorumlar. Kural yerel olarak `tools/eslint/no-explanatory-comments.js`'te
 uygulanır ve `eslint.config.js`'e inline `local` plugin olarak bağlanır
 (`plugins: { local: { rules: { … } } }`), `RuleTester` birim testiyle.
 

@@ -6,7 +6,28 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "type-check": "tsc -b",
+    "lint": "eslint .",
+    "lint:style": "stylelint \"src/**/*.scss\" --allow-empty-input",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "validate": "npm run type-check && npm run lint && npm run lint:style && npm run format:check",
+    "test": "node --test",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,cjs,mjs}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,html}": [
+      "prettier --write"
+    ],
+    "*.scss": [
+      "stylelint --fix",
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@tanstack/react-query": "^5.100.14",
@@ -24,15 +45,31 @@
     "yup": "^1.7.1"
   },
   "devDependencies": {
+    "@commitlint/cli": "^21.0.2",
+    "@commitlint/config-conventional": "^21.0.2",
+    "@eslint/js": "^9.39.4",
     "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^25.9.1",
     "@types/react": "^18.3.30",
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react": "^6.0.2",
     "autoprefixer": "^10.5.0",
+    "eslint": "^9.39.4",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-i18next": "^6.1.4",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "globals": "^17.6.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.7",
     "postcss": "^8.5.15",
+    "prettier": "^3.8.3",
+    "stylelint": "^17.12.0",
+    "stylelint-config-standard-scss": "^17.0.0",
+    "stylelint-order": "^8.1.1",
+    "stylelint-prettier": "^5.0.3",
     "tailwindcss": "3.4.19",
     "typescript": "^6.0.3",
+    "typescript-eslint": "^8.60.1",
     "vite": "^8.0.16"
   }
 }

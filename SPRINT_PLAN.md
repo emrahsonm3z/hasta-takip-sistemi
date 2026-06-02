@@ -47,7 +47,7 @@ passes; PrimeReact + Tailwind pinned exactly (no `^` on them).
 **Tests:** none yet (tooling lands in 0.2).
 **DoD:** + global DoD. Commit `chore: bootstrap vite react-ts project`.
 
-### 0.2 ⬜ Tooling + custom lint rule
+### 0.2 ✅ Tooling + custom lint rule
 **Goal:** The full quality chain (§12) green on an empty project, including the
 local `no-explanatory-comments` rule.
 **Depends on:** 0.1

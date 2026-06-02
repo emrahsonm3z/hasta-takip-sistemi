@@ -401,9 +401,13 @@ Declarations: `const` by default, `let` only when reassigned. No `var`.
 
 **No explanatory comments and no JSDoc.** Intent is carried by names, structure,
 and the docs. Enforced by the custom lint rule `local/no-explanatory-comments`
-(§12). The rare unavoidable comment (e.g. a directive) is written with an
-explicit `eslint-disable-next-line local/no-explanatory-comments` so it is never
-habitual and always visible in review.
+(§12). The only comments the rule permits are: `eslint-disable*` /
+`eslint-enable`, `@ts-*`, `prettier-ignore`, `global` / `globals`, triple-slash
+`/// <reference>` directives, the Vite `@vite-ignore` magic comment (Vite only —
+no webpack), shebang lines, and empty comments. The rare unavoidable explanatory
+comment (e.g. a directive not on that list) is written with an explicit
+`eslint-disable-next-line local/no-explanatory-comments` so it is never habitual
+and always visible in review.
 
 ## 8. Text and i18n
 
@@ -650,9 +654,10 @@ One integrated chain; Prettier is the only formatter.
 
 `no-literal-string` config: JSX-only mode, `jsx-attributes` whitelist (the §8 UI
 attributes), `callees` excluding `t`/`i18n.t`/`clsx`/`cn`, disabled in test and
-constants files. `local/no-explanatory-comments` allowlist: `eslint-disable*`,
-`@ts-*`, `prettier-ignore`, `global`, triple-slash references, Vite/webpack magic
-comments, shebang. The rule is implemented locally at
+constants files. `local/no-explanatory-comments` allowlist: `eslint-disable*` /
+`eslint-enable`, `@ts-*`, `prettier-ignore`, `global` / `globals`, triple-slash
+references, the Vite `@vite-ignore` magic comment (Vite only — no webpack),
+shebang, and empty comments. The rule is implemented locally at
 `tools/eslint/no-explanatory-comments.js` and wired into `eslint.config.js` as an
 inline `local` plugin (`plugins: { local: { rules: { … } } }`), with a
 `RuleTester` unit test.

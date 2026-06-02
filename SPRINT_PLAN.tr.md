@@ -51,7 +51,7 @@ PrimeReact + Tailwind tam-pinli (onlarda `^` yok).
 **Test:** henüz yok (tooling 0.2'de gelir).
 **DoD:** + global DoD. Commit `chore: bootstrap vite react-ts project`.
 
-### 0.2 ⬜ Tooling + custom lint kuralı
+### 0.2 ✅ Tooling + custom lint kuralı
 **Hedef:** Boş bir projede tüm kalite zinciri (§12) yeşil; yerel
 `no-explanatory-comments` kuralı dahil.
 **Bağımlılık:** 0.1
