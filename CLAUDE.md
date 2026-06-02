@@ -160,7 +160,8 @@ src/
 │   └── vite-env.d.ts        ImportMetaEnv augmentation
 ├── plugins/                 Third-party library configuration
 │   ├── primereact.ts        PrimeReactProvider value + locale + FilterService.register('nfcContains') (§8)
-│   ├── theme.ts             Lara Green light/dark theme.css?url + applyTheme/setThemeMode over <link id="app-theme"> (§9)
+│   ├── theme.ts             Lara Green light/dark theme.css?url + core/icon CSS once + applyTheme/setThemeMode over <link id="app-theme"> (§9)
+│   ├── theme.lib.ts         Pure theme-swap logic (resolveThemeMode/applyThemeMode); no ?url, unit-tested under node:test
 │   ├── react-query.ts       QueryClient defaults (§10)
 │   ├── dayjs.ts             Day.js plugins + tr/en locale + setDayjsLocale (§8)
 │   ├── i18n.ts              react-i18next init + PrimeReact + Day.js bridge (§8)
@@ -227,7 +228,7 @@ src/
 
 Repo root: index.html (holds <link id="app-theme"> + pre-paint theme-mode script, §9),
 README.md, .env.example, .nvmrc, vercel.json,
-package.json, vite.config.ts, tsconfig.json, eslint.config.js, tailwind.config.ts,
+package.json, vite.config.ts, tsconfig.json (+ tsconfig.app/node/test.json; test.json = node-typed config for *.test.ts), eslint.config.js, tailwind.config.ts,
 postcss.config.js, stylelint.config.js, commitlint.config.js, .husky/,
 release-please-config.json, .release-please-manifest.json,
 tools/eslint/no-explanatory-comments.js (custom lint rule, §12),

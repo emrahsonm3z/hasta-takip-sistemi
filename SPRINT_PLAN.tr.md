@@ -77,7 +77,7 @@ düşürür; conventional olmayan bir commit mesajı hook tarafından reddedilir
 direktifler; geçersiz: düzyazı yorum, JSDoc bloğu).
 **DoD:** + global DoD. Commit `chore: add lint, format, commit, and custom comment-rule tooling`.
 
-### 0.3 ⬜ Plugins, config, tema bootstrap + provider'lar
+### 0.3 ✅ Plugins, config, tema bootstrap + provider'lar
 **Hedef:** Tüm üçüncü-parti kütüphaneler `src/plugins/`'te yapılandırılmış, env
 tipli ve doğrulanmış, tema resources path'inden beslenmiş, provider'lar doğru
 bootstrap sırasında mount edilmiş.

@@ -1,9 +1,19 @@
 <!doctype html>
-<html lang="en">
+<html lang="tr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Hasta Takip Sistemi</title>
+    <link id="app-theme" rel="stylesheet" />
+    <script>
+      try {
+        if (localStorage.getItem('theme-mode') === 'dark') {
+          document.documentElement.classList.add('dark')
+        }
+      } catch (error) {
+        void error
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -73,7 +73,7 @@ lint; a non-conventional commit message is rejected by the hook.
 invalid: prose comment, JSDoc block).
 **DoD:** + global DoD. Commit `chore: add lint, format, commit, and custom comment-rule tooling`.
 
-### 0.3 ⬜ Plugins, config, theme bootstrap + providers
+### 0.3 ✅ Plugins, config, theme bootstrap + providers
 **Goal:** All third-party libraries configured in `src/plugins/`, env typed and
 validated, theme fed from the resources path, providers mounted in the correct
 bootstrap order.

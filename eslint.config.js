@@ -87,6 +87,20 @@ export default tseslint.config(
   },
 
   {
+    files: ['src/**/*.{test,spec}.{ts,tsx}'],
+    languageOptions: {
+      parserOptions: {
+        projectService: false,
+        project: ['./tsconfig.test.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+    rules: {
+      '@typescript-eslint/no-floating-promises': 'off',
+    },
+  },
+
+  {
     files: [
       'src/**/*.{test,spec}.{ts,tsx}',
       'src/**/*.constants.{ts,tsx}',
