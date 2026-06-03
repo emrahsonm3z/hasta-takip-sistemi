@@ -202,6 +202,9 @@ src/
 │   ├── tr.json
 │   └── en.json
 ├── styles/                  SCSS (SMACSS) + token alias'ları (§9)
+│   ├── main.scss            Giriş: primeicons @import, @layer tw-base/primereact/tw-components/tw-utilities sırası + katmanlarda Tailwind (§9)
+│   ├── utils/_tokens.scss   v10 tema değişkenlerinin SCSS alias'ları (bileşen SCSS'i için)
+│   └── theme/_dark.scss     Her iki mod için özel app token'ları (:root + .dark) — ör. --app-background (FOUC) (§9)
 ├── types/
 │   ├── route.types.ts       AppRouteHandle { titleKey; title?(args) } (§6)
 │   └── i18n.types.ts        TranslationKey union (yalnız-anahtar tipleme) (§8)
@@ -587,7 +590,36 @@ Tailwind farkındalığına gerek kalmaz.
 
 ### Cascade ve SCSS yapısı
 
-CSS `@layer` sırası: `base, primereact, components, utilities`. SCSS klasörleri:
+CSS `@layer` sırası: `tw-base, primereact, tw-components, tw-utilities` (utilities
+kazanır; `tw-base` en düşük). Etkin öncelik: Tailwind utilities > bizim
+component'ler > PrimeReact teması > Tailwind preflight.
+
+**(a) `tw-` öneki neden.** Tailwind v3, `base` / `components` / `utilities` çıplak
+isimlerini KENDİ derleme-zamanı direktifleri olarak sahiplenir — `@tailwind base`'i
+native `@layer base {}` içine sarmak Tailwind'in sarmalayıcıyı tüketip KATMANSIZ CSS
+üretmesine yol açar (bu da temayı ezer). Native katmanlara önek vermek
+(`tw-base` / `tw-components` / `tw-utilities`) onları Tailwind'in dokunmadığı gerçek
+CSS cascade katmanları olarak korur. `primereact` aradaki tema katmanıdır.
+
+**(b) `index.html`'deki satır-içi `<style>@layer …;` çapası İLK kalmalı** (app-theme
+link'inden ve bundle CSS'inden önce). Katman sırasının yetkili bildirimidir: ham
+HTML'dir, bundler/minifier'ın (lightningcss) bundle içi `@layer` ifadesini yeniden
+yazmasına karşı bağışıktır ve tema çalışma-zamanında yüklenir (takaslanabilir
+`<link>`), bu yüzden sıra herhangi bir sayfa yüklenmeden önce kilitlenmelidir.
+Kaldırmayın/yeniden sıralamayın; isimleri `tw-*` katmanlarıyla eşleşmeli.
+
+**(c) `--app-background` özel bir token'dır** (`theme/_dark.scss`, `:root` + `.dark`):
+pre-paint FOUC betiği, tema `<link>`'i yüklenmeden ÖNCE doğru bir arka plana ihtiyaç
+duyar, dolayısıyla henüz yüklenmemiş Lara `--surface-*` değişkenlerine bağlı olamaz.
+Her iki mod için değer tutun; `html`'e `tw-base` içinde uygulanır.
+
+**(d) Ayrı PrimeReact core import'u yok.** `primereact/resources/primereact.min.css`
+10.9.8'de kullanımdan kaldırılmış ve BOŞtur; tüm bileşen CSS'i (yapısal + skin) temada
+gelir, zaten `@layer primereact` içinde sarılıdır. Yalnız tema yüklenir (takaslanabilir
+`?url` link); import veya taşınacak bir core stil sayfası yoktur.
+
+SCSS klasörleri (`utils/` + `theme/` + `main.scss` şu an var;
+`base/`/`layout/`/`modules/`/`state/` ilk kullanımda eklenir):
 
 ```
 src/styles/
@@ -595,9 +627,9 @@ src/styles/
 ├── layout/    l- önekli ana iskele
 ├── modules/   tekrar kullanılır bileşen stilleri
 ├── state/     is- önekli durum sınıfları
-├── theme/     koyu-mod custom token'ları (.dark altında)
+├── theme/     koyu-mod custom token'ları (.dark altında) — _dark.scss
 ├── utils/     _tokens.scss, mixin'ler, fonksiyonlar (çıktı yok)
-└── main.scss  SMACSS sırasında import eder
+└── main.scss  primeicons @import + @layer sırası + katmanlarda Tailwind
 ```
 
 ## 10. Durum ve Veri

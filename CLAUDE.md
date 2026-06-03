@@ -160,7 +160,7 @@ src/
 │   └── vite-env.d.ts        ImportMetaEnv augmentation
 ├── plugins/                 Third-party library configuration
 │   ├── primereact.ts        PrimeReactProvider value + locale + FilterService.register('nfcContains') (§8)
-│   ├── theme.ts             Lara Green light/dark theme.css?url + core/icon CSS once + applyTheme/setThemeMode over <link id="app-theme"> (§9)
+│   ├── theme.ts             Lara Green light/dark theme.css?url + applyTheme/setThemeMode over <link id="app-theme"> (§9; core deprecated/empty, icons via main.scss)
 │   ├── theme.lib.ts         Pure theme-swap logic (resolveThemeMode/applyThemeMode); no ?url, unit-tested under node:test
 │   ├── react-query.ts       QueryClient defaults (§10)
 │   ├── dayjs.ts             Day.js plugins + tr/en locale + setDayjsLocale (§8)
@@ -198,6 +198,9 @@ src/
 │   ├── tr.json
 │   └── en.json
 ├── styles/                  SCSS (SMACSS) + token aliases (§9)
+│   ├── main.scss            Entry: primeicons @import, @layer tw-base/primereact/tw-components/tw-utilities order + Tailwind-in-layers (§9)
+│   ├── utils/_tokens.scss   SCSS aliases of the v10 theme vars (for component SCSS)
+│   └── theme/_dark.scss     Custom app tokens for both modes (:root + .dark) — e.g. --app-background (FOUC) (§9)
 ├── types/
 │   ├── route.types.ts       AppRouteHandle { titleKey; title?(args) } (§6)
 │   └── i18n.types.ts        TranslationKey union (key-only typing) (§8)
@@ -579,7 +582,36 @@ Tailwind awareness.
 
 ### Cascade and SCSS structure
 
-CSS `@layer` order: `base, primereact, components, utilities`. SCSS folders:
+CSS `@layer` order: `tw-base, primereact, tw-components, tw-utilities` (utilities
+win; `tw-base` lowest). Effective precedence: Tailwind utilities > our components >
+PrimeReact theme > Tailwind preflight.
+
+**(a) Why the `tw-` prefix.** Tailwind v3 owns the bare names `base` / `components` /
+`utilities` as its OWN compile-time directives — wrapping `@tailwind base` in a
+native `@layer base {}` makes Tailwind consume the wrapper and emit UNLAYERED CSS
+(which would then beat the theme). Prefixing the native layers
+(`tw-base` / `tw-components` / `tw-utilities`) keeps them as real CSS cascade layers
+that Tailwind leaves intact. `primereact` is the theme's own layer, sitting between.
+
+**(b) The inline `<style>@layer …;` anchor in `index.html` MUST stay first** (before
+the `app-theme` link and the bundle CSS). It is the authoritative declaration of
+layer order: raw HTML, immune to the bundler/minifier (lightningcss) rewriting the
+in-bundle `@layer` statement, and the theme loads at runtime (the swappable
+`<link>`), so the order must be pre-locked before any sheet loads. Do NOT remove or
+reorder it; its names must match the `tw-*` layers.
+
+**(c) `--app-background` is a custom token** (`theme/_dark.scss`, `:root` + `.dark`):
+the pre-paint FOUC script needs a correct background BEFORE the theme `<link>`
+loads, so it cannot depend on the not-yet-loaded Lara `--surface-*` vars. Keep
+both-mode values; it is applied to `html` in `tw-base`.
+
+**(d) No separate PrimeReact core import.** `primereact/resources/primereact.min.css`
+is deprecated and EMPTY in 10.9.8; all component CSS (structural + skin) ships in
+the theme, already wrapped in `@layer primereact`. Only the theme is loaded (the
+swappable `?url` link); there is no core stylesheet to import or relocate.
+
+SCSS folders (`utils/` + `theme/` + `main.scss` exist now;
+`base/`/`layout/`/`modules/`/`state/` added when first used):
 
 ```
 src/styles/
@@ -587,9 +619,9 @@ src/styles/
 ├── layout/    l- prefixed major scaffolding
 ├── modules/   reusable component styles
 ├── state/     is- prefixed state classes
-├── theme/     dark-mode custom tokens (under .dark)
+├── theme/     dark-mode custom tokens (under .dark) — _dark.scss
 ├── utils/     _tokens.scss, mixins, functions (no output)
-└── main.scss  imports in SMACSS order
+└── main.scss  primeicons @import + @layer order + Tailwind-in-layers
 ```
 
 ## 10. State and Data

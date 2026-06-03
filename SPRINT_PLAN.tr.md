@@ -110,7 +110,7 @@ değiştirmek temayı flash olmadan çevirir; eksik `VITE_API_URL`,
 swap + class toggle (jsdom).
 **DoD:** + global DoD. Commit `feat: configure plugins, env, and theme bootstrap`.
 
-### 0.4 ⬜ Stil sistemi — token-destekli Tailwind + SCSS (SMACSS) + dark
+### 0.4 ✅ Stil sistemi — token-destekli Tailwind + SCSS (SMACSS) + dark
 **Hedef:** Tek token kaynağı (v10 tema değişkenleri) hem Tailwind hem SCSS
 tarafından tüketilir; custom token'lar iki mod için tanımlı; hiçbir yerde ham hex
 yok.

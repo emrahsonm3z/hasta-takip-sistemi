@@ -105,7 +105,7 @@ storage flips theme with no flash; missing `VITE_API_URL` shows
 href + toggles class (jsdom).
 **DoD:** + global DoD. Commit `feat: configure plugins, env, and theme bootstrap`.
 
-### 0.4 ⬜ Styling system — token-backed Tailwind + SCSS (SMACSS) + dark
+### 0.4 ✅ Styling system — token-backed Tailwind + SCSS (SMACSS) + dark
 **Goal:** One token source (the v10 theme variables) consumed by both Tailwind
 and SCSS; custom tokens defined for both modes; no raw hex anywhere.
 **Depends on:** 0.3

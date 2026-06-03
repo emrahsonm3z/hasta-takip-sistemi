@@ -1,5 +1,6 @@
 import '@/plugins/i18n'
 import '@/plugins/yup'
+import '@/styles/main.scss'
 
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'

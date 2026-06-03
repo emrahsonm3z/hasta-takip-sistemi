@@ -1,0 +1,19 @@
+@use 'theme/dark';
+@import 'primeicons/primeicons.css';
+@layer tw-base, primereact, tw-components, tw-utilities;
+
+@layer tw-base {
+  @tailwind base;
+
+  html {
+    background-color: var(--app-background);
+  }
+}
+
+@layer tw-components {
+  @tailwind components;
+}
+
+@layer tw-utilities {
+  @tailwind utilities;
+}

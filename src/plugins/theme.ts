@@ -1,6 +1,3 @@
-import 'primereact/resources/primereact.min.css'
-import 'primeicons/primeicons.css'
-
 import darkThemeUrl from 'primereact/resources/themes/lara-dark-green/theme.css?url'
 import lightThemeUrl from 'primereact/resources/themes/lara-light-green/theme.css?url'
 
