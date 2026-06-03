@@ -68,7 +68,9 @@ Sections: <CLAUDE.md §refs>   ·   Paths: <key paths touched>
 Next: <the current/next sub-item — specific enough to start without context>
 ```
 
-_(No active work in progress.)_
+### Active: 0.8 CI, release-please, Dependabot (workflow transition) · branch: feat/ci-release · status: in-progress
+Sections: §12 §14 §15 §1.1 §0.1   ·   Paths: .github/workflows/{ci,release}.yml, release-please-config.json, .release-please-manifest.json, .github/dependabot.yml, vercel.json, CLAUDE.md
+Next: sub-item 2 — release-please. FINAL: flip §15/§14/§0.1/§1.1 to PR/CI/rebase-merge flow + SPRINT 0.8 ✅ + delete Active Work; close via PR (not ff-merge)
 
 ## 1. Project Overview
 
