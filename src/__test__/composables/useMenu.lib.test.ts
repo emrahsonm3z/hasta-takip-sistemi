@@ -3,7 +3,7 @@ import test from 'node:test'
 
 import type { TranslationKey } from '@/types/i18n.types'
 
-import { buildMenu, type MenuSource } from './useMenu.lib.ts'
+import { buildMenu, type MenuSource } from '../../composables/useMenu.lib.ts'
 
 const sources: MenuSource[] = [
   {

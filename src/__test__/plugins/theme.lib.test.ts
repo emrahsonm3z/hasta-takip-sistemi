@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { applyThemeMode, resolveThemeMode, THEME_STORAGE_KEY } from './theme.lib.ts'
+import {
+  applyThemeMode,
+  resolveThemeMode,
+  THEME_STORAGE_KEY,
+} from '../../plugins/theme.lib.ts'
 
 test('resolveThemeMode returns dark only for the dark value, light otherwise', () => {
   assert.equal(resolveThemeMode('dark'), 'dark')

@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import en from './en.json' with { type: 'json' }
-import tr from './tr.json' with { type: 'json' }
+import en from '../../locales/en.json' with { type: 'json' }
+import tr from '../../locales/tr.json' with { type: 'json' }
 
 function keyPaths(value: unknown, prefix = ''): string[] {
   if (value !== null && typeof value === 'object') {

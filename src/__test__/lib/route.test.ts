@@ -3,7 +3,7 @@ import test from 'node:test'
 
 import type { UIMatch } from 'react-router-dom'
 
-import { getRouteHandle } from './route.ts'
+import { getRouteHandle } from '../../lib/route.ts'
 
 const matchWith = (handle: unknown): UIMatch =>
   ({ id: 'x', pathname: '/', params: {}, data: undefined, handle }) as unknown as UIMatch

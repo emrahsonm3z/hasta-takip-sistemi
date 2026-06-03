@@ -68,7 +68,9 @@ Sections: <CLAUDE.md §refs>   ·   Paths: <key paths touched>
 Next: <the current/next sub-item — specific enough to start without context>
 ```
 
-_(No active work in progress.)_
+### Active: consolidate tests under src/__test__/ (refactor, no SPRINT task) · branch: refactor/consolidate-tests · status: in-progress
+Sections: §3 §11 §15   ·   Paths: src/__test__/, CLAUDE.md (§3/§11/§13.2/§17)
+Next: commit 2 — doc-sync test-location references (§3/§11/§13.2/§17 + tr); delete this item
 
 ## 1. Project Overview
 
