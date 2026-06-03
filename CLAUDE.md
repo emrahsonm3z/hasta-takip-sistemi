@@ -68,7 +68,9 @@ Sections: <CLAUDE.md §refs>   ·   Paths: <key paths touched>
 Next: <the current/next sub-item — specific enough to start without context>
 ```
 
-_(No active work in progress.)_
+### Active: 0.7 Global components (error surfaces, notify, loading, Form*, AppDataTable) · branch: feat/global-components · status: in-progress
+Sections: §3.1 §7 §8 §9 §10 §16 §15   ·   Paths: src/components/, src/components/form/, src/composables/useNotify*, src/lib/{text,date,pickLocalized}.ts, main.tsx
+Next: sub-item 2 — error surfaces (ErrorState, FatalError, AppErrorBoundary, full RouteErrorBoundary) + dev demo route
 
 ## 1. Project Overview
 

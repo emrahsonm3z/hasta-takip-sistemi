@@ -1,6 +1,8 @@
 import type { APIOptions } from 'primereact/api'
 import { addLocale, FilterService, locale } from 'primereact/api'
 
+import { turkishIncludes } from '@/lib/text'
+
 export const NFC_CONTAINS = 'nfcContains'
 
 const TR_LOCALE = {
@@ -18,8 +20,12 @@ const TR_LOCALE = {
 
 addLocale('tr', TR_LOCALE)
 
-function normalizeTurkish(value: unknown): string {
-  return String(value).normalize('NFC').toLocaleLowerCase('tr')
+function cellText(input: unknown): string {
+  return typeof input === 'string' ||
+    typeof input === 'number' ||
+    typeof input === 'boolean'
+    ? String(input)
+    : ''
 }
 
 FilterService.register(NFC_CONTAINS, (value: unknown, filter: unknown): boolean => {
@@ -29,7 +35,7 @@ FilterService.register(NFC_CONTAINS, (value: unknown, filter: unknown): boolean 
   if (value === undefined || value === null) {
     return false
   }
-  return normalizeTurkish(value).includes(normalizeTurkish(filter))
+  return turkishIncludes(cellText(value), cellText(filter))
 })
 
 export function setPrimeReactLocale(language: string): void {
