@@ -53,12 +53,12 @@ better suggestion, surface it before implementing. Otherwise proceed."
 The single "where are we" pointer — ONE active TOPIC at a time (≈ a SPRINT_PLAN
 task; a branch = a topic, §15). It answers what is in progress and where, at a
 glance, including the current sub-item (the `Next` line). The detailed trace lives
-in the topic's per-sub-item commits (and, once PRs are enabled in 0.8, the PR
-description — the contract, §15), NOT here — so this stays small and the rules file
-does not churn or cause merge conflicts. Created when an audit is approved; the
-`Next` line and `status` are updated as sub-items land; the whole item is DELETED in
-the topic's final commit when the topic is done. The permanent trace is
-`SPRINT_PLAN.md`.
+in the topic's per-sub-item commits and the PR description (the contract, §15),
+NOT here — so this stays small and the rules file does not churn or cause merge
+conflicts. Created when an audit is approved; the `Next` line and `status` are
+updated as sub-items land; the whole item is DELETED in the topic's final authored
+commit (the last commit before the Rebase and merge, §15) — there is no post-merge
+commit in which to remove it. The permanent trace is `SPRINT_PLAN.md`.
 
 **Format**:
 
@@ -68,9 +68,7 @@ Sections: <CLAUDE.md §refs>   ·   Paths: <key paths touched>
 Next: <the current/next sub-item — specific enough to start without context>
 ```
 
-### Active: 0.8 CI, release-please, Dependabot (workflow transition) · branch: feat/ci-release · status: in-progress
-Sections: §12 §14 §15 §1.1 §0.1   ·   Paths: .github/workflows/{ci,release}.yml, release-please-config.json, .release-please-manifest.json, .github/dependabot.yml, vercel.json, CLAUDE.md
-Next: sub-item 2 — release-please. FINAL: flip §15/§14/§0.1/§1.1 to PR/CI/rebase-merge flow + SPRINT 0.8 ✅ + delete Active Work; close via PR (not ff-merge)
+_(No active work in progress.)_
 
 ## 1. Project Overview
 
@@ -111,9 +109,13 @@ Data source (GET, read-only, one-time seed):
 - Docs-rendering deps: `react-markdown` (^9), `remark-gfm` (^4),
   `@tailwindcss/typography` (^0.5) — the last is wired into the Tailwind config
   `plugins` (§9).
-- Dependabot (`.github/dependabot.yml`) **ignores major updates** for
-  `primereact`, `tailwindcss`, `react`, and `react-dom` so versions never drift;
-  minor / patch are grouped and still go through PR + CI + review (§15).
+- Dependabot (`.github/dependabot.yml`, where this is ENFORCED) **ignores ALL
+  update types** for the five exact-pinned criticals — `react`, `react-dom`,
+  `primereact`, `primeicons`, `tailwindcss` — so they never drift, and **ignores
+  `eslint` major** (eslint v10 would break `eslint-plugin-jsx-a11y`, which caps at
+  eslint 9). Every other dependency's minor / patch updates are grouped into one
+  weekly PR that still goes through CI + review (§15); security exposure is covered
+  by the `npm audit --audit-level=high` gate.
 
 ## 2. Architecture
 
@@ -875,14 +877,18 @@ hand-edited into feature branches, so concurrent work never conflicts on it.
   history (commitlint, §12) is therefore also the release source. Every reviewed
   sub-commit is **preserved** on `main` (not squashed — §15 Merge strategy), so
   release-please reads each Conventional type.
-- **Release flow**: merging a topic branch to `main` — preserving its sub-commits
-  (ff-merge now; **Rebase and merge** from 0.8, §15) — deploys the code (Vercel,
-  from 0.8) immediately; the version is unchanged. The release-please GitHub Action
+- **Release flow** (live): merging a topic branch to `main` — preserving its
+  sub-commits (**Rebase and merge** on GitHub, §15) — deploys the code (Vercel)
+  immediately; the version is unchanged. The release-please GitHub Action
   (`.github/workflows/release.yml`, config in `release-please-config.json` +
   `.release-please-manifest.json`) opens/updates a single **Release PR** that
-  bumps the version and regenerates `CHANGELOG.md` from the commits since the
-  last release. Merging THAT PR performs the version bump + git tag. The app is
-  private — there is **no npm publish**. Detail: `docs/en/VERSIONING.md`.
+  bumps the version and regenerates `CHANGELOG.md` from the commits since the last
+  release. That Release PR is opened by the `GITHUB_TOKEN`, so it does **not**
+  trigger the `gate` check (GitHub anti-recursion: a token-opened PR cannot start
+  Actions). Because branch protection keeps administrators exempt (§15), the owner
+  merges this mechanical version + `CHANGELOG` PR directly, without the check.
+  Merging it performs the version bump + git tag. The app is private — there is
+  **no npm publish**. Detail: `docs/en/VERSIONING.md`.
 
 ## 15. Workflow
 
@@ -920,19 +926,16 @@ carry acceptance criteria.
 3. **docs:sync in the topic's final commit** — docs (both languages, §13.3) +
    `SPRINT_PLAN.md` ✅ + the Active Work deletion ride in the topic's LAST commit (or
    their own `docs:` / `chore:` commit), with a Conventional message (§14).
-4. **Finish the topic.** *Target (from 0.8):* **push** the branch → **open a PR; the
-   PR description is the contract** (audit plan + what was done + test notes + docs
-   touched + acceptance criteria + linked backlog item). *Interim (bootstrapping,
-   pre-0.8):* there is no remote PR/CI gate — run the FULL gates locally
-   (`validate` + tests + `build` + `npm audit --audit-level=high`) in this final
-   step, then ff-merge to `main` (Merge strategy below) on the owner's approval.
+4. **Finish the topic.** **Push** the branch → **open a PR; the PR description is
+   the contract** (audit plan + what was done + test notes + docs touched +
+   acceptance criteria + linked backlog item). CI's `gate` job runs on the PR and
+   must be green before review (Automated gate + Merge strategy below).
 
 ### Automated gate (CI)
 
-*Target (from 0.8):* on every PR, CI runs `validate` + tests + `build` +
-`npm audit --audit-level=high`; **a PR cannot merge unless CI is green** (required
-status check). Humans then review substance. *Interim (pre-0.8):* the same gates run
-LOCALLY as the topic's final step (Developer step 4); there is no remote check yet.
+On every PR, CI runs the `gate` job (`validate` + tests + `build` +
+`npm audit --audit-level=high`; `.github/workflows/ci.yml`); **a PR cannot merge
+unless `gate` is green** (required status check). Humans then review substance.
 
 ### Manager (the owner)
 
@@ -940,32 +943,34 @@ LOCALLY as the topic's final step (Developer step 4); there is no remote check y
    topic's sub-commits — *target:* on the PR with CI green; *interim:* on the local
    branch/commits. Issues → back to the developer.
 6. **Merge to `main`** preserving the sub-commits (Merge strategy below) →
-   *(from 0.8)* production deploy (Vercel) + release-please opens/updates the Release
-   PR (§14).
+   production deploy (Vercel) + release-please opens/updates the Release PR (§14).
 
 ### Merge strategy
 
 Merges **PRESERVE the reviewed sub-commits linearly on `main` — no squash.** Each
 sub-commit is atomic, reviewed, and Conventional, and release-please reads each type
-(§14), so squashing would drop release signal. *Interim (pre-0.8):*
-`git merge --ff-only <branch>` locally → `git push` → delete the branch.
-*Target (from 0.8):* **Rebase and merge** on GitHub (never "Squash and merge").
+(§14), so squashing would drop release signal. Close a topic with **Rebase and
+merge** on GitHub (never "Squash and merge", never a merge commit), then delete the
+branch and `git checkout main && git pull`.
 
 ### Branch protection
 
-`main` protection (required status checks + required PR) comes online in **0.8** with
-CI. Until then it is OFF and the developer ff-merges directly after the local gates.
-Solo note: GitHub does not let you approve your own PR, so once PRs are enabled use
-required status checks (CI green) as the gate; enable required approvals (1+) when a
-teammate joins. Rollback *(from 0.8)*: Vercel instant rollback to a previous
-deployment; urgent fix via `fix/*`, same flow expedited.
+`main` protection is **ON**, applied by the owner in repository settings:
+require a pull request before merging; require the `gate` status check to pass;
+require linear history (so only **Rebase and merge** is possible — no merge
+commits, no squash); block force-pushes and branch deletion. **Do NOT enable "Do
+not allow bypassing the above settings"** — administrators stay exempt so the
+owner can merge the release-please Release PR, which (opened by `GITHUB_TOKEN`)
+never runs the `gate` check (§14). Solo note: GitHub does not let you approve your
+own PR, so the gate is the required `gate` status check (CI green); enable required
+approvals (1+) when a teammate joins. Rollback: Vercel instant rollback to a
+previous deployment; urgent fix via `fix/*`, same flow expedited.
 
 ### Fast path
 
 Trivial, low-risk changes (incl. Dependabot bumps) skip the formal audit / Active
 Work ceremony (implement → self-review → Conventional commit) — but the gates are
-never skipped: local gates + ff-merge now; PR + CI + the owner's merge from 0.8. Only
-the audit is lightened.
+never skipped: PR + CI `gate` + the owner's merge. Only the audit is lightened.
 
 ### Git conventions
 
@@ -973,7 +978,7 @@ Branches `feat/*`, `fix/*`, `chore/*` (also `docs/*`, `refactor/*`, `test/*`) �
 topic per branch, carrying MULTIPLE Conventional Commits (`type(scope): subject`),
 one per reviewed sub-item, enforced by commitlint (§12) and consumed by release-please
 (§14). Push is manual. Merges preserve the sub-commits (Merge strategy above):
-`git merge --ff-only` now, **Rebase and merge** from 0.8 — never squash.
+**Rebase and merge** on GitHub — never squash, never a merge commit.
 
 Every prompt ends with: "If you see an issue, ambiguity, or a better suggestion,
 surface it before implementing. Otherwise proceed." Gate failures loop back: a

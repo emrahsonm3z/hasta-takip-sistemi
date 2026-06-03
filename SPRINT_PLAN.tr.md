@@ -212,7 +212,7 @@ geçersiz ISO → `''`; `pickLocalized` fallback'leri; `AppDataTable` Türkçe f
 eşleşmesi.
 **DoD:** + global DoD. Commit `feat: add global components, form fields, and error surfaces`.
 
-### 0.8 ⬜ CI, release-please, Dependabot, deploy config
+### 0.8 ✅ CI, release-please, Dependabot, deploy config
 **Hedef:** Otomatik kapı + release otomasyonu + bağımlılık hijyeni + Vercel'de SPA
 routing (§14, §15).
 **Bağımlılık:** 0.2
@@ -222,10 +222,12 @@ routing (§14, §15).
 - `.github/workflows/release.yml`: release-please action;
   `release-please-config.json` + `.release-please-manifest.json` (version `0.0.0`
   başlangıç, `release-type: node`, **publish yok** — private).
-- `.github/dependabot.yml`: npm ecosystem, minor/patch grupla, `primereact`,
-  `tailwindcss`, `react`, `react-dom` için **major ignore** (§1.1).
-- `vercel.json`: SPA rewrite (hepsi → `/index.html`); branch-protection kurulumunu
-  WORKFLOW'da belgele (solo: required checks + manuel merge).
+- `.github/dependabot.yml`: npm ecosystem, minor/patch grupla, beş tam pin
+  `react`, `react-dom`, `primereact`, `primeicons`, `tailwindcss` için **TÜM
+  güncelleme türlerini ignore** + **`eslint` major ignore** (§1.1).
+- `vercel.json`: SPA rewrite (hepsi → `/index.html`); branch koruması §15'te
+  belgeli (sahip uygular: PR + `gate` check + lineer geçmiş zorunlu; release-please
+  PR'ı için yöneticiler muaf).
 **Dosyalar:** `.github/workflows/ci.yml`, `.github/workflows/release.yml`,
 `release-please-config.json`, `.release-please-manifest.json`,
 `.github/dependabot.yml`, `vercel.json`.
