@@ -183,7 +183,7 @@ route'u izler.
 registry ile render).
 **DoD:** + global DoD. Commit `feat: add router, app layout, menu, and dynamic title`.
 
-### 0.7 ⬜ Global bileşenler (wrapper'lar, formlar, hata yüzeyleri, notify)
+### 0.7 ✅ Global bileşenler (wrapper'lar, formlar, hata yüzeyleri, notify)
 **Hedef:** §3.1'deki her tekrar kullanılır yapı taşı var olur ki özellik kodu
 asla ham PrimeReact'e dokunmaz.
 **Bağımlılık:** 0.3, 0.5, 0.6
@@ -400,6 +400,10 @@ tablo header ARIA, `<html lang>` senkronunu doğrula; iki temayı WCAG AA kontra
 için kontrol et; responsive akıl-sağlığı kontrolü; §17'ye karşı son self-review;
 ilk sürümü etiketlemek için release-please Release PR'ını merge et.
 **Dosyalar:** gerektikçe bileşenlerde küçük düzeltmeler.
+**Ertelenen UI rötuşu (0.6/0.7'den taşındı):** 404 sayfası metni/ifadesi;
+`AppThemeToggle` ikon yönü (sun-vs-moon konvansiyonu); switcher/ikon-buton
+`aria-label` ifade geçişi; `FormCheckbox` label-yanında düzeni (şu an diğer Form\*
+wrapper'ları gibi label-üstte).
 **Kabul:** jsx-a11y temiz; yalnız-klavye add/edit/delete çalışır; iki tema da
 kontrast geçer; §17 kontrol listesi karşılanır; ilk sürüm üretilmiş CHANGELOG ile
 etiketlenir.

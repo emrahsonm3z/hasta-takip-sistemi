@@ -68,9 +68,7 @@ Sections: <CLAUDE.md §refs>   ·   Paths: <key paths touched>
 Next: <the current/next sub-item — specific enough to start without context>
 ```
 
-### Active: 0.7 Global components (error surfaces, notify, loading, Form*, AppDataTable) · branch: feat/global-components · status: in-progress
-Sections: §3.1 §7 §8 §9 §10 §16 §15   ·   Paths: src/components/, src/components/form/, src/composables/useNotify*, src/lib/{text,date,pickLocalized}.ts, main.tsx
-Next: sub-item 6 — AppDataTable. FINAL(7): docs:sync (SPRINT 0.7 ✅; §8 note: ALL Yup messages incl custom .test() go via message() → TranslationKey-typed+reactive, resolveValidationMessage raw-fallback = graceful degradation not a skip; §3/§7/§10) + 2.3 polish note (404 wording, theme-icon dir, switcher aria-labels, FormCheckbox label-beside); REMOVE dev demo (/dev route+devRoutes, _dev import, _dev eslint override, DevDemoPage); delete Active Work
+_(No active work in progress.)_
 
 ## 1. Project Overview
 
@@ -176,8 +174,10 @@ src/
 ├── router/
 │   └── index.tsx            createBrowserRouter: AppLayout + errorElement + index redirect + module routes + 404 (§6)
 ├── components/              Global UI (App* wrappers + shells) — §3.1
-│   ├── AppDataTable.tsx     DataTable wrapper (native sort/filter/search, Turkish-aware)
+│   ├── AppDataTable.tsx     DataTable wrapper (toolbar slot + search + clear-filters, Turkish sort/filter, two-mode loading, responsive paginator) (§3.1)
+│   ├── AppDataTable.lib.ts  pure buildInitialFilters(globalMatchMode, defaults, includeGlobal) (unit-tested)
 │   ├── AppToastProvider.tsx Mounts PrimeReact <Toast/>; backs useNotify (§3.1)
+│   ├── toast-context.ts     ToastContext (split out so AppToastProvider stays fast-refresh-clean)
 │   ├── Loading.tsx          Lazy-route fallback
 │   ├── ErrorState.tsx       In-page expected-data error + retry (§3.1)
 │   ├── ConfigErrorScreen.tsx Missing-env screen (dev: names; prod: i18n) (§3 config)
@@ -188,6 +188,8 @@ src/
 │   ├── form/                Formik↔PrimeReact field wrappers (§3.1)
 │   │   ├── FormInputText.tsx  FormDropdown.tsx  FormCalendar.tsx
 │   │   ├── FormInputNumber.tsx  FormCheckbox.tsx  FormChips.tsx
+│   │   ├── FormField.tsx       Shared shell: i18n label + Yup error via resolveValidationMessage
+│   │   └── validation.ts       resolveValidationMessage(raw, t) — parse {key,values} → t() (unit-tested)
 │   └── layout/              App* layout shell (§6)
 │       ├── AppLayout.tsx      <Outlet/> + <ScrollRestoration/> + title from route handle
 │       ├── AppSidebar.tsx     renders useMenu() (§6)
@@ -197,7 +199,9 @@ src/
 ├── composables/
 │   ├── useMenu.ts           single menu source: module route constants + docs registry (§6)
 │   ├── useMenu.lib.ts       pure buildMenu(sources, translate) — sort + label (unit-tested)
-│   └── useNotify.ts         success / error / info toasts; key-only API; error normalisation (§3.1)
+│   ├── useNotify.ts         success / error / info toasts; key-only TranslationKey API (§3.1)
+│   ├── useNotify.lib.ts     pure normalizeErrorKey(error) → TranslationKey (unit-tested)
+│   └── useMediaQuery.ts     matchMedia hook (responsive paginator template, §16)
 ├── lib/                     Global pure helpers
 │   ├── text.ts              NFC + toLocaleLowerCase('tr'); Intl.Collator('tr') (§8)
 │   ├── date.ts              formatDate(value, pattern) via Day.js (§8)
@@ -260,26 +264,36 @@ it never re-implements them.
 
 **Components** (`src/components`):
 
-- `AppDataTable` — the only table. Wraps PrimeReact DataTable with native
-  sort / filter / search; Turkish-aware (global filter + text filters use a
-  registered `nfcContains`; sorting uses `Intl.Collator('tr', { numeric: true })`);
-  `emptyMessage` from an i18n key. Not its job: data fetching, page errors,
-  toolbars. Core props: `data`, `loading`, `dataKey`, `rows`,
-  `rowsPerPageOptions`, `paginator`, `globalFilterFields`, `showSearchBox`,
-  `clearButton`, `emptyMessageKey`, `filterDisplay`, `filters`, `onFilter`,
-  `sortField`, `sortOrder`, `onSort`, `children` (columns). Sort/filter may be
-  uncontrolled (built-in) or controlled via the paired props — pick one mode per
-  table; detail in COMPONENTS.md.
+- `AppDataTable` — the only table. Wraps PrimeReact DataTable; Turkish-aware
+  (global + column filters via the registered `nfcContains`; Turkish-collator
+  column sort via `compareTurkish`). Header = a `toolbar` action slot + global
+  search box + clear-filters button (resets search + column filters). Per-column
+  filters via `filterDisplay` + `defaultFilters` (filter state managed internally).
+  Two-mode loading (initial / empty → the `Loading` component; background refetch →
+  DataTable overlay). Responsive paginator (`useMediaQuery` mobile/desktop template)
+  with a `{first} - {last} / {total}` report. `emptyMessageKey` → `t()`. Props:
+  `data`, `children` (columns), `dataKey`, `loading`, `toolbar`, `showSearchBox`,
+  `globalFilterFields`, `filterDisplay`, `defaultFilters`, controlled sort
+  (`sortField` / `sortOrder` / `onSort`), `paginator`, `rows`, `rowsPerPageOptions`,
+  `rowClass` / `rowHover` / `stripedRows`, `emptyMessageKey`. Not its job: data
+  fetching, page errors. No selection / expansion / grouping; rowClick is a 1.2
+  decision. `buildInitialFilters` is the unit-tested pure core. (Final responsive
+  prop + patient columns land in 1.2.)
 - `AppToastProvider` — mounts the single PrimeReact `<Toast/>`; backs `useNotify`.
 - `Loading` — lazy-route Suspense fallback (no skeletons).
 - `ErrorState` — in-page expected-data error with `onRetry` (distinct from the
   error boundaries, which catch unexpected bugs).
-- `RouteErrorBoundary` — React Router `errorElement` (`useRouteError`).
-- `AppErrorBoundary` — small class boundary above `RouterProvider` → `FatalError`.
-- `FatalError`, `ConfigErrorScreen` — fallback screens. `ConfigErrorScreen`
-  renders after i18n init but before providers, using the react-i18next
-  singleton directly (dev shows the missing var names; prod shows an i18n
-  message).
+- `RouteErrorBoundary` — React Router `errorElement` (`useRouteError`);
+  `isRouteErrorResponse` 404 → `errors.notFound`, else `errors.unexpected`, with a
+  home link (dev shows the error message).
+- `AppErrorBoundary` — class boundary mounted **outermost** (just inside
+  `StrictMode`, wrapping the providers) → `FatalError`; catches render crashes
+  anywhere below.
+- `FatalError`, `ConfigErrorScreen` — fallback screens that BOTH use the
+  react-i18next **singleton** (`i18n.t`) + plain JSX (no PrimeReact, no hook) so
+  they survive a crashed or pre-provider tree. `FatalError` = the AppErrorBoundary
+  last-resort (reload button); `ConfigErrorScreen` = pre-providers env failure (dev:
+  var names; prod: i18n message).
 - `form/Form*` — Formik↔PrimeReact field wrappers (`FormInputText`,
   `FormDropdown`, `FormCalendar`, `FormInputNumber`, `FormCheckbox`,
   `FormChips`); i18n label + error display built in.
@@ -290,7 +304,9 @@ it never re-implements them.
 each module's route constants via barrels + the docs registry, sorts by
 `menuOrder`, resolves labels via `t(titleKey)`; `AppSidebar` only renders it);
 `useNotify` (success/error/info; accepts ONLY a `TranslationKey` — a literal is a
-compile error, §8; normalises unknown errors to `errors.unexpected`).
+compile error, §8; the pure `normalizeErrorKey` in `useNotify.lib` maps unknown
+errors to `errors.unexpected`); `useMediaQuery` (matchMedia hook for responsive UI,
+e.g. AppDataTable's paginator).
 
 **Lib** (`src/lib`): `text` (Turkish normalise + collator), `date`
 (`formatDate`), `pickLocalized`, `route` (`getRouteHandle`).
@@ -437,9 +453,16 @@ and always visible in review.
   `callees` excluding `t` / `i18n.t` / `clsx` / `cn`; disabled in test and
   constants files (§12). (b) The lint blind spots — toast and validation
   strings — are closed by TYPING, not review: `useNotify` accepts only a
-  `TranslationKey` (`types/i18n.types.ts`), and Yup messages are `setLocale` keys
-  written as `'…' satisfies TranslationKey` (`plugins/yup.ts`); a raw literal in
-  either place is a compile error.
+  `TranslationKey` (`types/i18n.types.ts`), and Yup messages go through the
+  `message(key, values)` helper (`plugins/yup.ts`) that serializes `{ key, values }`
+  with the key typed `TranslationKey`; a raw literal in either place is a compile
+  error.
+- **All Yup messages go through `message()`.** Every `setLocale` entry AND any
+  custom `.test()` / inline schema message must use `message(key, values)` so it
+  stays `TranslationKey`-typed and language-reactive; `FormField` resolves them at
+  render via `resolveValidationMessage` → `t(key, values)` (interpolating
+  `{{min}}`/`{{max}}`). `resolveValidationMessage`'s raw-string fallback is graceful
+  degradation, NOT a license to pass a bare literal.
 - **Key typing (`types/i18n.types.ts`).** `TranslationKey` is the leaf dot-path
   union derived (a recursive `DotPaths`) from the EN locale shape (`typeof`
   `en.json`, via `resolveJsonModule`). The same shape augments i18next's

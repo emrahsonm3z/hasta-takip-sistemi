@@ -173,7 +173,7 @@ data router aggregating (empty) module routes, and title resolution.
 (render with a stubbed registry).
 **DoD:** + global DoD. Commit `feat: add router, app layout, menu, and dynamic title`.
 
-### 0.7 ⬜ Global components (wrappers, forms, error surfaces, notify)
+### 0.7 ✅ Global components (wrappers, forms, error surfaces, notify)
 **Goal:** Every reusable building block from §3.1 exists so feature code never
 touches raw PrimeReact.
 **Depends on:** 0.3, 0.5, 0.6
@@ -385,6 +385,10 @@ table header ARIA, `<html lang>` sync; check both themes for WCAG AA contrast;
 responsive sanity check; final self-review against §17; merge the
 release-please Release PR to tag the first version.
 **Files:** small fixes across components as needed.
+**Deferred UI polish (carried from 0.6/0.7):** 404 page copy/wording;
+`AppThemeToggle` icon direction (sun-vs-moon convention); switcher/icon-button
+`aria-label` phrasing pass; `FormCheckbox` label-beside layout (currently
+label-above like the other Form\* wrappers).
 **Acceptance:** jsx-a11y clean; keyboard-only add/edit/delete works; both themes
 pass contrast; §17 checklist satisfied; first version tagged with a generated
 CHANGELOG.

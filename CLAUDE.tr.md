@@ -177,8 +177,10 @@ src/
 ├── router/
 │   └── index.tsx            createBrowserRouter: AppLayout + errorElement + index redirect + modül route'ları + 404 (§6)
 ├── components/              Global UI (App* wrapper'lar + kabuklar) — §3.1
-│   ├── AppDataTable.tsx     DataTable wrapper (native sort/filter/search, Türkçe-duyarlı)
+│   ├── AppDataTable.tsx     DataTable wrapper (toolbar slot + arama + filtre-temizle, Türkçe sort/filter, iki-mod loading, responsive paginator) (§3.1)
+│   ├── AppDataTable.lib.ts  saf buildInitialFilters(globalMatchMode, defaults, includeGlobal) (unit-test'li)
 │   ├── AppToastProvider.tsx Tek PrimeReact <Toast/>'u mount eder; useNotify'ı besler (§3.1)
+│   ├── toast-context.ts     ToastContext (AppToastProvider fast-refresh-temiz kalsın diye ayrıldı)
 │   ├── Loading.tsx          Lazy-route fallback
 │   ├── ErrorState.tsx       Sayfa-içi beklenen-veri hatası + retry (§3.1)
 │   ├── ConfigErrorScreen.tsx Eksik-env ekranı (dev: adlar; prod: i18n) (§3 config)
@@ -189,6 +191,8 @@ src/
 │   ├── form/                Formik↔PrimeReact alan wrapper'ları (§3.1)
 │   │   ├── FormInputText.tsx  FormDropdown.tsx  FormCalendar.tsx
 │   │   ├── FormInputNumber.tsx  FormCheckbox.tsx  FormChips.tsx
+│   │   ├── FormField.tsx       Paylaşılan kabuk: i18n label + resolveValidationMessage ile Yup hatası
+│   │   └── validation.ts       resolveValidationMessage(raw, t) — {key,values} parse → t() (unit-test'li)
 │   └── layout/              App* layout kabuğu (§6)
 │       ├── AppLayout.tsx      <Outlet/> + <ScrollRestoration/> + route handle'dan başlık
 │       ├── AppSidebar.tsx     useMenu()'yu render eder (§6)
@@ -198,7 +202,9 @@ src/
 ├── composables/
 │   ├── useMenu.ts           tek menü kaynağı: modül route constant'ları + docs registry (§6)
 │   ├── useMenu.lib.ts       saf buildMenu(sources, translate) — sırala + etiketle (unit-test'li)
-│   └── useNotify.ts         success / error / info toast; yalnız-anahtar API; hata normalizasyonu (§3.1)
+│   ├── useNotify.ts         success / error / info toast; yalnız-anahtar TranslationKey API (§3.1)
+│   ├── useNotify.lib.ts     saf normalizeErrorKey(error) → TranslationKey (unit-test'li)
+│   └── useMediaQuery.ts     matchMedia hook'u (responsive paginator template, §16)
 ├── lib/                     Global saf yardımcılar
 │   ├── text.ts              NFC + toLocaleLowerCase('tr'); Intl.Collator('tr') (§8)
 │   ├── date.ts              formatDate(value, pattern) Day.js ile (§8)
@@ -261,26 +267,34 @@ referans verir; asla yeniden uygulamaz.
 
 **Components** (`src/components`):
 
-- `AppDataTable` — tek tablo. PrimeReact DataTable'ı native sort / filter /
-  search ile sarar; Türkçe-duyarlı (global arama + metin filtreleri kayıtlı bir
-  `nfcContains` kullanır; sıralama `Intl.Collator('tr', { numeric: true })`
-  kullanır); `emptyMessage` bir i18n anahtarından. Görevi DEĞİL: veri çekme,
-  sayfa hataları, toolbar'lar. Temel prop'lar: `data`, `loading`, `dataKey`,
-  `rows`, `rowsPerPageOptions`, `paginator`, `globalFilterFields`,
-  `showSearchBox`, `clearButton`, `emptyMessageKey`, `filterDisplay`, `filters`,
-  `onFilter`, `sortField`, `sortOrder`, `onSort`, `children` (kolonlar).
-  Sort/filter ya uncontrolled (built-in) ya da eşli prop'larla controlled olur —
-  tablo başına tek mod seç; detay COMPONENTS.md.
+- `AppDataTable` — tek tablo. PrimeReact DataTable'ı sarar; Türkçe-duyarlı (global
+  + kolon filtreleri kayıtlı `nfcContains` ile; Türkçe-collator kolon sıralaması
+  `compareTurkish` ile). Header = bir `toolbar` aksiyon slotu + global arama kutusu
+  + filtre-temizle butonu (arama + kolon filtrelerini sıfırlar). Kolon filtreleri
+  `filterDisplay` + `defaultFilters` ile (filtre state'i içeride yönetilir). İki-mod
+  loading (ilk/boş → `Loading` bileşeni; arka plan refetch → DataTable overlay).
+  Responsive paginator (`useMediaQuery` mobil/masaüstü template) + `{first} - {last}
+  / {total}` raporu. `emptyMessageKey` → `t()`. Prop'lar: `data`, `children`
+  (kolonlar), `dataKey`, `loading`, `toolbar`, `showSearchBox`, `globalFilterFields`,
+  `filterDisplay`, `defaultFilters`, controlled sort (`sortField` / `sortOrder` /
+  `onSort`), `paginator`, `rows`, `rowsPerPageOptions`, `rowClass` / `rowHover` /
+  `stripedRows`, `emptyMessageKey`. Görevi DEĞİL: veri çekme, sayfa hataları.
+  Selection / expansion / grouping yok; rowClick 1.2 kararı. `buildInitialFilters`
+  unit-test'li saf çekirdektir. (Kesin responsive prop + hasta kolonları 1.2'de.)
 - `AppToastProvider` — tek PrimeReact `<Toast/>`'u mount eder; `useNotify`'ı besler.
 - `Loading` — lazy-route Suspense fallback (skeleton yok).
 - `ErrorState` — sayfa-içi beklenen-veri hatası + `onRetry` (beklenmeyen
   bug'ları yakalayan error boundary'lerden ayrıdır).
-- `RouteErrorBoundary` — React Router `errorElement` (`useRouteError`).
-- `AppErrorBoundary` — `RouterProvider` üstünde küçük class boundary → `FatalError`.
-- `FatalError`, `ConfigErrorScreen` — fallback ekranları. `ConfigErrorScreen`
-  i18n init'inden sonra ama provider'lardan önce, react-i18next singleton'ını
-  doğrudan kullanarak render olur (dev eksik değişken adlarını gösterir; prod bir
-  i18n mesajı gösterir).
+- `RouteErrorBoundary` — React Router `errorElement` (`useRouteError`);
+  `isRouteErrorResponse` 404 → `errors.notFound`, değilse `errors.unexpected`, ana
+  sayfa link'i ile (dev hata mesajını gösterir).
+- `AppErrorBoundary` — **en dışta** mount edilen class boundary (`StrictMode`'un hemen
+  içinde, provider'ları sarar) → `FatalError`; altındaki her render çökmesini yakalar.
+- `FatalError`, `ConfigErrorScreen` — HER İKİSİ de react-i18next **singleton**'ını
+  (`i18n.t`) + düz JSX (PrimeReact/hook yok) kullanan fallback ekranları; böylece
+  çökmüş veya provider-öncesi ağaçta da çalışırlar. `FatalError` = AppErrorBoundary
+  son-çaresi (reload butonu); `ConfigErrorScreen` = provider-öncesi env hatası (dev:
+  değişken adları; prod: i18n mesajı).
 - `form/Form*` — Formik↔PrimeReact alan wrapper'ları (`FormInputText`,
   `FormDropdown`, `FormCalendar`, `FormInputNumber`, `FormCheckbox`,
   `FormChips`); i18n label + hata gösterimi gömülü.
@@ -291,8 +305,9 @@ referans verir; asla yeniden uygulamaz.
 route constant'larını barrel üzerinden + docs registry'yi toplar, `menuOrder`'a
 göre sıralar, etiketleri `t(titleKey)` ile çözer; `AppSidebar` yalnız onu render
 eder); `useNotify` (success/error/info; YALNIZ bir `TranslationKey` kabul eder —
-literal derleme hatasıdır, §8; bilinmeyen hatayı `errors.unexpected`'e normalize
-eder).
+literal derleme hatasıdır, §8; `useNotify.lib`'deki saf `normalizeErrorKey`
+bilinmeyen hatayı `errors.unexpected`'e eşler); `useMediaQuery` (responsive UI için
+matchMedia hook'u, ör. AppDataTable paginator'ı).
 
 **Lib** (`src/lib`): `text` (Türkçe normalize + collator), `date` (`formatDate`),
 `pickLocalized`, `route` (`getRouteHandle`).
@@ -440,9 +455,16 @@ review'da her zaman görünür.
   `t`/`i18n.t`/`clsx`/`cn`'i dışlayan `callees` ile; test ve constants
   dosyalarında kapalı (§12). (b) Lint'in görmediği yerler — toast ve doğrulama
   string'leri — review ile değil TİPLE kapatılır: `useNotify` yalnız bir
-  `TranslationKey` kabul eder (`types/i18n.types.ts`) ve Yup mesajları
-  `'…' satisfies TranslationKey` olarak yazılan `setLocale` anahtarlarıdır
-  (`plugins/yup.ts`); her iki yerde de ham literal derleme hatasıdır.
+  `TranslationKey` kabul eder (`types/i18n.types.ts`) ve Yup mesajları, anahtarı
+  `TranslationKey` tipli `{ key, values }`'yi serialize eden `message(key, values)`
+  yardımcısından (`plugins/yup.ts`) geçer; her iki yerde de ham literal derleme
+  hatasıdır.
+- **Tüm Yup mesajları `message()`'ten geçer.** Her `setLocale` girdisi VE her özel
+  `.test()` / satır-içi şema mesajı `message(key, values)` kullanmalı ki
+  `TranslationKey`-tipli ve dile-tepkili kalsın; `FormField` bunları render-anında
+  `resolveValidationMessage` → `t(key, values)` ile çözer (`{{min}}`/`{{max}}`
+  interpolasyonu). `resolveValidationMessage`'ın ham-string fallback'i nazik
+  bozulmadır, ham literal geçme lisansı DEĞİL.
 - **Anahtar tipleme (`types/i18n.types.ts`).** `TranslationKey`, EN locale şeklinden
   (`resolveJsonModule` ile `typeof en.json`) türetilen yaprak nokta-yol birleşimidir
   (özyinelemeli `DotPaths`). Aynı şekil i18next'in `CustomTypeOptions.resources`'ını
