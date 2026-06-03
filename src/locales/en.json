@@ -1,0 +1,87 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "clear": "Clear",
+    "confirm": "Confirm",
+    "close": "Close",
+    "back": "Back",
+    "yes": "Yes",
+    "no": "No",
+    "loading": "Loading…",
+    "retry": "Retry",
+    "actions": "Actions"
+  },
+  "errors": {
+    "config": {
+      "title": "Configuration error",
+      "message": "The application is missing required configuration. Please contact your administrator."
+    },
+    "unexpected": "An unexpected error occurred.",
+    "notFound": "Not found.",
+    "loadFailed": "Failed to load data."
+  },
+  "validation": {
+    "required": "This field is required.",
+    "invalid": "Invalid value.",
+    "email": "Enter a valid email address.",
+    "stringMin": "Must be at least {{min}} characters.",
+    "stringMax": "Must be at most {{max}} characters.",
+    "numberMin": "Must be at least {{min}}.",
+    "numberMax": "Must be at most {{max}}."
+  },
+  "patients": {
+    "title": "Patients",
+    "fields": {
+      "fullName": "Full name",
+      "birthDate": "Birth date",
+      "appointmentDate": "Appointment date",
+      "createdAt": "Created",
+      "department": "Department",
+      "status": "Status",
+      "priority": "Priority",
+      "bloodType": "Blood type",
+      "score": "Score",
+      "note": "Note",
+      "diagnosis": "Diagnosis",
+      "isInsured": "Insured",
+      "isFollowUp": "Follow-up",
+      "isVaccinated": "Vaccinated",
+      "tags": "Tags"
+    },
+    "status": {
+      "waiting": "Waiting",
+      "inExamination": "In examination",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "priority": {
+      "urgent": "Urgent",
+      "normal": "Normal"
+    },
+    "department": {
+      "internalMedicine": "Internal medicine",
+      "cardiology": "Cardiology",
+      "neurology": "Neurology",
+      "orthopedics": "Orthopedics",
+      "pediatrics": "Pediatrics"
+    },
+    "bloodType": {
+      "0+": "O+",
+      "0-": "O-",
+      "A+": "A+",
+      "A-": "A-",
+      "AB+": "AB+",
+      "AB-": "AB-",
+      "B+": "B+",
+      "B-": "B-"
+    }
+  },
+  "docs": {
+    "title": "Documentation"
+  }
+}

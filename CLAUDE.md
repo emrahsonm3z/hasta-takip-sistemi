@@ -68,7 +68,9 @@ Sections: <CLAUDE.md §refs>   ·   Paths: <key paths touched>
 Next: <the current/next sub-item — specific enough to start without context>
 ```
 
-_(No active work in progress.)_
+### Active: 0.5 i18n locale files + key typing · branch: feat/i18n-locales · status: in-progress
+Sections: §8 §3 §15   ·   Paths: src/locales/{tr,en}.json, src/types/i18n.types.ts, src/plugins/{i18n,yup}.ts, tsconfig.app.json
+Next: sub-item 2 — TranslationKey typing (i18next augmentation, resolveJsonModule, wire i18n.ts to full JSON, yup satisfies)
 
 ## 1. Project Overview
 

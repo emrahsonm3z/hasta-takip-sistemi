@@ -1,0 +1,87 @@
+{
+  "common": {
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "add": "Ekle",
+    "search": "Ara",
+    "clear": "Temizle",
+    "confirm": "Onayla",
+    "close": "Kapat",
+    "back": "Geri",
+    "yes": "Evet",
+    "no": "Hayır",
+    "loading": "Yükleniyor…",
+    "retry": "Tekrar dene",
+    "actions": "İşlemler"
+  },
+  "errors": {
+    "config": {
+      "title": "Yapılandırma hatası",
+      "message": "Uygulama gerekli yapılandırmadan yoksun. Lütfen sistem yöneticinizle iletişime geçin."
+    },
+    "unexpected": "Beklenmeyen bir hata oluştu.",
+    "notFound": "Kayıt bulunamadı.",
+    "loadFailed": "Veriler yüklenemedi."
+  },
+  "validation": {
+    "required": "Bu alan zorunludur.",
+    "invalid": "Geçersiz değer.",
+    "email": "Geçerli bir e-posta adresi girin.",
+    "stringMin": "En az {{min}} karakter olmalı.",
+    "stringMax": "En fazla {{max}} karakter olmalı.",
+    "numberMin": "En az {{min}} olmalı.",
+    "numberMax": "En fazla {{max}} olmalı."
+  },
+  "patients": {
+    "title": "Hastalar",
+    "fields": {
+      "fullName": "Ad Soyad",
+      "birthDate": "Doğum tarihi",
+      "appointmentDate": "Randevu tarihi",
+      "createdAt": "Oluşturulma",
+      "department": "Bölüm",
+      "status": "Durum",
+      "priority": "Öncelik",
+      "bloodType": "Kan grubu",
+      "score": "Puan",
+      "note": "Not",
+      "diagnosis": "Tanı",
+      "isInsured": "Sigortalı",
+      "isFollowUp": "Takipte",
+      "isVaccinated": "Aşılı",
+      "tags": "Etiketler"
+    },
+    "status": {
+      "waiting": "Bekliyor",
+      "inExamination": "Muayenede",
+      "completed": "Tamamlandı",
+      "cancelled": "İptal"
+    },
+    "priority": {
+      "urgent": "Acil",
+      "normal": "Normal"
+    },
+    "department": {
+      "internalMedicine": "Dahiliye",
+      "cardiology": "Kardiyoloji",
+      "neurology": "Nöroloji",
+      "orthopedics": "Ortopedi",
+      "pediatrics": "Pediatri"
+    },
+    "bloodType": {
+      "0+": "0+",
+      "0-": "0-",
+      "A+": "A+",
+      "A-": "A-",
+      "AB+": "AB+",
+      "AB-": "AB-",
+      "B+": "B+",
+      "B-": "B-"
+    }
+  },
+  "docs": {
+    "title": "Dokümanlar"
+  }
+}
