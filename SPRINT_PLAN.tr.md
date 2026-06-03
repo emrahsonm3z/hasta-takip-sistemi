@@ -155,7 +155,7 @@ yapan `TranslationKey` tipi.
 olduğunu doğrulayan unit (ikisi asla kaymasın).
 **DoD:** + global DoD. Commit `feat: add bilingual locale files and translation-key typing`.
 
-### 0.6 ⬜ Router + layout kabuğu + menü + dinamik başlık
+### 0.6 ✅ Router + layout kabuğu + menü + dinamik başlık
 **Hedef:** sidebar/topbar'lı, dil + tema anahtarlı, (boş) modül route'larını
 toplayan bir data router'lı ve başlık çözümlü çalışan bir `AppLayout`.
 **Bağımlılık:** 0.3, 0.4, 0.5

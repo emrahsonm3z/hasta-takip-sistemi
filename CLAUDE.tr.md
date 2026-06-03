@@ -181,7 +181,8 @@ src/
 │   ├── Loading.tsx          Lazy-route fallback
 │   ├── ErrorState.tsx       Sayfa-içi beklenen-veri hatası + retry (§3.1)
 │   ├── ConfigErrorScreen.tsx Eksik-env ekranı (dev: adlar; prod: i18n) (§3 config)
-│   ├── RouteErrorBoundary.tsx Router errorElement (useRouteError) (§6)
+│   ├── RouteErrorBoundary.tsx Router errorElement (useRouteError) (§6; 0.7'ye dek minimal)
+│   ├── NotFound.tsx         `*` route için 404 sayfası (errors.notFound) (§6)
 │   ├── AppErrorBoundary.tsx RouterProvider üstündeki class boundary → FatalError (§6)
 │   ├── FatalError.tsx       Beklenmeyen-hata fallback UI
 │   ├── form/                Formik↔PrimeReact alan wrapper'ları (§3.1)
@@ -195,6 +196,7 @@ src/
 │       └── AppThemeToggle.tsx       → plugins/theme setThemeMode + 'theme-mode' (§9)
 ├── composables/
 │   ├── useMenu.ts           tek menü kaynağı: modül route constant'ları + docs registry (§6)
+│   ├── useMenu.lib.ts       saf buildMenu(sources, translate) — sırala + etiketle (unit-test'li)
 │   └── useNotify.ts         success / error / info toast; yalnız-anahtar API; hata normalizasyonu (§3.1)
 ├── lib/                     Global saf yardımcılar
 │   ├── text.ts              NFC + toLocaleLowerCase('tr'); Intl.Collator('tr') (§8)
@@ -210,7 +212,8 @@ src/
 │   └── theme/_dark.scss     Her iki mod için özel app token'ları (:root + .dark) — ör. --app-background (FOUC) (§9)
 ├── types/
 │   ├── route.types.ts       AppRouteHandle { titleKey; title?(args) } (§6)
-│   └── i18n.types.ts        TranslationKey (DotPaths) + i18next CustomTypeOptions augmentation (yalnız-anahtar tipleme) (§8)
+│   ├── i18n.types.ts        TranslationKey (en.json'dan DotPaths) — taşınabilir, i18next referansı yok (§8)
+│   └── i18next-augmentation.ts  yalnız-app ambient i18next CustomTypeOptions augmentation (typeof en.json). i18n.types.ts'ten ayrıldı ki node-tipli test projesi (route type'ları üzerinden i18n.types'ı çeken) TS2664'e düşmesin; TranslationKey testlerde import-güvenli kalır (§8)
 └── modules/
     ├── patients/
     │   ├── api/
@@ -531,6 +534,12 @@ renklerde Tailwind `dark:` varyantı KULLANMA; swap zaten mod-doğru yapar.**
 `.dark` sınıfı YALNIZ PrimeReact'in sağlamadığı uygulamaya-özel custom token'lar
 için vardır; HER İKİ mod için bir kez tanımlanır — `:root { … }` ve `.dark { … }`
 altında (Tailwind'in değiştirdiği aynı sınıf) — asla tek-modlu hardcoded değer.
+
+**Token renklerinde `/alpha` yok.** Köprülenmiş Tailwind renkleri düz `var(--…)`
+değerleridir (`<alpha-value>` kanalı yok), bu yüzden Tailwind'in opaklık modifikatörü
+(`bg-primary/10`, `text-text/50`) onlarda ÇALIŞMAZ. Hover / active / selected durumları
+için opaklık varyantı yerine **solid bir surface adımı** (`bg-surface-100`,
+`bg-surface-200`, …) kullan — bunlar swap ile mod-doğrudur.
 
 ### Önce tema değişkeni; custom token yalnız gerektiğinde
 

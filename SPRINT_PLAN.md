@@ -147,7 +147,7 @@ passing a non-key string to a `TranslationKey` slot is a compile error.
 (recursively) so the two never drift.
 **DoD:** + global DoD. Commit `feat: add bilingual locale files and translation-key typing`.
 
-### 0.6 ⬜ Router + layout shell + menu + dynamic title
+### 0.6 ✅ Router + layout shell + menu + dynamic title
 **Goal:** A working `AppLayout` with sidebar/topbar, language + theme switches, a
 data router aggregating (empty) module routes, and title resolution.
 **Depends on:** 0.3, 0.4, 0.5

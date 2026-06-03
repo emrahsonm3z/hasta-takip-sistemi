@@ -68,9 +68,7 @@ Sections: <CLAUDE.md §refs>   ·   Paths: <key paths touched>
 Next: <the current/next sub-item — specific enough to start without context>
 ```
 
-### Active: 0.6 Router + layout shell + menu + dynamic title · branch: feat/router-layout · status: in-progress
-Sections: §3 §5 §6 §9 §16 §15   ·   Paths: src/router/, src/modules/{patients,docs}/, src/components/layout/, src/composables/useMenu.ts, src/types/route.types.ts, src/lib/route.ts
-Next: sub-item 2 — useMenu + responsive app shell (AppSidebar + AppTopbar)
+_(No active work in progress.)_
 
 ## 1. Project Overview
 
@@ -180,7 +178,8 @@ src/
 │   ├── Loading.tsx          Lazy-route fallback
 │   ├── ErrorState.tsx       In-page expected-data error + retry (§3.1)
 │   ├── ConfigErrorScreen.tsx Missing-env screen (dev: names; prod: i18n) (§3 config)
-│   ├── RouteErrorBoundary.tsx Router errorElement (useRouteError) (§6)
+│   ├── RouteErrorBoundary.tsx Router errorElement (useRouteError) (§6; minimal until 0.7)
+│   ├── NotFound.tsx         404 page for the `*` route (errors.notFound) (§6)
 │   ├── AppErrorBoundary.tsx Class boundary above RouterProvider → FatalError (§6)
 │   ├── FatalError.tsx       Unexpected-error fallback UI
 │   ├── form/                Formik↔PrimeReact field wrappers (§3.1)
@@ -194,6 +193,7 @@ src/
 │       └── AppThemeToggle.tsx       → plugins/theme setThemeMode + 'theme-mode' (§9)
 ├── composables/
 │   ├── useMenu.ts           single menu source: module route constants + docs registry (§6)
+│   ├── useMenu.lib.ts       pure buildMenu(sources, translate) — sort + label (unit-tested)
 │   └── useNotify.ts         success / error / info toasts; key-only API; error normalisation (§3.1)
 ├── lib/                     Global pure helpers
 │   ├── text.ts              NFC + toLocaleLowerCase('tr'); Intl.Collator('tr') (§8)
@@ -209,7 +209,8 @@ src/
 │   └── theme/_dark.scss     Custom app tokens for both modes (:root + .dark) — e.g. --app-background (FOUC) (§9)
 ├── types/
 │   ├── route.types.ts       AppRouteHandle { titleKey; title?(args) } (§6)
-│   └── i18n.types.ts        TranslationKey (DotPaths) + i18next CustomTypeOptions augmentation (key-only typing) (§8)
+│   ├── i18n.types.ts        TranslationKey (DotPaths from en.json) — portable, no i18next ref (§8)
+│   └── i18next-augmentation.ts  app-only ambient i18next CustomTypeOptions augmentation (typeof en.json). Split from i18n.types.ts so the node-typed test project (which pulls i18n.types via route types) doesn't hit TS2664; TranslationKey stays import-safe in tests (§8)
 └── modules/
     ├── patients/
     │   ├── api/
@@ -527,6 +528,12 @@ variants on token-backed colours; they are already mode-correct via the swap.**
 The `.dark` class exists ONLY for the app-specific custom tokens PrimeReact does
 not provide, defined once for BOTH modes — under `:root { … }` and `.dark { … }`
 (the same class Tailwind toggles) — never a single-mode hardcoded value.
+
+**No `/alpha` on token colours.** The bridged Tailwind colours are plain
+`var(--…)` values (no `<alpha-value>` channel), so Tailwind's opacity modifier
+(`bg-primary/10`, `text-text/50`) does NOT work on them. For hover / active /
+selected states use a **solid surface step** (`bg-surface-100`, `bg-surface-200`,
+…) — they are mode-correct via the swap — not an opacity variant.
 
 ### Prefer a theme var; add a custom token only when needed
 
