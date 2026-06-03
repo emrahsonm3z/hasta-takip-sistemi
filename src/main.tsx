@@ -9,6 +9,7 @@ import { PrimeReactProvider } from 'primereact/api'
 
 import App from '@/App'
 import { AppErrorBoundary } from '@/components/AppErrorBoundary'
+import { AppToastProvider } from '@/components/AppToastProvider'
 import { ConfigErrorScreen } from '@/components/ConfigErrorScreen'
 import { EnvConfigError, validateRequiredEnvVars } from '@/config/env'
 import { primeReactConfig } from '@/plugins/primereact'
@@ -32,7 +33,9 @@ root.render(
     <AppErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <PrimeReactProvider value={primeReactConfig}>
-          <App />
+          <AppToastProvider>
+            <App />
+          </AppToastProvider>
         </PrimeReactProvider>
       </QueryClientProvider>
     </AppErrorBoundary>

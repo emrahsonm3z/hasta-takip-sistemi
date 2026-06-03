@@ -1,9 +1,13 @@
 import { useState } from 'react'
+import { Button } from 'primereact/button'
 
 import { ErrorState } from '@/components/ErrorState'
+import { useNotify } from '@/composables/useNotify'
+import { normalizeErrorKey } from '@/composables/useNotify.lib'
 
 export default function DevDemoPage() {
   const [crash, setCrash] = useState(false)
+  const notify = useNotify()
 
   if (crash) {
     throw new Error('Demo: route render crash')
@@ -29,6 +33,33 @@ export default function DevDemoPage() {
         >
           Trigger route render error
         </button>
+      </section>
+
+      <section className="rounded border border-surface-border p-4">
+        <h2 className="mb-3 font-medium text-text">useNotify</h2>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            label="Success"
+            severity="success"
+            onClick={() => {
+              notify.success('common.save')
+            }}
+          />
+          <Button
+            label="Info"
+            severity="info"
+            onClick={() => {
+              notify.info('patients.title')
+            }}
+          />
+          <Button
+            label="Error"
+            severity="danger"
+            onClick={() => {
+              notify.error(normalizeErrorKey(new Error('demo')))
+            }}
+          />
+        </div>
       </section>
     </div>
   )
