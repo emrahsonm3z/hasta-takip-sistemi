@@ -201,7 +201,7 @@ literal passed to `useNotify` is a compile error.
 ISO → `''`; `pickLocalized` fallbacks; `AppDataTable` Turkish filter match.
 **DoD:** + global DoD. Commit `feat: add global components, form fields, and error surfaces`.
 
-### 0.8 ⬜ CI, release-please, Dependabot, deploy config
+### 0.8 ✅ CI, release-please, Dependabot, deploy config
 **Goal:** Automated gate + release automation + dependency hygiene + SPA routing
 on Vercel (§14, §15).
 **Depends on:** 0.2
@@ -211,10 +211,12 @@ on Vercel (§14, §15).
 - `.github/workflows/release.yml`: release-please action;
   `release-please-config.json` + `.release-please-manifest.json` (version `0.0.0`
   start, `release-type: node`, **no publish** — private).
-- `.github/dependabot.yml`: npm ecosystem, group minor/patch, **ignore major**
-  for `primereact`, `tailwindcss`, `react`, `react-dom` (§1.1).
-- `vercel.json`: SPA rewrite (all → `/index.html`); document branch-protection
-  setup in WORKFLOW (solo: required checks + manual merge).
+- `.github/dependabot.yml`: npm ecosystem, group minor/patch, **ignore ALL update
+  types** for the five exact pins `react`, `react-dom`, `primereact`,
+  `primeicons`, `tailwindcss` + **ignore `eslint` major** (§1.1).
+- `vercel.json`: SPA rewrite (all → `/index.html`); branch protection documented
+  in §15 (owner-applied: require PR + the `gate` check + linear history; admins
+  exempt for the release-please PR).
 **Files:** `.github/workflows/ci.yml`, `.github/workflows/release.yml`,
 `release-please-config.json`, `.release-please-manifest.json`,
 `.github/dependabot.yml`, `vercel.json`.

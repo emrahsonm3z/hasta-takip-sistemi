@@ -58,11 +58,12 @@ a better suggestion, surface it before implementing. Otherwise proceed."
 Tek "neredeyiz" göstergesi — aynı anda TEK aktif TOPIC (≈ bir SPRINT_PLAN görevi;
 bir branch = bir topic, §15). Neyin devam ettiğini ve nerede olduğunu — mevcut
 alt-madde dahil (`Next` satırı) — tek bakışta söyler. Ayrıntılı iz burada değil,
-topic'in alt-madde-başına commit'lerinde (ve PR'lar 0.8'de açılınca PR açıklamasında
-— sözleşme, §15) yaşar — böylece bu kısım küçük kalır ve kural dosyası ne şişer ne de
-merge conflict üretir. Audit onaylanınca oluşturulur; alt-maddeler indikçe `Next`
-satırı ve `status` güncellenir; topic bitince topic'in son commit'inde maddenin
-tamamı SİLİNİR. Kalıcı iz `SPRINT_PLAN.md`'dir.
+topic'in alt-madde-başına commit'lerinde ve PR açıklamasında (sözleşme, §15) yaşar —
+böylece bu kısım küçük kalır ve kural dosyası ne şişer ne de merge conflict üretir.
+Audit onaylanınca oluşturulur; alt-maddeler indikçe `Next` satırı ve `status`
+güncellenir; maddenin tamamı topic'in son authored commit'inde (Rebase and merge
+öncesi son commit, §15) SİLİNİR — merge sonrası silinecek bir commit yoktur. Kalıcı
+iz `SPRINT_PLAN.md`'dir.
 
 **Biçim**:
 
@@ -113,9 +114,13 @@ Veri kaynağı (GET, salt-okunur, tek-seferlik seed):
 - Docs-render dep'leri: `react-markdown` (^9), `remark-gfm` (^4),
   `@tailwindcss/typography` (^0.5) — sonuncusu Tailwind config `plugins`'ine
   bağlanır (§9).
-- Dependabot (`.github/dependabot.yml`) `primereact`, `tailwindcss`, `react` ve
-  `react-dom` için **major güncellemeleri ignore eder** ki sürümler kaymasın;
-  minor / patch gruplanır ve yine PR + CI + review'dan geçer (§15).
+- Dependabot (`.github/dependabot.yml`, ENFORCE edildiği yer) beş tam-pinli kritik
+  paket — `react`, `react-dom`, `primereact`, `primeicons`, `tailwindcss` — için
+  **TÜM güncelleme türlerini ignore eder** ki asla kaymasınlar, ve `eslint` için
+  **major'ı ignore eder** (eslint v10, eslint 9'da sabitlenen
+  `eslint-plugin-jsx-a11y`'yi bozar). Diğer her bağımlılığın minor / patch
+  güncellemeleri tek bir haftalık PR'da gruplanır ve yine CI + review'dan geçer
+  (§15); güvenlik açığı `npm audit --audit-level=high` kapısıyla karşılanır.
 
 ## 2. Mimari
 
@@ -878,15 +883,18 @@ branch'lerine elle yazılmaz; böylece eşzamanlı iş onda çakışmaz.
   okunur geçmiş (commitlint, §12) aynı zamanda release kaynağıdır. İncelenmiş her
   sub-commit `main` üzerinde **korunur** (squash yok — §15 Merge stratejisi), böylece
   release-please her Conventional tipi okur.
-- **Release akışı**: bir topic branch'ini `main`'e merge etmek — sub-commit'lerini
-  koruyarak (şimdi ff-merge; 0.8'den itibaren **Rebase and merge**, §15) — kodu hemen
-  deploy eder (Vercel, 0.8'den itibaren); sürüm değişmez. release-please GitHub
-  Action'ı
+- **Release akışı** (canlı): bir topic branch'ini `main`'e merge etmek —
+  sub-commit'lerini koruyarak (GitHub'da **Rebase and merge**, §15) — kodu hemen
+  deploy eder (Vercel); sürüm değişmez. release-please GitHub Action'ı
   (`.github/workflows/release.yml`, config `release-please-config.json` +
   `.release-please-manifest.json`) tek bir **Release PR** açar/günceller; bu PR
   sürümü yükseltir ve son release'ten beri olan commit'lerden `CHANGELOG.md`'yi
-  yeniden üretir. O PR'ı merge etmek sürüm bump'ı + git tag'i yapar. Uygulama
-  özeldir — **npm publish yok**. Detay: `docs/tr/VERSIONING.md`.
+  yeniden üretir. Bu Release PR'ı `GITHUB_TOKEN` açar; bu yüzden `gate` kontrolünü
+  **tetiklemez** (GitHub anti-recursion: token'ın açtığı PR Actions başlatamaz).
+  Branch koruması yöneticileri muaf tuttuğu için (§15), sahip bu mekanik sürüm +
+  `CHANGELOG` PR'ını kontrol olmadan doğrudan merge eder. Onu merge etmek sürüm
+  bump'ı + git tag'i yapar. Uygulama özeldir — **npm publish yok**. Detay:
+  `docs/tr/VERSIONING.md`.
 
 ## 15. Workflow
 
@@ -926,20 +934,16 @@ taşıyabilir.
 3. **Topic'in son commit'inde docs:sync** — docs (iki dil, §13.3) + `SPRINT_PLAN.md`
    ✅ + Active Work silinmesi, topic'in SON commit'inde (ya da kendi `docs:` /
    `chore:` commit'inde) yer alır; Conventional mesajla (§14).
-4. **Topic'i bitir.** *Hedef (0.8'den itibaren):* branch'i **push** et → **PR aç; PR
-   açıklaması sözleşmedir** (audit planı + ne yapıldı + test notları + dokunulan docs
-   + kabul kriteri + bağlı backlog maddesi). *Geçici (bootstrapping, 0.8 öncesi):*
-   uzak PR/CI kapısı yok — bu son adımda TÜM kapıları yerelde çalıştır
-   (`validate` + testler + `build` + `npm audit --audit-level=high`), sonra sahibin
-   onayıyla `main`'e ff-merge et (aşağıdaki Merge stratejisi).
+4. **Topic'i bitir.** Branch'i **push** et → **PR aç; PR açıklaması sözleşmedir**
+   (audit planı + ne yapıldı + test notları + dokunulan docs + kabul kriteri + bağlı
+   backlog maddesi). CI'nin `gate` job'u PR'da çalışır ve review öncesi yeşil olmalı
+   (aşağıdaki Otomatik kapı + Merge stratejisi).
 
 ### Otomatik kapı (CI)
 
-*Hedef (0.8'den itibaren):* her PR'da CI `validate` + testler + `build` +
-`npm audit --audit-level=high` çalıştırır; **CI yeşil olmadan PR merge edilemez**
-(required status check). İnsanlar sonra özü inceler. *Geçici (0.8 öncesi):* aynı
-kapılar topic'in son adımında YERELDE çalışır (Geliştirici adım 4); henüz uzak
-kontrol yok.
+Her PR'da CI `gate` job'unu çalıştırır (`validate` + testler + `build` +
+`npm audit --audit-level=high`; `.github/workflows/ci.yml`); **`gate` yeşil olmadan
+PR merge edilemez** (required status check). İnsanlar sonra özü inceler.
 
 ### Yönetici (sahip)
 
@@ -947,33 +951,34 @@ kontrol yok.
    sub-commit'leri boyunca — *hedef:* CI yeşil ile PR üzerinde; *geçici:* yerel
    branch/commit'ler üzerinde. Sorun → geliştiriciye geri.
 6. **`main`'e merge**, sub-commit'leri koruyarak (aşağıdaki Merge stratejisi) →
-   *(0.8'den itibaren)* production deploy (Vercel) + release-please Release PR'ı
-   açar/günceller (§14).
+   production deploy (Vercel) + release-please Release PR'ı açar/günceller (§14).
 
 ### Merge stratejisi
 
 Merge'ler **incelenmiş sub-commit'leri `main` üzerinde lineer KORUR — squash yok.**
 Her sub-commit atomik, incelenmiş ve Conventional'dır ve release-please her tipi
-okur (§14); squash release sinyalini düşürürdü. *Geçici (0.8 öncesi):*
-yerelde `git merge --ff-only <branch>` → `git push` → branch'i sil.
-*Hedef (0.8'den itibaren):* GitHub'da **Rebase and merge** (asla "Squash and merge").
+okur (§14); squash release sinyalini düşürürdü. Bir topic'i GitHub'da **Rebase and
+merge** ile kapat (asla "Squash and merge", asla merge commit'i), sonra branch'i sil
+ve `git checkout main && git pull`.
 
 ### Branch koruması
 
-`main` koruması (required status checks + zorunlu PR) CI ile birlikte **0.8**'de
-devreye girer. O zamana dek KAPALIdır ve geliştirici yerel kapılardan sonra doğrudan
-ff-merge eder. Solo not: GitHub kendi PR'ını onaylamana izin vermez; PR'lar
-açıldığında kapı olarak required status checks (CI yeşil) kullan; bir takım arkadaşı
-katılınca required approvals'ı (1+) etkinleştir. Rollback *(0.8'den itibaren)*:
-Vercel anında önceki deploy'a döner; acil düzeltme `fix/*` ile, aynı akış
-hızlandırılmış.
+`main` koruması **AÇIK**, sahip tarafından repo ayarlarında uygulanır: merge'den
+önce pull request zorunlu; `gate` status check'inin geçmesi zorunlu; lineer geçmiş
+zorunlu (yani yalnız **Rebase and merge** mümkün — merge commit'i yok, squash yok);
+force-push ve branch silme engelli. **"Do not allow bypassing the above settings"'i
+ETKİNLEŞTİRME** — yöneticiler muaf kalsın ki sahip, (`GITHUB_TOKEN`'ın açtığı için)
+`gate` kontrolünü hiç çalıştırmayan release-please Release PR'ını merge edebilsin
+(§14). Solo not: GitHub kendi PR'ını onaylamana izin vermez; bu yüzden kapı zorunlu
+`gate` status check'idir (CI yeşil); bir takım arkadaşı katılınca required
+approvals'ı (1+) etkinleştir. Rollback: Vercel anında önceki deploy'a döner; acil
+düzeltme `fix/*` ile, aynı akış hızlandırılmış.
 
 ### Fast path
 
 Trivial, düşük-riskli değişiklikler (Dependabot bump'ları dahil) formal audit /
 Active Work seremonisini atlar (implement → self-review → Conventional commit) — ama
-kapılar asla atlanmaz: şimdi yerel kapılar + ff-merge; 0.8'den itibaren PR + CI +
-sahibin merge'i. Yalnız audit hafifler.
+kapılar asla atlanmaz: PR + CI `gate` + sahibin merge'i. Yalnız audit hafifler.
 
 ### Git konvansiyonları
 
@@ -981,8 +986,8 @@ Branch'ler `feat/*`, `fix/*`, `chore/*` (ayrıca `docs/*`, `refactor/*`, `test/*
 branch başına tek topic, BİRDEN ÇOK Conventional Commit (`type(scope): subject`)
 taşır, incelenmiş her alt-madde için bir tane; commitlint ile dayatılır (§12) ve
 release-please tarafından tüketilir (§14). Push manueldir. Merge'ler sub-commit'leri
-korur (yukarıdaki Merge stratejisi): şimdi `git merge --ff-only`, 0.8'den itibaren
-**Rebase and merge** — asla squash.
+korur (yukarıdaki Merge stratejisi): GitHub'da **Rebase and merge** — asla squash,
+asla merge commit'i.
 
 Her prompt şununla biter: "If you see an issue, ambiguity, or a better suggestion,
 surface it before implementing. Otherwise proceed." Kapı başarısızlıkları geri
