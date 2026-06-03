@@ -68,9 +68,7 @@ Sections: <CLAUDE.md §refs>   ·   Paths: <key paths touched>
 Next: <the current/next sub-item — specific enough to start without context>
 ```
 
-### Active: 0.5 i18n locale files + key typing · branch: feat/i18n-locales · status: in-progress
-Sections: §8 §3 §15   ·   Paths: src/locales/{tr,en}.json, src/types/i18n.types.ts, src/plugins/{i18n,yup}.ts, tsconfig.app.json
-Next: sub-item 2 — TranslationKey typing (i18next augmentation, resolveJsonModule, wire i18n.ts to full JSON, yup satisfies)
+_(No active work in progress.)_
 
 ## 1. Project Overview
 
@@ -209,7 +207,7 @@ src/
 │   └── theme/_dark.scss     Custom app tokens for both modes (:root + .dark) — e.g. --app-background (FOUC) (§9)
 ├── types/
 │   ├── route.types.ts       AppRouteHandle { titleKey; title?(args) } (§6)
-│   └── i18n.types.ts        TranslationKey union (key-only typing) (§8)
+│   └── i18n.types.ts        TranslationKey (DotPaths) + i18next CustomTypeOptions augmentation (key-only typing) (§8)
 └── modules/
     ├── patients/
     │   ├── api/
@@ -433,12 +431,27 @@ and always visible in review.
   `callees` excluding `t` / `i18n.t` / `clsx` / `cn`; disabled in test and
   constants files (§12). (b) The lint blind spots — toast and validation
   strings — are closed by TYPING, not review: `useNotify` accepts only a
-  `TranslationKey` (`types/i18n.types.ts`), and Yup messages come from
-  `yup.setLocale()` keys (`plugins/yup.ts`); a raw literal in either place is a
-  compile error.
+  `TranslationKey` (`types/i18n.types.ts`), and Yup messages are `setLocale` keys
+  written as `'…' satisfies TranslationKey` (`plugins/yup.ts`); a raw literal in
+  either place is a compile error.
+- **Key typing (`types/i18n.types.ts`).** `TranslationKey` is the leaf dot-path
+  union derived (a recursive `DotPaths`) from the EN locale shape (`typeof`
+  `en.json`, via `resolveJsonModule`). The same shape augments i18next's
+  `CustomTypeOptions.resources`, so `t()` itself is key-checked natively — a wrong
+  key is a compile error (`t()` → TS2345, a `satisfies TranslationKey` slot →
+  TS1360). EN is the source of truth for the key set; `tr.json` must match it (a
+  `node:test` asserts parity).
 - A new key is added to BOTH `tr.json` and `en.json` in the same change.
 - **Critical pattern.** An enum value is a constant; its label is translated:
-  the status value is `'active'`, the label is ``t(`patient.status.${status}`)``.
+  the status value is `'waiting'`, the label is ``t(`patients.status.${status}`)``.
+- **Enum codes are the locale keys (0.5 → 1.1 forward-contract).** The canonical
+  codes live under `patients.{status,priority,department,bloodType}` in the locale
+  files. The status/priority/department enum unions in the model and the mapper
+  (`models/patient.model.ts`, `lib/patient.mapper.ts`, §10) MUST use these exact
+  codes; the mapper normalizes the API's Turkish display values
+  (e.g. `Bekliyor` → `waiting`, `acil` → `urgent`, `Dahiliye` → `internalMedicine`)
+  to them. `bloodType` keys are the raw notation (`0+`…); EN labels use the letter
+  `O`, TR keeps the zero.
 
 ### Bilingual content fields (flat) + `pickLocalized`
 

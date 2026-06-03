@@ -129,7 +129,7 @@ colour source for SCSS.
 **Tests:** none (visual/lint-verified).
 **DoD:** + global DoD. Commit `feat: add token-backed tailwind and SMACSS scss layer`.
 
-### 0.5 ⬜ i18n locale files + key typing
+### 0.5 ✅ i18n locale files + key typing
 **Goal:** Base locale JSON for both languages and the `TranslationKey` type that
 makes `useNotify`/Yup key-only.
 **Depends on:** 0.3

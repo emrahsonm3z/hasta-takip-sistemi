@@ -136,7 +136,7 @@ renk kaynağı.
 **Test:** yok (görsel/lint-doğrulamalı).
 **DoD:** + global DoD. Commit `feat: add token-backed tailwind and SMACSS scss layer`.
 
-### 0.5 ⬜ i18n locale dosyaları + anahtar tipleme
+### 0.5 ✅ i18n locale dosyaları + anahtar tipleme
 **Hedef:** İki dil için temel locale JSON ve `useNotify`/Yup'ı yalnız-anahtar
 yapan `TranslationKey` tipi.
 **Bağımlılık:** 0.3

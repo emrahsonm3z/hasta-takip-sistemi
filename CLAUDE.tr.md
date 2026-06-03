@@ -210,7 +210,7 @@ src/
 │   └── theme/_dark.scss     Her iki mod için özel app token'ları (:root + .dark) — ör. --app-background (FOUC) (§9)
 ├── types/
 │   ├── route.types.ts       AppRouteHandle { titleKey; title?(args) } (§6)
-│   └── i18n.types.ts        TranslationKey union (yalnız-anahtar tipleme) (§8)
+│   └── i18n.types.ts        TranslationKey (DotPaths) + i18next CustomTypeOptions augmentation (yalnız-anahtar tipleme) (§8)
 └── modules/
     ├── patients/
     │   ├── api/
@@ -437,11 +437,25 @@ review'da her zaman görünür.
   dosyalarında kapalı (§12). (b) Lint'in görmediği yerler — toast ve doğrulama
   string'leri — review ile değil TİPLE kapatılır: `useNotify` yalnız bir
   `TranslationKey` kabul eder (`types/i18n.types.ts`) ve Yup mesajları
-  `yup.setLocale()` anahtarlarından gelir (`plugins/yup.ts`); her iki yerde de
-  ham literal derleme hatasıdır.
+  `'…' satisfies TranslationKey` olarak yazılan `setLocale` anahtarlarıdır
+  (`plugins/yup.ts`); her iki yerde de ham literal derleme hatasıdır.
+- **Anahtar tipleme (`types/i18n.types.ts`).** `TranslationKey`, EN locale şeklinden
+  (`resolveJsonModule` ile `typeof en.json`) türetilen yaprak nokta-yol birleşimidir
+  (özyinelemeli `DotPaths`). Aynı şekil i18next'in `CustomTypeOptions.resources`'ını
+  augment eder; böylece `t()`'nin kendisi de native olarak anahtar-denetlenir — yanlış
+  anahtar derleme hatasıdır (`t()` → TS2345, `satisfies TranslationKey` yuvası →
+  TS1360). Anahtar kümesinin doğruluk kaynağı EN'dir; `tr.json` ona uymalıdır (bir
+  `node:test` pariteyi doğrular).
 - Yeni anahtar aynı değişiklikte HEM `tr.json` HEM `en.json`'a eklenir.
 - **Kritik desen.** Enum değeri bir constant'tır; etiketi çevrilir: status değeri
-  `'active'`, etiket ``t(`patient.status.${status}`)``.
+  `'waiting'`, etiket ``t(`patients.status.${status}`)``.
+- **Enum kodları locale anahtarlarıdır (0.5 → 1.1 forward-contract).** Kanonik kodlar
+  locale dosyalarında `patients.{status,priority,department,bloodType}` altında yaşar.
+  Model ve mapper'daki (`models/patient.model.ts`, `lib/patient.mapper.ts`, §10)
+  status/priority/department enum union'ları TAM olarak bu kodları kullanmalı; mapper
+  API'nin Türkçe görünen değerlerini (ör. `Bekliyor` → `waiting`, `acil` → `urgent`,
+  `Dahiliye` → `internalMedicine`) bunlara normalize eder. `bloodType` anahtarları ham
+  notasyondur (`0+`…); EN etiketleri `O` harfini kullanır, TR sıfırı korur.
 
 ### İki dilli içerik alanları (düz) + `pickLocalized`
 
