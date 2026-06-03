@@ -1,12 +1,16 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Outlet, ScrollRestoration, useMatches } from 'react-router-dom'
 
 import { getRouteHandle } from '@/lib/route'
 
+import { AppSidebar } from './AppSidebar'
+import { AppTopbar } from './AppTopbar'
+
 export function AppLayout() {
   const { t } = useTranslation()
   const matches = useMatches()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const active = [...matches].reverse().find((match) => getRouteHandle(match))
   const handle = active ? getRouteHandle(active) : undefined
@@ -19,11 +23,18 @@ export function AppLayout() {
   }, [title])
 
   return (
-    <>
-      <main className="min-h-screen bg-ground p-6 text-text">
-        <Outlet />
-      </main>
+    <div className="flex min-h-screen bg-ground text-text">
+      <AppSidebar
+        mobileOpen={mobileMenuOpen}
+        onMobileClose={() => setMobileMenuOpen(false)}
+      />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <AppTopbar title={title} onMenuToggle={() => setMobileMenuOpen(true)} />
+        <main className="flex-1 p-6">
+          <Outlet />
+        </main>
+      </div>
       <ScrollRestoration />
-    </>
+    </div>
   )
 }
