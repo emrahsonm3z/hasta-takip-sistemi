@@ -11,10 +11,3 @@ type DotPaths<T> = T extends Primitive
     }[keyof T & string]
 
 export type TranslationKey = DotPaths<LocaleResources>
-
-declare module 'i18next' {
-  interface CustomTypeOptions {
-    defaultNS: 'translation'
-    resources: { translation: LocaleResources }
-  }
-}

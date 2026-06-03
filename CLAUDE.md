@@ -68,7 +68,9 @@ Sections: <CLAUDE.md §refs>   ·   Paths: <key paths touched>
 Next: <the current/next sub-item — specific enough to start without context>
 ```
 
-_(No active work in progress.)_
+### Active: 0.6 Router + layout shell + menu + dynamic title · branch: feat/router-layout · status: in-progress
+Sections: §3 §5 §6 §9 §16 §15   ·   Paths: src/router/, src/modules/{patients,docs}/, src/components/layout/, src/composables/useMenu.ts, src/types/route.types.ts, src/lib/route.ts
+Next: sub-item 2 — useMenu + responsive app shell (AppSidebar + AppTopbar)
 
 ## 1. Project Overview
 
