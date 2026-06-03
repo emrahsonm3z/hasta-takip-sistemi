@@ -49,19 +49,22 @@ better suggestion, surface it before implementing. Otherwise proceed."
 
 ## 0.1 Active Work
 
-The single "where are we" pointer — ONE active task at a time. It answers what is
-in progress and where, at a glance. The detailed step-by-step log lives in the PR
-description (the contract, §15), NOT here — so this stays small and the rules file
+The single "where are we" pointer — ONE active TOPIC at a time (≈ a SPRINT_PLAN
+task; a branch = a topic, §15). It answers what is in progress and where, at a
+glance, including the current sub-item (the `Next` line). The detailed trace lives
+in the topic's per-sub-item commits (and, once PRs are enabled in 0.8, the PR
+description — the contract, §15), NOT here — so this stays small and the rules file
 does not churn or cause merge conflicts. Created when an audit is approved; the
-`Next` line and `status` are updated as work moves; the whole item is DELETED in
-the final commit when the task is done. The permanent trace is `SPRINT_PLAN.md`.
+`Next` line and `status` are updated as sub-items land; the whole item is DELETED in
+the topic's final commit when the topic is done. The permanent trace is
+`SPRINT_PLAN.md`.
 
 **Format**:
 
 ```markdown
 ### Active: <SPRINT_PLAN id + name> · branch: <branch> · status: <planned | in-progress | in-review>
 Sections: <CLAUDE.md §refs>   ·   Paths: <key paths touched>
-Next: <the immediate next action, specific enough to start without context>
+Next: <the current/next sub-item — specific enough to start without context>
 ```
 
 _(No active work in progress.)_
@@ -802,9 +805,12 @@ hand-edited into feature branches, so concurrent work never conflicts on it.
 
 - **No changeset files.** The bump is derived from commit types on `main`:
   `fix:` → patch, `feat:` → minor, `feat!:` / `BREAKING CHANGE` → major. Readable
-  history (commitlint, §12) is therefore also the release source.
-- **Release flow**: merging a feature PR to `main` deploys the code (Vercel)
-  immediately; the version is unchanged. The release-please GitHub Action
+  history (commitlint, §12) is therefore also the release source. Every reviewed
+  sub-commit is **preserved** on `main` (not squashed — §15 Merge strategy), so
+  release-please reads each Conventional type.
+- **Release flow**: merging a topic branch to `main` — preserving its sub-commits
+  (ff-merge now; **Rebase and merge** from 0.8, §15) — deploys the code (Vercel,
+  from 0.8) immediately; the version is unchanged. The release-please GitHub Action
   (`.github/workflows/release.yml`, config in `release-please-config.json` +
   `.release-please-manifest.json`) opens/updates a single **Release PR** that
   bumps the version and regenerates `CHANGELOG.md` from the commits since the
@@ -835,52 +841,76 @@ carry acceptance criteria.
 ### Developer (local)
 
 1. **Audit / Plan** — no code. Scope + sub-step breakdown + test plan + consulted
-   docs + drift. Refined in chat; on approval the §0.1 Active Work item is created.
-2. **Implementation** — Claude Code writes code + tests. Does NOT commit.
-3. **Developer self code-review** — the developer reviews Claude Code's output;
-   issues → fix → re-review (loop). Commit only when confident.
-4. **commit + docs:sync** — code + tests + docs (both languages, §13.3) +
-   `SPRINT_PLAN.md` ✅ + Active Work update, with a Conventional Commit message
-   (§14). The final commit of the task DELETES the Active Work item.
-5. **push** the feature branch → **open a PR. The PR description is the contract**:
-   audit plan + what was done + test notes + docs touched + acceptance criteria +
-   linked backlog item.
+   docs + drift. Refined in chat; on approval the §0.1 Active Work item is created
+   for the TOPIC.
+2. **Implementation, one sub-item at a time** — a branch is ONE topic (≈ a
+   SPRINT_PLAN task, or a tight group of related sub-steps) and carries MULTIPLE
+   commits, one per reviewed sub-item. For each sub-item: Claude Code writes code +
+   tests → **developer self code-review** (issues → fix → re-review loop) → a
+   Conventional Commit when confident (commitlint runs per commit, §12). Claude Code
+   never commits without explicit approval. The §0.1 Active Work `Next` / `status` is
+   updated as sub-items land.
+3. **docs:sync in the topic's final commit** — docs (both languages, §13.3) +
+   `SPRINT_PLAN.md` ✅ + the Active Work deletion ride in the topic's LAST commit (or
+   their own `docs:` / `chore:` commit), with a Conventional message (§14).
+4. **Finish the topic.** *Target (from 0.8):* **push** the branch → **open a PR; the
+   PR description is the contract** (audit plan + what was done + test notes + docs
+   touched + acceptance criteria + linked backlog item). *Interim (bootstrapping,
+   pre-0.8):* there is no remote PR/CI gate — run the FULL gates locally
+   (`validate` + tests + `build` + `npm audit --audit-level=high`) in this final
+   step, then ff-merge to `main` (Merge strategy below) on the owner's approval.
 
 ### Automated gate (CI)
 
-On every PR, CI runs `validate` + tests + `build` + `npm audit --audit-level=high`.
-**A PR cannot merge unless CI is green** (required status check). Humans then
-review substance.
+*Target (from 0.8):* on every PR, CI runs `validate` + tests + `build` +
+`npm audit --audit-level=high`; **a PR cannot merge unless CI is green** (required
+status check). Humans then review substance. *Interim (pre-0.8):* the same gates run
+LOCALLY as the topic's final step (Developer step 4); there is no remote check yet.
 
-### Manager (the owner, remote)
+### Manager (the owner)
 
-6. **PR review** against the contract (plan, acceptance criteria, code, docs) —
-   with CI green. Issues → back to the developer.
-7. **Merge to `main`** → production deploy (Vercel) + release-please opens/updates
-   the Release PR (§14).
+5. **Review** against the contract (plan, acceptance criteria, code, docs) across the
+   topic's sub-commits — *target:* on the PR with CI green; *interim:* on the local
+   branch/commits. Issues → back to the developer.
+6. **Merge to `main`** preserving the sub-commits (Merge strategy below) →
+   *(from 0.8)* production deploy (Vercel) + release-please opens/updates the Release
+   PR (§14).
 
-`main` is protected. Solo configuration: required status checks (CI green) +
-manual review-and-merge (GitHub does not allow approving your own PR). When a
-teammate joins, enable required approvals (1+). Rollback: Vercel instant rollback
-to a previous deployment; urgent fix via `fix/*`, same flow expedited.
+### Merge strategy
+
+Merges **PRESERVE the reviewed sub-commits linearly on `main` — no squash.** Each
+sub-commit is atomic, reviewed, and Conventional, and release-please reads each type
+(§14), so squashing would drop release signal. *Interim (pre-0.8):*
+`git merge --ff-only <branch>` locally → `git push` → delete the branch.
+*Target (from 0.8):* **Rebase and merge** on GitHub (never "Squash and merge").
+
+### Branch protection
+
+`main` protection (required status checks + required PR) comes online in **0.8** with
+CI. Until then it is OFF and the developer ff-merges directly after the local gates.
+Solo note: GitHub does not let you approve your own PR, so once PRs are enabled use
+required status checks (CI green) as the gate; enable required approvals (1+) when a
+teammate joins. Rollback *(from 0.8)*: Vercel instant rollback to a previous
+deployment; urgent fix via `fix/*`, same flow expedited.
 
 ### Fast path
 
 Trivial, low-risk changes (incl. Dependabot bumps) skip the formal audit / Active
-Work ceremony (implement → self-review → commit → PR) — but PR + CI + the
-manager's merge still apply. The gates are never skipped; only the audit is
-lightened.
+Work ceremony (implement → self-review → Conventional commit) — but the gates are
+never skipped: local gates + ff-merge now; PR + CI + the owner's merge from 0.8. Only
+the audit is lightened.
 
 ### Git conventions
 
-Branches `feat/*`, `fix/*`, `chore/*` (also `docs/*`, `refactor/*`, `test/*`).
-Conventional Commits (`type(scope): subject`), enforced by commitlint (§12) and
-consumed by release-please (§14). Push is manual. PRs squash-merge to a linear
-history; the squash message (= PR title) is conventional.
+Branches `feat/*`, `fix/*`, `chore/*` (also `docs/*`, `refactor/*`, `test/*`) — one
+topic per branch, carrying MULTIPLE Conventional Commits (`type(scope): subject`),
+one per reviewed sub-item, enforced by commitlint (§12) and consumed by release-please
+(§14). Push is manual. Merges preserve the sub-commits (Merge strategy above):
+`git merge --ff-only` now, **Rebase and merge** from 0.8 — never squash.
 
 Every prompt ends with: "If you see an issue, ambiguity, or a better suggestion,
 surface it before implementing. Otherwise proceed." Gate failures loop back: a
-failed self-review returns to step 2; a failed PR review returns to the developer.
+failed self-review returns to implementation; a failed review returns to the developer.
 
 ## 16. Accessibility and Performance
 

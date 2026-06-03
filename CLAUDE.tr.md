@@ -54,19 +54,21 @@ a better suggestion, surface it before implementing. Otherwise proceed."
 
 ## 0.1 Active Work
 
-Tek "neredeyiz" göstergesi — aynı anda TEK aktif görev. Neyin devam ettiğini ve
-nerede olduğunu tek bakışta söyler. Ayrıntılı adım-adım günlük burada değil, PR
-açıklamasında (sözleşme, §15) yaşar — böylece bu kısım küçük kalır ve kural
-dosyası ne şişer ne de merge conflict üretir. Audit onaylanınca oluşturulur; iş
-ilerledikçe `Next` satırı ve `status` güncellenir; görev bitince son commit'te
-maddenin tamamı SİLİNİR. Kalıcı iz `SPRINT_PLAN.md`'dir.
+Tek "neredeyiz" göstergesi — aynı anda TEK aktif TOPIC (≈ bir SPRINT_PLAN görevi;
+bir branch = bir topic, §15). Neyin devam ettiğini ve nerede olduğunu — mevcut
+alt-madde dahil (`Next` satırı) — tek bakışta söyler. Ayrıntılı iz burada değil,
+topic'in alt-madde-başına commit'lerinde (ve PR'lar 0.8'de açılınca PR açıklamasında
+— sözleşme, §15) yaşar — böylece bu kısım küçük kalır ve kural dosyası ne şişer ne de
+merge conflict üretir. Audit onaylanınca oluşturulur; alt-maddeler indikçe `Next`
+satırı ve `status` güncellenir; topic bitince topic'in son commit'inde maddenin
+tamamı SİLİNİR. Kalıcı iz `SPRINT_PLAN.md`'dir.
 
 **Biçim**:
 
 ```markdown
 ### Active: <SPRINT_PLAN id + ad> · branch: <branch> · status: <planned | in-progress | in-review>
 Sections: <CLAUDE.md §referansları>   ·   Paths: <dokunulan ana yollar>
-Next: <bağlam olmadan başlamaya yetecek kadar net, sıradaki eylem>
+Next: <mevcut/sıradaki alt-madde — bağlam olmadan başlamaya yetecek kadar net>
 ```
 
 _(Devam eden aktif iş yok.)_
@@ -811,9 +813,13 @@ branch'lerine elle yazılmaz; böylece eşzamanlı iş onda çakışmaz.
 
 - **Changeset dosyası yok.** Bump, `main`'deki commit tiplerinden türetilir:
   `fix:` → patch, `feat:` → minor, `feat!:` / `BREAKING CHANGE` → major. Yani
-  okunur geçmiş (commitlint, §12) aynı zamanda release kaynağıdır.
-- **Release akışı**: bir feature PR'ı `main`'e merge etmek kodu hemen deploy eder
-  (Vercel); sürüm değişmez. release-please GitHub Action'ı
+  okunur geçmiş (commitlint, §12) aynı zamanda release kaynağıdır. İncelenmiş her
+  sub-commit `main` üzerinde **korunur** (squash yok — §15 Merge stratejisi), böylece
+  release-please her Conventional tipi okur.
+- **Release akışı**: bir topic branch'ini `main`'e merge etmek — sub-commit'lerini
+  koruyarak (şimdi ff-merge; 0.8'den itibaren **Rebase and merge**, §15) — kodu hemen
+  deploy eder (Vercel, 0.8'den itibaren); sürüm değişmez. release-please GitHub
+  Action'ı
   (`.github/workflows/release.yml`, config `release-please-config.json` +
   `.release-please-manifest.json`) tek bir **Release PR** açar/günceller; bu PR
   sürümü yükseltir ve son release'ten beri olan commit'lerden `CHANGELOG.md`'yi
@@ -846,51 +852,79 @@ taşıyabilir.
 ### Geliştirici (yerel)
 
 1. **Audit / Plan** — kod yok. Kapsam + alt-adım kırılımı + test planı + danışılan
-   dokümanlar + drift. Sohbette netleşir; onayda §0.1 Active Work maddesi oluşur.
-2. **Implementation** — Claude Code kod + test yazar. Commit YAPMAZ.
-3. **Geliştirici self code-review** — geliştirici Claude Code'un çıktısını
-   inceler; sorun → düzelt → tekrar incele (döngü). Yalnız emin olunca commit.
-4. **commit + docs:sync** — kod + test + docs (iki dil, §13.3) + `SPRINT_PLAN.md`
-   ✅ + Active Work güncellemesi; Conventional Commit mesajıyla (§14). Görevin son
-   commit'i Active Work maddesini SİLER.
-5. **push** feature branch → **PR aç. PR açıklaması sözleşmedir**: audit planı +
-   ne yapıldı + test notları + dokunulan docs + kabul kriteri + bağlı backlog
-   maddesi.
+   dokümanlar + drift. Sohbette netleşir; onayda TOPIC için §0.1 Active Work maddesi
+   oluşur.
+2. **Implementation, her seferinde bir alt-madde** — bir branch TEK bir topic'tir
+   (≈ bir SPRINT_PLAN görevi ya da sıkı ilişkili alt-adımlar grubu) ve BİRDEN ÇOK
+   commit taşır, incelenmiş her alt-madde için bir tane. Her alt-madde için: Claude
+   Code kod + test yazar → **geliştirici self code-review** (sorun → düzelt → tekrar
+   incele döngüsü) → emin olununca bir Conventional Commit (commitlint her commit'te
+   çalışır, §12). Claude Code açık onay olmadan asla commit'lemez. §0.1 Active Work
+   `Next` / `status`, alt-maddeler indikçe güncellenir.
+3. **Topic'in son commit'inde docs:sync** — docs (iki dil, §13.3) + `SPRINT_PLAN.md`
+   ✅ + Active Work silinmesi, topic'in SON commit'inde (ya da kendi `docs:` /
+   `chore:` commit'inde) yer alır; Conventional mesajla (§14).
+4. **Topic'i bitir.** *Hedef (0.8'den itibaren):* branch'i **push** et → **PR aç; PR
+   açıklaması sözleşmedir** (audit planı + ne yapıldı + test notları + dokunulan docs
+   + kabul kriteri + bağlı backlog maddesi). *Geçici (bootstrapping, 0.8 öncesi):*
+   uzak PR/CI kapısı yok — bu son adımda TÜM kapıları yerelde çalıştır
+   (`validate` + testler + `build` + `npm audit --audit-level=high`), sonra sahibin
+   onayıyla `main`'e ff-merge et (aşağıdaki Merge stratejisi).
 
 ### Otomatik kapı (CI)
 
-Her PR'da CI `validate` + testler + `build` + `npm audit --audit-level=high`
-çalıştırır. **CI yeşil olmadan PR merge edilemez** (required status check).
-İnsanlar sonra özü inceler.
+*Hedef (0.8'den itibaren):* her PR'da CI `validate` + testler + `build` +
+`npm audit --audit-level=high` çalıştırır; **CI yeşil olmadan PR merge edilemez**
+(required status check). İnsanlar sonra özü inceler. *Geçici (0.8 öncesi):* aynı
+kapılar topic'in son adımında YERELDE çalışır (Geliştirici adım 4); henüz uzak
+kontrol yok.
 
-### Yönetici (sahip, uzak)
+### Yönetici (sahip)
 
-6. **PR incelemesi** sözleşmeye karşı (plan, kabul kriteri, kod, docs) — CI yeşil
-   ile. Sorun → geliştiriciye geri.
-7. **`main`'e merge** → production deploy (Vercel) + release-please Release PR'ı
+5. **İnceleme** sözleşmeye karşı (plan, kabul kriteri, kod, docs), topic'in
+   sub-commit'leri boyunca — *hedef:* CI yeşil ile PR üzerinde; *geçici:* yerel
+   branch/commit'ler üzerinde. Sorun → geliştiriciye geri.
+6. **`main`'e merge**, sub-commit'leri koruyarak (aşağıdaki Merge stratejisi) →
+   *(0.8'den itibaren)* production deploy (Vercel) + release-please Release PR'ı
    açar/günceller (§14).
 
-`main` korumalıdır. Solo konfigürasyon: required status checks (CI yeşil) + manuel
-inceleme-ve-merge (GitHub kendi PR'ını onaylamana izin vermez). Bir takım arkadaşı
-katılınca required approvals'ı (1+) etkinleştir. Rollback: Vercel anında önceki
-deploy'a döner; acil düzeltme `fix/*` ile, aynı akış hızlandırılmış.
+### Merge stratejisi
+
+Merge'ler **incelenmiş sub-commit'leri `main` üzerinde lineer KORUR — squash yok.**
+Her sub-commit atomik, incelenmiş ve Conventional'dır ve release-please her tipi
+okur (§14); squash release sinyalini düşürürdü. *Geçici (0.8 öncesi):*
+yerelde `git merge --ff-only <branch>` → `git push` → branch'i sil.
+*Hedef (0.8'den itibaren):* GitHub'da **Rebase and merge** (asla "Squash and merge").
+
+### Branch koruması
+
+`main` koruması (required status checks + zorunlu PR) CI ile birlikte **0.8**'de
+devreye girer. O zamana dek KAPALIdır ve geliştirici yerel kapılardan sonra doğrudan
+ff-merge eder. Solo not: GitHub kendi PR'ını onaylamana izin vermez; PR'lar
+açıldığında kapı olarak required status checks (CI yeşil) kullan; bir takım arkadaşı
+katılınca required approvals'ı (1+) etkinleştir. Rollback *(0.8'den itibaren)*:
+Vercel anında önceki deploy'a döner; acil düzeltme `fix/*` ile, aynı akış
+hızlandırılmış.
 
 ### Fast path
 
 Trivial, düşük-riskli değişiklikler (Dependabot bump'ları dahil) formal audit /
-Active Work seremonisini atlar (implement → self-review → commit → PR) — ama PR +
-CI + yöneticinin merge'i yine geçerli. Kapılar asla atlanmaz; yalnız audit hafifler.
+Active Work seremonisini atlar (implement → self-review → Conventional commit) — ama
+kapılar asla atlanmaz: şimdi yerel kapılar + ff-merge; 0.8'den itibaren PR + CI +
+sahibin merge'i. Yalnız audit hafifler.
 
 ### Git konvansiyonları
 
-Branch'ler `feat/*`, `fix/*`, `chore/*` (ayrıca `docs/*`, `refactor/*`, `test/*`).
-Conventional Commits (`type(scope): subject`), commitlint ile dayatılır (§12) ve
-release-please tarafından tüketilir (§14). Push manueldir. PR'lar linear history'ye
-squash-merge edilir; squash mesajı (= PR başlığı) conventional'dır.
+Branch'ler `feat/*`, `fix/*`, `chore/*` (ayrıca `docs/*`, `refactor/*`, `test/*`) —
+branch başına tek topic, BİRDEN ÇOK Conventional Commit (`type(scope): subject`)
+taşır, incelenmiş her alt-madde için bir tane; commitlint ile dayatılır (§12) ve
+release-please tarafından tüketilir (§14). Push manueldir. Merge'ler sub-commit'leri
+korur (yukarıdaki Merge stratejisi): şimdi `git merge --ff-only`, 0.8'den itibaren
+**Rebase and merge** — asla squash.
 
 Her prompt şununla biter: "If you see an issue, ambiguity, or a better suggestion,
 surface it before implementing. Otherwise proceed." Kapı başarısızlıkları geri
-döner: başarısız self-review adım 2'ye, başarısız PR incelemesi geliştiriciye.
+döner: başarısız self-review implementation'a, başarısız inceleme geliştiriciye.
 
 ## 16. Erişilebilirlik ve Performans
 
