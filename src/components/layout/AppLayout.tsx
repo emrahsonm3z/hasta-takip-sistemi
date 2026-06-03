@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Outlet, ScrollRestoration, useMatches } from 'react-router-dom'
 
+import { Loading } from '@/components/Loading'
 import { getRouteHandle } from '@/lib/route'
 
 import { AppSidebar } from './AppSidebar'
@@ -31,7 +32,9 @@ export function AppLayout() {
       <div className="flex min-w-0 flex-1 flex-col">
         <AppTopbar title={title} onMenuToggle={() => setMobileMenuOpen(true)} />
         <main className="flex-1 p-6">
-          <Outlet />
+          <Suspense fallback={<Loading />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
       <ScrollRestoration />

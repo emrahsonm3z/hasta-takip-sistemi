@@ -1,8 +1,9 @@
+import { lazy } from 'react'
 import type { RouteObject } from 'react-router-dom'
 
 import type { AppRouteHandle } from '@/types/route.types'
 
-import DocsOverviewPage from './pages/DocsOverviewPage'
+const DocsOverviewPage = lazy(() => import('./pages/DocsOverviewPage'))
 
 export const DOCS_ROUTES = {
   OVERVIEW: {

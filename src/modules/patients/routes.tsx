@@ -1,8 +1,9 @@
+import { lazy } from 'react'
 import type { RouteObject } from 'react-router-dom'
 
 import type { AppRouteHandle } from '@/types/route.types'
 
-import PatientsPage from './pages/PatientsPage'
+const PatientsPage = lazy(() => import('./pages/PatientsPage'))
 
 export const PATIENT_ROUTES = {
   LIST: {
