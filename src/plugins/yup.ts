@@ -2,19 +2,23 @@ import { setLocale } from 'yup'
 
 import type { TranslationKey } from '@/types/i18n.types'
 
+function message(key: TranslationKey, values?: Record<string, unknown>): string {
+  return JSON.stringify({ key, values })
+}
+
 setLocale({
   mixed: {
-    default: 'validation.invalid' satisfies TranslationKey,
-    required: 'validation.required' satisfies TranslationKey,
-    notType: 'validation.invalid' satisfies TranslationKey,
+    default: () => message('validation.invalid'),
+    required: () => message('validation.required'),
+    notType: () => message('validation.invalid'),
   },
   string: {
-    email: 'validation.email' satisfies TranslationKey,
-    min: 'validation.stringMin' satisfies TranslationKey,
-    max: 'validation.stringMax' satisfies TranslationKey,
+    email: () => message('validation.email'),
+    min: ({ min }) => message('validation.stringMin', { min }),
+    max: ({ max }) => message('validation.stringMax', { max }),
   },
   number: {
-    min: 'validation.numberMin' satisfies TranslationKey,
-    max: 'validation.numberMax' satisfies TranslationKey,
+    min: ({ min }) => message('validation.numberMin', { min }),
+    max: ({ max }) => message('validation.numberMax', { max }),
   },
 })

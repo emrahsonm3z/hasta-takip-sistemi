@@ -1,9 +1,14 @@
 import { useState } from 'react'
+import { Form, Formik } from 'formik'
 import { Button } from 'primereact/button'
+import * as yup from 'yup'
 
 import { ErrorState } from '@/components/ErrorState'
+import { FormInputText } from '@/components/form'
 import { useNotify } from '@/composables/useNotify'
 import { normalizeErrorKey } from '@/composables/useNotify.lib'
+
+const demoSchema = yup.object({ fullName: yup.string().required().min(3) })
 
 export default function DevDemoPage() {
   const [crash, setCrash] = useState(false)
@@ -60,6 +65,20 @@ export default function DevDemoPage() {
             }}
           />
         </div>
+      </section>
+
+      <section className="rounded border border-surface-border p-4">
+        <h2 className="mb-3 font-medium text-text">Form* (validation)</h2>
+        <Formik
+          initialValues={{ fullName: '' }}
+          validationSchema={demoSchema}
+          onSubmit={() => undefined}
+        >
+          <Form className="flex max-w-sm flex-col gap-3">
+            <FormInputText name="fullName" labelKey="patients.fields.fullName" />
+            <Button type="submit" label="Submit" />
+          </Form>
+        </Formik>
       </section>
     </div>
   )
