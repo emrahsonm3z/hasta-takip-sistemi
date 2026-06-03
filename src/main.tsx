@@ -8,6 +8,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { PrimeReactProvider } from 'primereact/api'
 
 import App from '@/App'
+import { AppErrorBoundary } from '@/components/AppErrorBoundary'
 import { ConfigErrorScreen } from '@/components/ConfigErrorScreen'
 import { EnvConfigError, validateRequiredEnvVars } from '@/config/env'
 import { primeReactConfig } from '@/plugins/primereact'
@@ -28,10 +29,12 @@ applyTheme()
 
 root.render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <PrimeReactProvider value={primeReactConfig}>
-        <App />
-      </PrimeReactProvider>
-    </QueryClientProvider>
+    <AppErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <PrimeReactProvider value={primeReactConfig}>
+          <App />
+        </PrimeReactProvider>
+      </QueryClientProvider>
+    </AppErrorBoundary>
   </StrictMode>,
 )

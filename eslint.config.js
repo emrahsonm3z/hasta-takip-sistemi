@@ -105,6 +105,7 @@ export default tseslint.config(
       'src/**/*.{test,spec}.{ts,tsx}',
       'src/**/*.constants.{ts,tsx}',
       'src/**/constants/**',
+      'src/**/_dev/**',
     ],
     rules: {
       'i18next/no-literal-string': 'off',
