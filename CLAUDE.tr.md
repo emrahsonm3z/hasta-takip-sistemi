@@ -116,9 +116,11 @@ Veri kaynağı (GET, salt-okunur, tek-seferlik seed):
   bağlanır (§9).
 - Dependabot (`.github/dependabot.yml`, ENFORCE edildiği yer) beş tam-pinli kritik
   paket — `react`, `react-dom`, `primereact`, `primeicons`, `tailwindcss` — için
-  **TÜM güncelleme türlerini ignore eder** ki asla kaymasınlar, ve `eslint` için
-  **major'ı ignore eder** (eslint v10, eslint 9'da sabitlenen
-  `eslint-plugin-jsx-a11y`'yi bozar). Diğer her bağımlılığın minor / patch
+  **TÜM güncelleme türlerini ignore eder** ki asla kaymasınlar, ve `eslint` İLE
+  `@eslint/*` **major'larını ignore eder** (eslint v10, eslint 9'da sabitlenen
+  `eslint-plugin-jsx-a11y`'yi bozar; `@eslint/js` AYRI bir pakettir, major'u aynı
+  eslint hattını izler ve bir kez `eslint`-yalnız ignore'dan sızdı, bu yüzden
+  `@eslint/*` da ignore edilir). Diğer her bağımlılığın minor / patch
   güncellemeleri tek bir haftalık PR'da gruplanır ve yine CI + review'dan geçer
   (§15); güvenlik açığı `npm audit --audit-level=high` kapısıyla karşılanır.
 
@@ -879,10 +881,10 @@ release-please, Conventional Commits (§15) ile sürülür. Sürüm asla feature
 branch'lerine elle yazılmaz; böylece eşzamanlı iş onda çakışmaz.
 
 - **Changeset dosyası yok.** Bump, `main`'deki commit tiplerinden türetilir:
-  `fix:` → patch, `feat:` → minor, `feat!:` / `BREAKING CHANGE` → major. Yani
-  okunur geçmiş (commitlint, §12) aynı zamanda release kaynağıdır. İncelenmiş her
-  sub-commit `main` üzerinde **korunur** (squash yok — §15 Merge stratejisi), böylece
-  release-please her Conventional tipi okur.
+  `fix:` → patch, `feat:` → minor, `feat!:` / `BREAKING CHANGE` → major (aşağıdaki
+  1.0 öncesi istisnayla). Yani okunur geçmiş (commitlint, §12) aynı zamanda release
+  kaynağıdır. İncelenmiş her sub-commit `main` üzerinde **korunur** (squash yok —
+  §15 Merge stratejisi), böylece release-please her Conventional tipi okur.
 - **Release akışı** (canlı): bir topic branch'ini `main`'e merge etmek —
   sub-commit'lerini koruyarak (GitHub'da **Rebase and merge**, §15) — kodu hemen
   deploy eder (Vercel); sürüm değişmez. release-please GitHub Action'ı
@@ -895,6 +897,19 @@ branch'lerine elle yazılmaz; böylece eşzamanlı iş onda çakışmaz.
   `CHANGELOG` PR'ını kontrol olmadan doğrudan merge eder. Onu merge etmek sürüm
   bump'ı + git tag'i yapar. Uygulama özeldir — **npm publish yok**. Detay:
   `docs/tr/VERSIONING.md`.
+- **İlk geliştirmede 0.x.** release-please 1.0 öncesi aralıkta tutulur. Manifest
+  `0.0.0` değil **`0.0.1`** ile başlatılır — `0.0.0`'da release-please pre-major
+  seçeneklerini yoksayar ve doğrudan `1.0.0`'a atlar
+  (googleapis/release-please#2087) — ve `bump-minor-pre-major: true`
+  (`release-please-config.json`) breaking değişiklikleri 0.x içinde MINOR bump
+  olarak tutar. Yani 1.0 öncesi: `feat:` ve breaking değişiklikler **minor**'ı
+  yükseltir (örn. `0.1.0` → `0.2.0`, 0.x'te kalır), `fix:` ise **patch**'i. İlk
+  release böylece `0.1.0` olur. `1.0.0`'a geçiş **bilinçlidir**, uygulama
+  feature-complete olunca yapılır — bir breaking değişiklikle otomatik tetiklenmez.
+- **Gerekli repo ayarı.** release-please Release PR'ını `GITHUB_TOKEN` ile açtığı
+  için, **Settings → Actions → General → Workflow permissions → "Allow GitHub
+  Actions to create and approve pull requests"** ETKİN olmalı, yoksa Action Release
+  PR'ını açamaz.
 
 ## 15. Workflow
 
