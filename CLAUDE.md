@@ -40,6 +40,7 @@ the UNION of all matching rows.
 | Versioning / release               | §14                 | `docs/en/VERSIONING.md`                        |
 | Workflow / audit / commit / merge  | §15                 | `docs/en/WORKFLOW.md`                          |
 | Accessibility / performance        | §16                 | `docs/en/COMPONENTS.md`                        |
+| Responsive design / responsiveness | §16                 | `docs/en/COMPONENTS.md`                        |
 
 **Always-on** (every task): §0.1 Active Work (read FIRST), §7 Naming, §8 Text &
 i18n, §13 Documentation System, §15 Workflow (incl. pre-work doc reading).
@@ -510,6 +511,18 @@ The `.dark` class exists ONLY for the app-specific custom tokens PrimeReact does
 not provide, defined once for BOTH modes — under `:root { … }` and `.dark { … }`
 (the same class Tailwind toggles) — never a single-mode hardcoded value.
 
+### Prefer a theme var; add a custom token only when needed
+
+Default to a Lara theme var — via the bridged Tailwind tokens (`primary`,
+`surface.*`, `ground`, `card`, `surface-border`, `text`, `text-secondary`) or the
+`_tokens.scss` aliases — for any colour/surface that has a suitable one. This keeps
+PrimeReact and Tailwind on ONE palette, dark-correct via the theme swap (no `dark:`).
+Define an app-specific CUSTOM token (`:root` + `.dark`, both modes — e.g.
+`--app-background`, the FOUC background) ONLY when no suitable theme var exists OR
+there is a clear functional reason (e.g. a value needed before the theme link loads).
+Use judgment: reach for an existing var first; do not fragment the palette with
+parallel custom colours.
+
 ### Token pipeline
 
 ```
@@ -936,6 +949,22 @@ failed self-review returns to implementation; a failed review returns to the dev
 - No premature memoisation — the native table removes most of the need; memoise
   only a measured bottleneck.
 
+**Responsive (mobile-first):**
+
+- Design mobile-first; layer Tailwind breakpoints up (`sm` 640 / `md` 768 / `lg`
+  1024 / `xl` 1280 — Tailwind defaults). Avoid fixed pixel widths; prefer fluid
+  utilities (`w-full`, `max-w-*`, grid/flex) and verify at `sm`/`md`/`lg`/`xl`.
+- Bake responsive behaviour into the `App*` / `Form*` wrappers so screens get it by
+  default: `AppSidebar` collapses on small screens (off-canvas/toggle); `AppDataTable`
+  adopts a responsive/horizontal-scroll mode rather than overflowing; `Form*` fields
+  stack to one column on narrow widths; `Dialog` goes full-width on mobile.
+- Tool split: use **PrimeReact's own responsive features** for a component's internals
+  — `DataTable` scroll/responsive mode, `Dialog` `breakpoints` (e.g.
+  `{ '960px': '75vw', '640px': '95vw' }`) — and **Tailwind breakpoint utilities** for
+  the layout/spacing around them. Don't reimplement what the component already provides.
+  (The exact `AppDataTable` responsive prop is settled when that wrapper is built in
+  1.2.)
+
 ## 17. Checklist for New Code
 
 1. Module placement (§2 §3) — barrel-only imports; module-specific code in the
@@ -953,14 +982,16 @@ failed self-review returns to implementation; a failed review returns to the dev
    PrimeReact + Day.js locale synced.
 7. Turkish-aware text (§8) — NFC + `toLocaleLowerCase('tr')`; `Intl.Collator('tr')`
    via `lib/text.ts` / `AppDataTable`.
-8. Styling (§9) — token-backed only, no raw hex; SCSS via `_tokens.scss`; every
-   colour valid in both modes; no `dark:` on token colours; no `@apply` in SCSS.
+8. Styling (§9) — token-backed only, no raw hex; prefer a theme var, custom token
+   only when no suitable var exists or a functional reason; SCSS via `_tokens.scss`;
+   every colour valid in both modes; no `dark:` on token colours; no `@apply` in SCSS.
 9. State (§10) — React Query seeds from storage; CRUD via the storage service +
    `invalidateQueries`; query-key factory; one source of truth.
 10. Tests (§11) — planned in audit, written with the code; MSW for the GET;
     colocated.
 11. Lint/format (§12) — `validate` passes.
-12. Accessibility / performance (§16) — labelled fields, a11y lint, lazy routes.
+12. Accessibility / performance / responsive (§16) — labelled fields, a11y lint,
+    lazy routes; mobile-first, Tailwind breakpoints, responsive `App*`/`Form*` wrappers.
 13. Docs (§13) — routed through §13.3, both languages, registered per §13.4
     (incl. `docsRegistry`).
 14. Versioning (§14) — a clear Conventional Commit (release-please derives the

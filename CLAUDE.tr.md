@@ -45,6 +45,7 @@ eşleşen tüm satırların BİRLEŞİMİ.
 | Sürümleme / release                | §14                 | `docs/tr/VERSIONING.md`                        |
 | Workflow / audit / commit / merge  | §15                 | `docs/tr/WORKFLOW.md`                          |
 | Erişilebilirlik / performans       | §16                 | `docs/tr/COMPONENTS.md`                        |
+| Responsive tasarım / responsiveness | §16                 | `docs/tr/COMPONENTS.md`                        |
 
 **Her zaman açık** (her görev): §0.1 Active Work (ÖNCE oku), §7 İsimlendirme,
 §8 Metin & i18n, §13 Dokümantasyon Sistemi, §15 Workflow (ön-iş doküman okuması dahil).
@@ -517,6 +518,18 @@ renklerde Tailwind `dark:` varyantı KULLANMA; swap zaten mod-doğru yapar.**
 için vardır; HER İKİ mod için bir kez tanımlanır — `:root { … }` ve `.dark { … }`
 altında (Tailwind'in değiştirdiği aynı sınıf) — asla tek-modlu hardcoded değer.
 
+### Önce tema değişkeni; custom token yalnız gerektiğinde
+
+Uygun bir tema değişkeni olan herhangi bir renk/yüzey için varsayılan olarak bir
+Lara tema değişkeni kullan — köprülenmiş Tailwind token'ları (`primary`,
+`surface.*`, `ground`, `card`, `surface-border`, `text`, `text-secondary`) ya da
+`_tokens.scss` alias'ları üzerinden. Bu, PrimeReact ile Tailwind'i TEK bir palette
+tutar, tema swap'i sayesinde mod-doğrudur (`dark:` yok). Uygulamaya-özel bir CUSTOM
+token'ı (`:root` + `.dark`, her iki mod — ör. `--app-background`, FOUC arka planı)
+YALNIZCA uygun bir tema değişkeni yokken VEYA net bir işlevsel neden varken tanımla
+(ör. tema link'i yüklenmeden önce gereken bir değer). Muhakeme kullan: önce mevcut
+bir değişkene uzan; paleti paralel custom renklerle parçalama.
+
 ### Token boru hattı
 
 ```
@@ -949,6 +962,22 @@ döner: başarısız self-review implementation'a, başarısız inceleme gelişt
 - Erken memoization yok — native tablo ihtiyacın çoğunu kaldırır; yalnız ölçülen
   bir darboğazı memoize et.
 
+**Responsive (mobile-first):**
+
+- Mobile-first tasarla; Tailwind breakpoint'lerini yukarı katmanla (`sm` 640 /
+  `md` 768 / `lg` 1024 / `xl` 1280 — Tailwind varsayılanları). Sabit piksel
+  genişliklerinden kaçın; akışkan utility'leri tercih et (`w-full`, `max-w-*`,
+  grid/flex) ve `sm`/`md`/`lg`/`xl`'de doğrula.
+- Responsive davranışı `App*` / `Form*` wrapper'larına göm ki ekranlar varsayılan
+  olarak alsın: `AppSidebar` küçük ekranlarda toplanır (off-canvas/toggle);
+  `AppDataTable` taşma yerine responsive/yatay-scroll moduna geçer; `Form*` alanları
+  dar genişliklerde tek kolona iner; `Dialog` mobilde tam genişlik olur.
+- Araç ayrımı: bir bileşenin iç yapısı için **PrimeReact'in kendi responsive
+  özelliklerini** kullan — `DataTable` scroll/responsive modu, `Dialog` `breakpoints`
+  (ör. `{ '960px': '75vw', '640px': '95vw' }`) — ve etraflarındaki layout/spacing için
+  **Tailwind breakpoint utility'leri**. Bileşenin zaten sağladığını yeniden yazma.
+  (Kesin `AppDataTable` responsive prop'u, o wrapper 1.2'de yazılırken belirlenir.)
+
 ## 17. Yeni Kod için Kontrol Listesi
 
 1. Modül yerleştirme (§2 §3) — barrel-only import'lar; modüle-özel kod modülde,
@@ -966,13 +995,17 @@ döner: başarısız self-review implementation'a, başarısız inceleme gelişt
    PrimeReact + Day.js locale senkron.
 7. Türkçe-duyarlı metin (§8) — NFC + `toLocaleLowerCase('tr')`; `Intl.Collator('tr')`
    `lib/text.ts` / `AppDataTable` üzerinden.
-8. Stil (§9) — yalnız token-destekli, ham hex yok; SCSS `_tokens.scss` üzerinden;
-   her renk iki modda geçerli; token renklerinde `dark:` yok; SCSS'te `@apply` yok.
+8. Stil (§9) — yalnız token-destekli, ham hex yok; önce tema değişkeni, custom token
+   yalnız uygun değişken yokken ya da işlevsel neden varken; SCSS `_tokens.scss`
+   üzerinden; her renk iki modda geçerli; token renklerinde `dark:` yok; SCSS'te
+   `@apply` yok.
 9. Durum (§10) — React Query storage'tan seed eder; CRUD storage servisi +
    `invalidateQueries` ile; query-key factory; tek doğruluk kaynağı.
 10. Testler (§11) — audit'te planlanır, kodla yazılır; GET için MSW; colocate.
 11. Lint/format (§12) — `validate` geçer.
-12. Erişilebilirlik / performans (§16) — etiketli alanlar, a11y lint, lazy route'lar.
+12. Erişilebilirlik / performans / responsive (§16) — etiketli alanlar, a11y lint,
+    lazy route'lar; mobile-first, Tailwind breakpoint'leri, responsive `App*`/`Form*`
+    wrapper'ları.
 13. Docs (§13) — §13.3 üzerinden yönlendirilir, iki dil, §13.4 ile kaydedilir
     (`docsRegistry` dahil).
 14. Sürümleme (§14) — net bir Conventional Commit (release-please bump'ı türetir);
