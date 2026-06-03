@@ -1,0 +1,21 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: '/'
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+    ignore:
+      - dependency-name: react
+      - dependency-name: react-dom
+      - dependency-name: primereact
+      - dependency-name: primeicons
+      - dependency-name: tailwindcss
+      - dependency-name: eslint
+        update-types:
+          - version-update:semver-major
