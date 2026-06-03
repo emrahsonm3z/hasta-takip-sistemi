@@ -1,6 +1,9 @@
 import { initReactI18next } from 'react-i18next'
 import i18n from 'i18next'
 
+import en from '@/locales/en.json'
+import tr from '@/locales/tr.json'
+
 import { setDayjsLocale } from './dayjs'
 import { setPrimeReactLocale } from './primereact'
 
@@ -8,28 +11,8 @@ export const DEFAULT_LANGUAGE = 'tr'
 export const FALLBACK_LANGUAGE = 'en'
 
 const resources = {
-  tr: {
-    translation: {
-      errors: {
-        config: {
-          title: 'Yapılandırma hatası',
-          message:
-            'Uygulama gerekli yapılandırmadan yoksun. Lütfen sistem yöneticinizle iletişime geçin.',
-        },
-      },
-    },
-  },
-  en: {
-    translation: {
-      errors: {
-        config: {
-          title: 'Configuration error',
-          message:
-            'The application is missing required configuration. Please contact your administrator.',
-        },
-      },
-    },
-  },
+  tr: { translation: tr },
+  en: { translation: en },
 }
 
 function syncLanguageCompanions(language: string): void {
