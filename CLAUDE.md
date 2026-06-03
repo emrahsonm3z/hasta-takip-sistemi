@@ -68,9 +68,7 @@ Sections: <CLAUDE.md §refs>   ·   Paths: <key paths touched>
 Next: <the current/next sub-item — specific enough to start without context>
 ```
 
-### Active: consolidate tests under src/__test__/ (refactor, no SPRINT task) · branch: refactor/consolidate-tests · status: in-progress
-Sections: §3 §11 §15   ·   Paths: src/__test__/, CLAUDE.md (§3/§11/§13.2/§17)
-Next: commit 2 — doc-sync test-location references (§3/§11/§13.2/§17 + tr); delete this item
+_(No active work in progress.)_
 
 ## 1. Project Overview
 
@@ -161,6 +159,7 @@ Authoritative detail: `docs/en/ARCHITECTURE.md`.
 ```
 src/
 ├── main.tsx                 Bootstrap: init i18n → validate env → apply theme link → providers → RouterProvider
+├── __test__/                node:test specs mirroring the source tree (§11); value imports relative, type-only via @/
 ├── config/
 │   ├── env.ts               Typed frozen env + validateRequiredEnvVars()
 │   └── vite-env.d.ts        ImportMetaEnv augmentation
@@ -240,7 +239,7 @@ src/
 
 Repo root: index.html (holds <link id="app-theme"> + pre-paint theme-mode script, §9),
 README.md, .env.example, .nvmrc, vercel.json,
-package.json, vite.config.ts, tsconfig.json (+ tsconfig.app/node/test.json; test.json = node-typed config for *.test.ts), eslint.config.js, tailwind.config.ts,
+package.json, vite.config.ts, tsconfig.json (+ tsconfig.app/node/test.json; test.json = node-typed config for src/__test__ *.test.ts), eslint.config.js, tailwind.config.ts,
 postcss.config.js, stylelint.config.js, commitlint.config.js, .husky/,
 release-please-config.json, .release-please-manifest.json,
 tools/eslint/no-explanatory-comments.js (custom lint rule, §12),
@@ -705,7 +704,9 @@ Vitest + React Testing Library + MSW. Tests are PLANNED in the audit step (§15)
 and WRITTEN with the code in implementation.
 
 - **Network** — the GET is mocked with MSW; no real network in tests.
-- **Layout** — test files are colocated with source as `*.test.ts(x)`.
+- **Layout** — test files live under `src/__test__/` mirroring the source tree, as
+  `*.test.ts(x)`. Value imports use relative paths (node:test does not resolve `@/`);
+  type-only imports may use `@/`. The tooling RuleTester test stays in `tools/eslint/`.
 - **Coverage** — no mandatory threshold; priority targets are pure `lib/`
   (mapper, `pickLocalized`, `formatDate`, Turkish normalise), the composables'
   CRUD-on-storage behaviour, and the custom lint rule (`RuleTester`).
@@ -773,7 +774,7 @@ All docs exist in both `docs/en/` and `docs/tr/` (CHANGELOG.md excepted — §13
 | `STYLING.md`            | v10 theme model, Lara Green via resources ?url, theme-swap dark mode, Tailwind + SCSS token aliases, SMACSS, both-mode colour |
 | `STATE_MANAGEMENT.md`   | localStorage source + React Query seed, invalidation-only CRUD, mapper, query keys |
 | `I18N.md`               | Locale files, keys, flat localized fields + `pickLocalized`, key-only typing, PrimeReact locale, dates, Turkish-aware text |
-| `TESTING.md`            | Test strategy, MSW, colocation, priorities                |
+| `TESTING.md`            | Test strategy, MSW, layout (`src/__test__`), priorities   |
 | `WORKFLOW.md`           | Team roles, backlog, gated flow, CI gate, PR-as-contract, fast path, CI/Vercel/release mechanics |
 | `VERSIONING.md`         | release-please Release-PR flow, Conventional-Commit bumps, no publish |
 | `SPRINT_PLAN.md`        | Living backlog + completed (✅) record — kept permanently |
@@ -1013,8 +1014,8 @@ failed self-review returns to implementation; a failed review returns to the dev
    every colour valid in both modes; no `dark:` on token colours; no `@apply` in SCSS.
 9. State (§10) — React Query seeds from storage; CRUD via the storage service +
    `invalidateQueries`; query-key factory; one source of truth.
-10. Tests (§11) — planned in audit, written with the code; MSW for the GET;
-    colocated.
+10. Tests (§11) — planned in audit, written with the code; MSW for the GET; under
+    `src/__test__/` mirroring source.
 11. Lint/format (§12) — `validate` passes.
 12. Accessibility / performance / responsive (§16) — labelled fields, a11y lint,
     lazy routes; mobile-first, Tailwind breakpoints, responsive `App*`/`Form*` wrappers.

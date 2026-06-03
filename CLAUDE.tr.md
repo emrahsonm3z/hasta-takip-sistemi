@@ -163,6 +163,7 @@ Otoriter detay: `docs/tr/ARCHITECTURE.md`.
 ```
 src/
 ├── main.tsx                 Bootstrap: i18n init → env doğrula → tema link uygula → provider'lar → RouterProvider
+├── __test__/                kaynak ağacını yansıtan node:test spec'leri (§11); value import'lar göreli, yalnız-tip @/ ile
 ├── config/
 │   ├── env.ts               Tipli donmuş env + validateRequiredEnvVars()
 │   └── vite-env.d.ts        ImportMetaEnv augmentation
@@ -241,7 +242,7 @@ src/
 
 Repo kökü: index.html (<link id="app-theme"> + paint-öncesi theme-mode script'i tutar, §9),
 README.md, .env.example, .nvmrc, vercel.json,
-package.json, vite.config.ts, tsconfig.json, eslint.config.js, tailwind.config.ts,
+package.json, vite.config.ts, tsconfig.json (+ tsconfig.app/node/test.json; test.json = src/__test__ *.test.ts için node-tipli config), eslint.config.js, tailwind.config.ts,
 postcss.config.js, stylelint.config.js, commitlint.config.js, .husky/,
 release-please-config.json, .release-please-manifest.json,
 tools/eslint/no-explanatory-comments.js (custom lint kuralı, §12),
@@ -711,7 +712,10 @@ Vitest + React Testing Library + MSW. Testler audit adımında (§15) PLANLANIR 
 implementation'da kodla birlikte YAZILIR.
 
 - **Ağ** — GET, MSW ile mock'lanır; testte gerçek ağ yok.
-- **Düzen** — test dosyaları kaynakla `*.test.ts(x)` olarak colocate edilir.
+- **Düzen** — test dosyaları kaynak ağacını yansıtarak `src/__test__/` altında
+  `*.test.ts(x)` olarak yaşar. Value import'lar göreli yol kullanır (node:test `@/`
+  alias'ını çözmez); yalnız-tip import'lar `@/` kullanabilir. Tooling RuleTester
+  testi `tools/eslint/` içinde kalır.
 - **Coverage** — zorunlu eşik yok; öncelik hedefleri saf `lib/` (mapper,
   `pickLocalized`, `formatDate`, Türkçe normalize), composable'ların
   CRUD-on-storage davranışı ve custom lint kuralıdır (`RuleTester`).
@@ -778,7 +782,7 @@ Tüm dokümanlar hem `docs/en/` hem `docs/tr/` içinde bulunur (CHANGELOG.md har
 | `STYLING.md`            | v10 tema modeli, resources ?url ile Lara Green, tema-swap koyu mod, Tailwind + SCSS token alias'ları, SMACSS, çift-mod renk |
 | `STATE_MANAGEMENT.md`   | localStorage kaynağı + React Query seed, yalnız-invalidation CRUD, mapper, query key'ler |
 | `I18N.md`               | Locale dosyaları, anahtarlar, düz yerelleştirilmiş alanlar + `pickLocalized`, yalnız-anahtar tipleme, PrimeReact locale, tarihler, Türkçe-duyarlı metin |
-| `TESTING.md`            | Test stratejisi, MSW, colocation, öncelikler               |
+| `TESTING.md`            | Test stratejisi, MSW, düzen (`src/__test__`), öncelikler   |
 | `WORKFLOW.md`           | Takım rolleri, backlog, gated akış, CI kapısı, PR-sözleşme, fast path, CI/Vercel/release mekaniği |
 | `VERSIONING.md`         | release-please Release-PR akışı, Conventional-Commit bump, publish-yok |
 | `SPRINT_PLAN.md`        | Yaşayan backlog + tamamlanan (✅) kayıt — kalıcı tutulur   |
@@ -1024,7 +1028,8 @@ döner: başarısız self-review implementation'a, başarısız inceleme gelişt
    `@apply` yok.
 9. Durum (§10) — React Query storage'tan seed eder; CRUD storage servisi +
    `invalidateQueries` ile; query-key factory; tek doğruluk kaynağı.
-10. Testler (§11) — audit'te planlanır, kodla yazılır; GET için MSW; colocate.
+10. Testler (§11) — audit'te planlanır, kodla yazılır; GET için MSW; kaynağı
+    yansıtarak `src/__test__/` altında.
 11. Lint/format (§12) — `validate` geçer.
 12. Erişilebilirlik / performans / responsive (§16) — etiketli alanlar, a11y lint,
     lazy route'lar; mobile-first, Tailwind breakpoint'leri, responsive `App*`/`Form*`
