@@ -15,6 +15,8 @@
     "loading": "Yükleniyor…",
     "retry": "Tekrar dene",
     "menu": "Menü",
+    "language": "Dil",
+    "theme": "Tema",
     "actions": "İşlemler"
   },
   "errors": {
