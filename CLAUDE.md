@@ -112,10 +112,13 @@ Data source (GET, read-only, one-time seed):
 - Dependabot (`.github/dependabot.yml`, where this is ENFORCED) **ignores ALL
   update types** for the five exact-pinned criticals — `react`, `react-dom`,
   `primereact`, `primeicons`, `tailwindcss` — so they never drift, and **ignores
-  `eslint` major** (eslint v10 would break `eslint-plugin-jsx-a11y`, which caps at
-  eslint 9). Every other dependency's minor / patch updates are grouped into one
-  weekly PR that still goes through CI + review (§15); security exposure is covered
-  by the `npm audit --audit-level=high` gate.
+  the `eslint` AND `@eslint/*` majors** (eslint v10 would break
+  `eslint-plugin-jsx-a11y`, which caps at eslint 9; `@eslint/js` is a SEPARATE
+  package whose major tracks the same eslint line and slipped through the
+  `eslint`-only ignore once, so `@eslint/*` is ignored too). Every other
+  dependency's minor / patch updates are grouped into one weekly PR that still goes
+  through CI + review (§15); security exposure is covered by the
+  `npm audit --audit-level=high` gate.
 
 ## 2. Architecture
 
@@ -873,10 +876,10 @@ release-please, driven by Conventional Commits (§15). The version is never
 hand-edited into feature branches, so concurrent work never conflicts on it.
 
 - **No changeset files.** The bump is derived from commit types on `main`:
-  `fix:` → patch, `feat:` → minor, `feat!:` / `BREAKING CHANGE` → major. Readable
-  history (commitlint, §12) is therefore also the release source. Every reviewed
-  sub-commit is **preserved** on `main` (not squashed — §15 Merge strategy), so
-  release-please reads each Conventional type.
+  `fix:` → patch, `feat:` → minor, `feat!:` / `BREAKING CHANGE` → major (with the
+  pre-1.0 exception below). Readable history (commitlint, §12) is therefore also
+  the release source. Every reviewed sub-commit is **preserved** on `main` (not
+  squashed — §15 Merge strategy), so release-please reads each Conventional type.
 - **Release flow** (live): merging a topic branch to `main` — preserving its
   sub-commits (**Rebase and merge** on GitHub, §15) — deploys the code (Vercel)
   immediately; the version is unchanged. The release-please GitHub Action
@@ -889,6 +892,20 @@ hand-edited into feature branches, so concurrent work never conflicts on it.
   merges this mechanical version + `CHANGELOG` PR directly, without the check.
   Merging it performs the version bump + git tag. The app is private — there is
   **no npm publish**. Detail: `docs/en/VERSIONING.md`.
+- **0.x during initial development.** release-please is kept in the pre-1.0 range.
+  The manifest is seeded at `0.0.1`, **not** `0.0.0` — at `0.0.0` release-please
+  ignores the pre-major options and jumps straight to `1.0.0`
+  (googleapis/release-please#2087) — and `bump-minor-pre-major: true`
+  (`release-please-config.json`) keeps breaking changes as MINOR bumps inside 0.x.
+  So while pre-1.0: `feat:` and breaking changes bump the **minor** (e.g.
+  `0.1.0` → `0.2.0`, staying in 0.x) and `fix:` bumps the **patch**. The first
+  release therefore lands at `0.1.0`. The move to `1.0.0` is **deliberate**, taken
+  when the app is feature-complete — not triggered automatically by a breaking
+  change.
+- **Required repo setting.** Because release-please opens its Release PR with the
+  `GITHUB_TOKEN`, **Settings → Actions → General → Workflow permissions → "Allow
+  GitHub Actions to create and approve pull requests"** must be ENABLED, or the
+  Action cannot open the Release PR.
 
 ## 15. Workflow
 
