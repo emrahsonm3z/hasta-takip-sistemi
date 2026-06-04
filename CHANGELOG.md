@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/emrahsonm3z/hasta-takip-sistemi/compare/v0.1.0...v0.2.0) (2026-06-04)
+
+
+### Features
+
+* **layout:** atlantis-style app shell ([ba02c26](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/ba02c262d3f3557c8000b11d6c6e9bd0d7b7a873))
+
 ## [0.1.0](https://github.com/emrahsonm3z/hasta-takip-sistemi/compare/v0.0.1...v0.1.0) (2026-06-03)
 
 
