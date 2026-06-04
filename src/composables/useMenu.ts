@@ -2,8 +2,12 @@ import { useTranslation } from 'react-i18next'
 
 import { docsRegistry } from '@/modules/docs'
 import { PATIENT_ROUTES } from '@/modules/patients'
+import type { TranslationKey } from '@/types/i18n.types'
 
-import { buildMenu, type MenuItem, type MenuSource } from './useMenu.lib'
+import { buildMenu, type MenuGroup, type MenuSource } from './useMenu.lib'
+
+const GENERAL_SECTION_KEY: TranslationKey = 'menu.section.general'
+const GENERAL_SECTION_ORDER = 1
 
 function menuSources(): MenuSource[] {
   return [
@@ -13,6 +17,8 @@ function menuSources(): MenuSource[] {
       path: PATIENT_ROUTES.LIST.path,
       icon: PATIENT_ROUTES.LIST.icon,
       menuOrder: PATIENT_ROUTES.LIST.menuOrder,
+      sectionKey: GENERAL_SECTION_KEY,
+      sectionOrder: GENERAL_SECTION_ORDER,
     },
     ...docsRegistry.map((entry) => ({
       key: entry.slug,
@@ -20,11 +26,13 @@ function menuSources(): MenuSource[] {
       path: entry.path,
       icon: entry.icon,
       menuOrder: entry.menuOrder,
+      sectionKey: GENERAL_SECTION_KEY,
+      sectionOrder: GENERAL_SECTION_ORDER,
     })),
   ]
 }
 
-export function useMenu(): MenuItem[] {
+export function useMenu(): MenuGroup[] {
   const { t } = useTranslation()
   return buildMenu(menuSources(), (key) => t(key))
 }

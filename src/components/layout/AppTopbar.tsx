@@ -13,17 +13,22 @@ export function AppTopbar({ title, onMenuToggle }: AppTopbarProps) {
   const { t } = useTranslation()
 
   return (
-    <header className="flex items-center gap-3 border-b border-surface-border bg-card px-4 py-3">
-      <Button
-        icon="pi pi-bars"
-        text
-        rounded
-        aria-label={t('common.menu')}
-        onClick={onMenuToggle}
-        className="md:hidden"
-      />
-      <h1 className="text-lg font-semibold text-text">{title}</h1>
-      <div className="ml-auto flex items-center gap-2">
+    <header className="l-topbar">
+      <div className="l-topbar-start">
+        <Button
+          icon="pi pi-bars"
+          text
+          rounded
+          aria-label={t('common.menu')}
+          onClick={onMenuToggle}
+          pt={{
+            root: { className: 'l-topbar-iconbtn h-10 w-10' },
+            icon: { className: 'text-xl' },
+          }}
+        />
+        <h1 className="truncate text-lg font-semibold text-text">{title}</h1>
+      </div>
+      <div className="l-topbar-actions">
         <AppLanguageSwitcher />
         <AppThemeToggle />
       </div>

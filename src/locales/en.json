@@ -88,5 +88,10 @@
   },
   "docs": {
     "title": "Documentation"
+  },
+  "menu": {
+    "section": {
+      "general": "General"
+    }
   }
 }

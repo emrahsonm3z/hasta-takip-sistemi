@@ -22,6 +22,10 @@ export function AppThemeToggle() {
       rounded
       aria-label={t('common.theme')}
       onClick={toggle}
+      pt={{
+        root: { className: 'l-topbar-iconbtn l-topbar-chip' },
+        icon: { className: 'text-lg' },
+      }}
     />
   )
 }

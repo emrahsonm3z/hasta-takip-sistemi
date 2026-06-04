@@ -88,5 +88,10 @@
   },
   "docs": {
     "title": "Dokümanlar"
+  },
+  "menu": {
+    "section": {
+      "general": "Genel"
+    }
   }
 }
