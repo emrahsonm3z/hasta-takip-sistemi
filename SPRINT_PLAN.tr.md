@@ -262,6 +262,41 @@ her kayıtlı doküman erişilebilir; kayıtsız-doküman kuralı geçerli.
 + tr dosyasına çözülür).
 **DoD:** + global DoD. Commit `feat: add in-app docs module with bilingual skeletons`.
 
+### 0.10 ✅ Kabuk tasarım geçişi (Atlantis-esinli)
+**Hedef:** Uygulama kabuğunu Atlantis-esinli tasarıma (§9) göre yeniden stillemek:
+transparan düz sidebar vs raised `.card` yüzey modeli, özel `--app-*` token'ları,
+marka işareti, pattern arka planı, responsive drawer.
+**Bağımlılık:** 0.6
+**Alt-adımlar (indiği haliyle):**
+- `--app-*` özel token'ları (`theme/_dark.scss`, iki mod) + `_tokens.scss`
+  alias'ları + Tailwind açılımı (`bg-app-ground`, `w-sidebar`, Inter-öncelikli
+  `fontFamily.sans`).
+- Kabuk partial'ları: `layout/_layout`, `layout/_sidebar`, `layout/_topbar`,
+  `modules/_card` `@layer tw-components` içinde; `base/_typography` self-hosted
+  Inter variable woff2 (latin + latin-ext) ile; 14px taban.
+- `AppLogo` (token-renkli inline SVG + `BRAND_NAME`), `public/favicon.svg`.
+- Topbar: nötr hamburger, dairesel `.l-topbar-chip` aksiyon butonları, metin
+  TR/EN aktif-dil switcher'ı (bayraklar kaldırıldı), yalnız-`:focus-visible` odak.
+- Masaüstü collapse toggle (`.is-collapsed` @ `lg`) + mobil PrimeReact `<Sidebar>`
+  drawer: opak `--app-ground` panel, `0 16px 16px 0` köşeler, yüzen kapatma (X),
+  logo en üstte, route değişiminde kapanır.
+- Arka plan: `.l-layout` üzerinde self-hosted PrimeVue `pattern.png`, mod-bağımsız
+  `--glow-image` + `--glow-blend` (`hard-light, multiply`), `auto 20rem`, top,
+  no-repeat, `--app-ground` üzerine blend (geçici scallop-SVG mask'in yerini aldı).
+- `useMenu` gruplu section'lar (`menu.section.general`) + güncellenen `useMenu.lib`
+  spec'i.
+- Temizlik: artık kullanılmayan `common.languages.*` anahtarları ve `content-offset`
+  Tailwind spacing'i kaldırıldı.
+**Dosyalar:** `src/components/layout/*`, `src/composables/useMenu*`,
+`src/styles/{base,fonts,images,layout,modules,theme,utils}/*`, `src/styles/main.scss`,
+`tailwind.config.ts`, `index.html`, `public/favicon.svg`, `src/locales/*`,
+`src/__test__/composables/useMenu.lib.test.ts`.
+**Kabul:** kabuk iki modda da §9 spec'iyle eşleşir; drawer + collapse `lg` eşiğinde
+çalışır; token tanımları dışında raw hex yok; `validate` + testler yeşil.
+**Test:** `useMenu.lib` gruplama spec'i güncellendi (29 spec yeşil, Node 24).
+**DoD:** + global DoD. Commit'ler `feat(layout): atlantis-style app shell` +
+`docs: sync rule files and sprint plan for the shell design pass`.
+
 ---
 
 ## Sprint 1 — Patients özelliği (baştan sona)

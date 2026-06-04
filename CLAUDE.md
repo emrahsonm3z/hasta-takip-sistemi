@@ -88,7 +88,7 @@ _(No active work in progress.)_
 | i18n          | react-i18next (TR / EN) + PrimeReact Locale API (§8)          |
 | In-app docs   | `docs` module renders `docs/{tr,en}/*.md` (react-markdown) — §13 |
 | Versioning    | release-please (Conventional-Commit driven) (§14)             |
-| Testing       | Vitest + React Testing Library + MSW (§11)                    |
+| Testing       | Node built-in test runner (`node --test`, Node 24 type-strip), pure-logic specs — no Vitest/RTL/MSW (§11) |
 
 Data source (GET, read-only, one-time seed):
 `https://v0-json-api-three.vercel.app/api/data`
@@ -197,15 +197,16 @@ src/
 │   │   ├── FormInputNumber.tsx  FormCheckbox.tsx  FormChips.tsx
 │   │   ├── FormField.tsx       Shared shell: i18n label + Yup error via resolveValidationMessage
 │   │   └── validation.ts       resolveValidationMessage(raw, t) — parse {key,values} → t() (unit-tested)
-│   └── layout/              App* layout shell (§6)
-│       ├── AppLayout.tsx      <Outlet/> + <ScrollRestoration/> + title from route handle
-│       ├── AppSidebar.tsx     renders useMenu() (§6)
-│       ├── AppTopbar.tsx
-│       ├── AppLanguageSwitcher.tsx  → i18n.changeLanguage (single language flow §8)
+│   └── layout/              App* layout shell (§6, §9)
+│       ├── AppLayout.tsx      <Outlet/> + <ScrollRestoration/> + title from route handle; fixed sidebar offset (lg) + mobile-drawer close on route change
+│       ├── AppSidebar.tsx     renders useMenu() groups; transparent fixed panel (lg) + PrimeReact <Sidebar> drawer (< lg, .l-sidebar-drawer) (§6, §9, §16)
+│       ├── AppTopbar.tsx      .l-topbar-start (hamburger + title) + action chips (language + theme), no avatar
+│       ├── AppLogo.tsx        inline-SVG brand mark (token-colored) + BRAND_NAME wordmark (§9)
+│       ├── AppLanguageSwitcher.tsx  active-language text chip (TR/EN) → i18n.changeLanguage toggles the other (single language flow §8)
 │       └── AppThemeToggle.tsx       → plugins/theme setThemeMode + 'theme-mode' (§9)
 ├── composables/
-│   ├── useMenu.ts           single menu source: module route constants + docs registry (§6)
-│   ├── useMenu.lib.ts       pure buildMenu(sources, translate) — sort + label (unit-tested)
+│   ├── useMenu.ts           single menu source: module route constants + docs registry, assigns sections (§6)
+│   ├── useMenu.lib.ts       pure buildMenu(sources, translate) — grouped sections, sort + label (unit-tested)
 │   ├── useNotify.ts         success / error / info toasts; key-only TranslationKey API (§3.1)
 │   ├── useNotify.lib.ts     pure normalizeErrorKey(error) → TranslationKey (unit-tested)
 │   └── useMediaQuery.ts     matchMedia hook (responsive paginator template, §16)
@@ -218,9 +219,16 @@ src/
 │   ├── tr.json
 │   └── en.json
 ├── styles/                  SCSS (SMACSS) + token aliases (§9)
-│   ├── main.scss            Entry: primeicons @import, @layer tw-base/primereact/tw-components/tw-utilities order + Tailwind-in-layers (§9)
-│   ├── utils/_tokens.scss   SCSS aliases of the v10 theme vars (for component SCSS)
-│   └── theme/_dark.scss     Custom app tokens for both modes (:root + .dark) — e.g. --app-background (FOUC) (§9)
+│   ├── main.scss            Entry: @use base/layout/module partials + primeicons @import, @layer tw-base/primereact/tw-components/tw-utilities order + Tailwind-in-layers + 14px base/antialiased (§9)
+│   ├── base/_typography.scss  @font-face Inter (variable woff2, latin + latin-ext) (§9)
+│   ├── fonts/               Self-hosted Inter variable woff2 (latin + latin-ext) — no npm dep (§9)
+│   ├── images/pattern.png   Self-hosted PrimeVue/Atlantis pattern asset (licensed, like the Inter font) — fed to --glow-image (§9)
+│   ├── layout/_layout.scss    .l-layout wrapper (relative, ground + pattern background via --glow-image/--glow-blend) + .l-content offset column (§9)
+│   ├── layout/_sidebar.scss   .l-sidebar shell — TRANSPARENT (no surface/shadow), fixed 21rem, brand, grouped nav, 8px primary border-left accent; .l-sidebar-drawer mobile-panel overrides (§9)
+│   ├── layout/_topbar.scss    .l-topbar shell — transparent (start cluster, action chips, :focus-visible-only focus) (§9)
+│   ├── modules/_card.scss     .card the RAISED surface (card-bg + 1px border + faint shadow, radius 8px, padding 14px) (§9)
+│   ├── utils/_tokens.scss   SCSS aliases of the v10 theme vars + the app-* custom tokens (for component SCSS)
+│   └── theme/_dark.scss     Custom app tokens (:root + .dark) — app-ground/card/radii/sidebar-width + the mode-invariant --glow-* pattern tokens; --app-background folded into the cool ground (FOUC) (§9)
 ├── types/
 │   ├── route.types.ts       AppRouteHandle { titleKey; title?(args) } (§6)
 │   ├── i18n.types.ts        TranslationKey (DotPaths from en.json) — portable, no i18next ref (§8)
@@ -250,7 +258,8 @@ src/
         ├── routes.tsx        DOCS_ROUTES constants + route array
         └── index.ts          barrel
 
-Repo root: index.html (holds <link id="app-theme"> + pre-paint theme-mode script, §9),
+Repo root: index.html (holds <link id="app-theme"> + pre-paint theme-mode script + favicon link, §9),
+public/favicon.svg (app mark; referenced by index.html),
 README.md, .env.example, .nvmrc, vercel.json,
 package.json, vite.config.ts, tsconfig.json (+ tsconfig.app/node/test.json; test.json = node-typed config for src/__test__ *.test.ts), eslint.config.js, tailwind.config.ts,
 postcss.config.js, stylelint.config.js, commitlint.config.js, .husky/,
@@ -304,8 +313,14 @@ it never re-implements them.
 - `form/Form*` — Formik↔PrimeReact field wrappers (`FormInputText`,
   `FormDropdown`, `FormCalendar`, `FormInputNumber`, `FormCheckbox`,
   `FormChips`); i18n label + error display built in.
-- `layout/App*` — `AppLayout`, `AppSidebar`, `AppTopbar`,
-  `AppLanguageSwitcher`, `AppThemeToggle`.
+- `layout/App*` — `AppLayout`, `AppSidebar`, `AppTopbar`, `AppLogo`,
+  `AppLanguageSwitcher`, `AppThemeToggle`. `AppLogo` is the brand mark (token-colored
+  inline SVG + the `BRAND_NAME` constant wordmark — a proper noun, not i18n);
+  `AppLanguageSwitcher` is a single text chip showing ONLY the active language code
+  (`TR`/`EN`); clicking it switches to the other via `i18n.changeLanguage` (§8). It and
+  `AppThemeToggle` share the `.l-topbar-chip` circular surface styling (§9).
+  The shell styling lives in `styles/layout/_sidebar.scss` + `_topbar.scss`; the
+  reusable content surface is the `.card` module (`styles/modules/_card.scss`, §9).
 
 **Composables** (`src/composables`): `useMenu` (the single menu source — collects
 each module's route constants via barrels + the docs registry, sorts by
@@ -580,6 +595,109 @@ there is a clear functional reason (e.g. a value needed before the theme link lo
 Use judgment: reach for an existing var first; do not fragment the palette with
 parallel custom colours.
 
+### App shell custom tokens (Atlantis-inspired)
+
+The shell adds app-specific custom tokens in `theme/_dark.scss` (colour tokens in
+both modes, `:root` + `.dark`; radii/width/`--glow-*` are mode-invariant, `:root`
+only), aliased in `utils/_tokens.scss`, and exposed to Tailwind in
+`tailwind.config.ts` where used by TSX (`bg-app-ground`, `w-sidebar`). Color
+literals live ONLY in these definitions (written as
+`rgb()`, not hex, to match the file convention); every consumer uses the token:
+
+| Token | Light | Dark |
+| --- | --- | --- |
+| `--app-ground` (wrapper/body bg) | `rgb(248 250 252)` | `rgb(9 9 11)` |
+| `--app-background` (FOUC, = ground) | `var(--app-ground)` | `var(--app-ground)` |
+| `--app-card-bg` (raised card surface) | `rgb(255 255 255)` | `rgb(24 24 27)` |
+| `--app-card-border` | `rgb(226 232 240)` | `rgb(63 63 70)` |
+| `--app-card-shadow` | `0 1px 2px rgb(15 23 42 / 4%), 0 1px 3px rgb(15 23 42 / 6%)` | `none` |
+| `--app-menu-item-hover-bg` (sidebar hover/active overlay) | `rgb(100 116 139 / 10%)` | `rgb(255 255 255 / 5%)` |
+| `--app-radius-card` / `-item` | `8px` / `8px` | same |
+| `--app-radius-sidebar` / `-drawer` (desktop panel / mobile drawer right corners) | `16px` / `16px` | same |
+| `--app-sidebar-width` | `21rem` (sidebar width; content offset is `+ 1rem` = 22rem) | same |
+| `--glow-image` (pattern asset) | `url('../images/pattern.png')` | same |
+| `--glow-blend` (pattern blend) | `hard-light, multiply` | same |
+
+**Surface model (the core of the Atlantis look): the SIDEBAR is the FLAT layer and the
+CARDS are the RAISED layer.** The sidebar has NO background, NO border, NO shadow — the
+menu sits directly on the ground and the decorative pattern shows behind it. The `.card`
+module is the only elevated surface: `--app-card-bg` (distinct from the ground) + a 1px
+`--app-card-border` + a faint `--app-card-shadow` (which collapses to `none` in dark, the
+border carrying the separation). `--app-background` is folded into the ground so first
+paint matches. The favicon/Inter/`pattern.png` assets are fixed brand/decorative
+literals, NOT theme tokens — the only sanctioned non-token colours.
+
+### Static layout + decorative background
+
+`.l-layout` (the wrapper, `position: relative`, `bg-app-ground`, `min-block-size: 100vh`)
+holds the fixed sidebar plus `.l-content` — the content column (`padding: 2rem`,
+`position: relative`, `z-index: 1`, `overflow-x: hidden`). At `>= lg` the column is offset
+right of the fixed sidebar via `margin-inline-start: calc(var(--app-sidebar-width) + 1rem)`
+(= 22rem), set in `_layout.scss` (not a Tailwind utility, so the collapse can transition it).
+The **topbar lives inside `.l-content`** (`.l-topbar`: transparent,
+`justify-content: space-between`, `margin-block-end: 2rem`; `.l-topbar-start` = hamburger
+2.5rem + title, gaps 1.5rem; no avatar/search). The right cluster (`.l-topbar-actions`) is
+the language + theme **chips**: `.l-topbar-chip` = circular (`border-radius: 50%`),
+`2.5rem`, `--surface-card` background, `--surface-100` hover. The hamburger is a NEUTRAL
+icon (`.l-topbar-iconbtn` → `--text-color-secondary`, beating the Lara text-button primary
+via the `tw-components` layer), not primary. All topbar buttons are
+**`:focus-visible`-only**: `.l-topbar-iconbtn:focus` clears the PrimeReact
+box-shadow/outline (no ring on mouse click) and `:focus-visible` restores a 2px primary
+ring for keyboard focus (§16).
+**Sidebar** (`.l-sidebar` + `.l-sidebar-fixed`): **transparent**, fixed, full height,
+`21rem`, `border-radius: 0 var(--app-radius-sidebar) var(--app-radius-sidebar) 0` (16px),
+NO shadow/border; menu padding `0 1.5rem`, groups
+`margin-bottom: 2.25rem` (first `margin-top: 2rem`), section label `0.857rem`/600/uppercase/
+muted, items `padding: 0.5rem 1rem` + `border-inline-start: 8px solid transparent`; **active
+= `border-inline-start-color: primary` (8px green accent) + `--app-menu-item-hover-bg`**
+(no text-colour change), hover = the same overlay.
+**Sidebar toggle.** The topbar hamburger is visible at all widths. At `>= lg` it toggles a
+`.is-collapsed` modifier on `.l-layout` (state in `AppLayout`, branched on
+`useMediaQuery('(min-width: 1024px)')`): collapsed → `.l-sidebar-fixed` `transform:
+translateX(-100%)` and `.l-content` `margin-inline-start: 0` (content reflows full width),
+both transitioned `0.3s cubic-bezier(0,0,0.2,1)`. Below `lg` the hamburger instead opens the
+**mobile drawer** — the PrimeReact `<Sidebar>` with `showCloseIcon`, restyled via
+`pt.root` + `.l-sidebar-drawer`: an OPAQUE `--app-ground` panel (overriding the Lara
+surface so it matches the page ground in both modes), `border-radius: 0
+var(--app-radius-drawer) var(--app-radius-drawer) 0` (16px), `box-shadow: none` (the
+backdrop separates), `overflow: hidden`, width `w-sidebar` capped `max-w-[85vw]`. Its
+`.p-sidebar-header` is positioned ABSOLUTE in the top-right (`padding: 1rem`,
+`z-index: 1`) so the close (X) floats and takes no vertical space — the drawer renders the
+same `SidebarContent` (logo + menu) with the logo at the very top, at the desktop offset
+(the `.l-sidebar-brand` padding). The drawer closes on route change; the collapse
+transform is gated to `>= lg`. The decorative background sits directly on `.l-layout`:
+the **self-hosted** `images/pattern.png` (the licensed PrimeVue/Atlantis pattern asset,
+self-hosted like the Inter font — never hot-linked) via the mode-invariant tokens
+`--glow-image` + `--glow-blend` — `background-image: var(--glow-image)`,
+`background-blend-mode: var(--glow-blend)` (`hard-light, multiply`),
+`background-position: top`, `background-repeat: no-repeat`, `background-size: auto 20rem` —
+blended against the element's `--app-ground` `background-color` (which MUST stay on
+`.l-layout` for the blend to have a base), so ONE asset adapts to both modes. It shows
+behind the transparent sidebar + topbar; the opaque drawer covers it. Atlantis's breakpoint
+is 992px; we use Tailwind `lg` (1024px) so the drawer threshold matches our mobile rule.
+
+### Custom SCSS goes in the right cascade layer (the `@layer`-merge mechanism)
+
+Sass `@use` must be top-level, so to land custom rules in the correct CSS cascade
+layer each shell/module partial **wraps its rules in `@layer tw-components { … }`**
+(same-named layers merge regardless of source position); `@font-face` and the
+`:root`/`.dark` custom-property blocks stay UNLAYERED (correct for them). `main.scss`
+`@use`s the partials (`base/_typography`, `layout/_layout`, `layout/_sidebar`,
+`layout/_topbar`, `modules/_card`). Layer ORDER stays locked by the `index.html` inline anchor (§9
+Cascade (b)), so the partials appearing before the in-bundle `@layer` statement is
+fine. SMACSS folders now in use: `base/` (typography), `layout/` (`l-*` shell),
+`modules/` (`.card`); state via an `is-active` class. Class names are kebab-case
+(SMACSS `l-`/`is-`), NOT BEM `__`/`--`, to satisfy `selector-class-pattern` without a
+Stylelint config change.
+
+### Typography (Inter, self-hosted)
+
+`base/_typography.scss` `@font-face`s the **self-hosted Inter variable woff2** (latin
++ latin-ext subsets in `styles/fonts/`, with `unicode-range`; latin-ext covers the
+Turkish glyphs ğ/ş/ı/İ) — **no npm dependency**, the font asset is the only addition.
+`Inter` is the first `fontFamily.sans` entry in the Tailwind config (so preflight uses
+it), and `main.scss` sets the **14px** base size + antialiasing in `@layer tw-base`.
+
 ### Token pipeline
 
 ```
@@ -617,7 +735,10 @@ export default {
         'surface-border': 'var(--surface-border)',
         text: 'var(--text-color)',
         'text-secondary': 'var(--text-color-secondary)',
+        'app-ground': 'var(--app-ground)',
       },
+      width: { sidebar: 'var(--app-sidebar-width)' },
+      fontFamily: { sans: ['Inter', 'system-ui', /* … platform fallbacks */ 'sans-serif'] },
     },
   },
   plugins: [typography],
@@ -732,16 +853,27 @@ Detail: `docs/en/STATE_MANAGEMENT.md`, `docs/en/modules/PATIENTS.md`.
 
 ## 11. Testing
 
-Vitest + React Testing Library + MSW. Tests are PLANNED in the audit step (§15)
+The runner is **Node's built-in test runner** (`node --test`, the `node:test` +
+`node:assert/strict` modules) over **pure-logic** specs — there is **no Vitest, no
+React Testing Library, no MSW, no jsdom**. Tests are PLANNED in the audit step (§15)
 and WRITTEN with the code in implementation.
 
-- **Network** — the GET is mocked with MSW; no real network in tests.
-- **Layout** — test files live under `src/__test__/` mirroring the source tree, as
-  `*.test.ts(x)`. Value imports use relative paths (node:test does not resolve `@/`);
-  type-only imports may use `@/`. The tooling RuleTester test stays in `tools/eslint/`.
-- **Coverage** — no mandatory threshold; priority targets are pure `lib/`
-  (mapper, `pickLocalized`, `formatDate`, Turkish normalise), the composables'
-  CRUD-on-storage behaviour, and the custom lint rule (`RuleTester`).
+- **Node 24 required.** Specs are TypeScript (`*.test.ts`) run via Node's native
+  type-stripping, which needs **Node 24** (per `.nvmrc`; CI uses it). On older Node
+  (e.g. 20) `node --test` silently skips the `.ts` specs and only the JS tooling test
+  runs — so run tests on Node 24 (`nvm use`) or trust CI.
+- **What is tested** — pure functions: `lib/` (mapper, `pickLocalized`, `formatDate`,
+  Turkish normalise), pure composable cores (`useMenu.lib` grouping, `useNotify.lib`,
+  `theme.lib`, `AppDataTable.lib`, form `validation`), locale parity, and the custom
+  lint rule (`RuleTester`). **Components, hooks, and DOM/interaction are NOT
+  unit-tested** (no renderer) — shell/visual behaviour is covered by `validate`
+  (type-check + ESLint + Stylelint + Prettier) + manual QA. Adding a DOM harness
+  (Vitest/RTL/jsdom) for component smoke tests would be a separate chore.
+- **Layout** — specs live under `src/__test__/` mirroring the source tree, as
+  `*.test.ts`. Value imports use relative paths with the `.ts` extension (node:test
+  does not resolve `@/`); type-only imports may use `@/`. The tooling RuleTester test
+  stays in `tools/eslint/`.
+- **Coverage** — no mandatory threshold.
 
 Detail: `docs/en/TESTING.md`.
 

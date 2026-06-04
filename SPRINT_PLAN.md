@@ -251,6 +251,39 @@ registered doc is reachable; unregistered doc rule holds.
 existing en + tr file).
 **DoD:** + global DoD. Commit `feat: add in-app docs module with bilingual skeletons`.
 
+### 0.10 ✅ Shell design pass (Atlantis-inspired)
+**Goal:** Restyle the app shell to the Atlantis-inspired design (§9): transparent
+flat sidebar vs raised `.card` surface model, custom `--app-*` tokens, brand mark,
+pattern background, responsive drawer.
+**Depends on:** 0.6
+**Sub-steps (as landed):**
+- `--app-*` custom tokens (`theme/_dark.scss`, both modes) + `_tokens.scss` aliases
+  + Tailwind exposure (`bg-app-ground`, `w-sidebar`, Inter-first `fontFamily.sans`).
+- Shell partials: `layout/_layout`, `layout/_sidebar`, `layout/_topbar`,
+  `modules/_card` in `@layer tw-components`; `base/_typography` with self-hosted
+  Inter variable woff2 (latin + latin-ext); 14px base.
+- `AppLogo` (token-colored inline SVG + `BRAND_NAME`), `public/favicon.svg`.
+- Topbar: neutral hamburger, circular `.l-topbar-chip` action buttons,
+  text TR/EN active-language switcher (flags dropped), `:focus-visible`-only focus.
+- Desktop collapse toggle (`.is-collapsed` @ `lg`) + mobile PrimeReact `<Sidebar>`
+  drawer: opaque `--app-ground` panel, `0 16px 16px 0` corners, floated close (X),
+  logo at top, closes on route change.
+- Background: self-hosted PrimeVue `pattern.png` on `.l-layout` via mode-invariant
+  `--glow-image` + `--glow-blend` (`hard-light, multiply`), `auto 20rem`, top,
+  no-repeat, blended over `--app-ground` (replaced the interim scallop-SVG mask).
+- `useMenu` grouped sections (`menu.section.general`) + updated `useMenu.lib` spec.
+- Cleanup: removed orphaned `common.languages.*` keys and the unused
+  `content-offset` Tailwind spacing.
+**Files:** `src/components/layout/*`, `src/composables/useMenu*`,
+`src/styles/{base,fonts,images,layout,modules,theme,utils}/*`, `src/styles/main.scss`,
+`tailwind.config.ts`, `index.html`, `public/favicon.svg`, `src/locales/*`,
+`src/__test__/composables/useMenu.lib.test.ts`.
+**Acceptance:** shell matches the §9 spec in both modes; drawer + collapse work at
+the `lg` threshold; no raw hex outside token definitions; `validate` + tests green.
+**Tests:** `useMenu.lib` grouping spec updated (29 specs green, Node 24).
+**DoD:** + global DoD. Commits `feat(layout): atlantis-style app shell` +
+`docs: sync rule files and sprint plan for the shell design pass`.
+
 ---
 
 ## Sprint 1 — Patients feature (end to end)
