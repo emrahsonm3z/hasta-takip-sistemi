@@ -93,7 +93,7 @@ _(Devam eden aktif iş yok.)_
 | i18n          | react-i18next (TR / EN) + PrimeReact Locale API (§8)          |
 | Uygulama-içi docs | `docs` modülü `docs/{tr,en}/*.md` render eder (react-markdown) — §13 |
 | Sürümleme     | release-please (Conventional-Commit güdümlü) (§14)            |
-| Test          | Vitest + React Testing Library + MSW (§11)                    |
+| Test          | Node yerleşik test runner (`node --test`, Node 24 type-strip), saf-mantık spec'leri — Vitest/RTL/MSW yok (§11) |
 
 Veri kaynağı (GET, salt-okunur, tek-seferlik seed):
 `https://v0-json-api-three.vercel.app/api/data`
@@ -200,15 +200,16 @@ src/
 │   │   ├── FormInputNumber.tsx  FormCheckbox.tsx  FormChips.tsx
 │   │   ├── FormField.tsx       Paylaşılan kabuk: i18n label + resolveValidationMessage ile Yup hatası
 │   │   └── validation.ts       resolveValidationMessage(raw, t) — {key,values} parse → t() (unit-test'li)
-│   └── layout/              App* layout kabuğu (§6)
-│       ├── AppLayout.tsx      <Outlet/> + <ScrollRestoration/> + route handle'dan başlık
-│       ├── AppSidebar.tsx     useMenu()'yu render eder (§6)
-│       ├── AppTopbar.tsx
-│       ├── AppLanguageSwitcher.tsx  → i18n.changeLanguage (tek dil akışı §8)
+│   └── layout/              App* layout kabuğu (§6, §9)
+│       ├── AppLayout.tsx      <Outlet/> + <ScrollRestoration/> + route handle'dan başlık; sabit sidebar offset (lg) + route değişiminde mobil drawer kapanır
+│       ├── AppSidebar.tsx     useMenu() gruplarını render eder; transparan sabit panel (lg) + PrimeReact <Sidebar> drawer (< lg, .l-sidebar-drawer) (§6, §9, §16)
+│       ├── AppTopbar.tsx      .l-topbar-start (hamburger + başlık) + aksiyon chip'leri (dil + tema), avatar yok
+│       ├── AppLogo.tsx        inline-SVG marka işareti (token-renkli) + BRAND_NAME wordmark (§9)
+│       ├── AppLanguageSwitcher.tsx  aktif-dil metin chip'i (TR/EN) → i18n.changeLanguage diğerine geçirir (tek dil akışı §8)
 │       └── AppThemeToggle.tsx       → plugins/theme setThemeMode + 'theme-mode' (§9)
 ├── composables/
-│   ├── useMenu.ts           tek menü kaynağı: modül route constant'ları + docs registry (§6)
-│   ├── useMenu.lib.ts       saf buildMenu(sources, translate) — sırala + etiketle (unit-test'li)
+│   ├── useMenu.ts           tek menü kaynağı: modül route constant'ları + docs registry, section atar (§6)
+│   ├── useMenu.lib.ts       saf buildMenu(sources, translate) — gruplu section'lar, sırala + etiketle (unit-test'li)
 │   ├── useNotify.ts         success / error / info toast; yalnız-anahtar TranslationKey API (§3.1)
 │   ├── useNotify.lib.ts     saf normalizeErrorKey(error) → TranslationKey (unit-test'li)
 │   └── useMediaQuery.ts     matchMedia hook'u (responsive paginator template, §16)
@@ -221,9 +222,16 @@ src/
 │   ├── tr.json
 │   └── en.json
 ├── styles/                  SCSS (SMACSS) + token alias'ları (§9)
-│   ├── main.scss            Giriş: primeicons @import, @layer tw-base/primereact/tw-components/tw-utilities sırası + katmanlarda Tailwind (§9)
-│   ├── utils/_tokens.scss   v10 tema değişkenlerinin SCSS alias'ları (bileşen SCSS'i için)
-│   └── theme/_dark.scss     Her iki mod için özel app token'ları (:root + .dark) — ör. --app-background (FOUC) (§9)
+│   ├── main.scss            Giriş: base/layout/module partial'larını @use + primeicons @import, @layer tw-base/primereact/tw-components/tw-utilities sırası + katmanlarda Tailwind + 14px base/antialiased (§9)
+│   ├── base/_typography.scss  @font-face Inter (variable woff2, latin + latin-ext) (§9)
+│   ├── fonts/               Self-hosted Inter variable woff2 (latin + latin-ext) — npm bağımlılığı yok (§9)
+│   ├── images/pattern.png   Self-hosted PrimeVue/Atlantis pattern asset'i (lisanslı, Inter fontu gibi) — --glow-image'a verilir (§9)
+│   ├── layout/_layout.scss    .l-layout wrapper (relative, ground + --glow-image/--glow-blend ile pattern arka planı) + .l-content offset kolonu (§9)
+│   ├── layout/_sidebar.scss   .l-sidebar kabuğu — TRANSPARAN (yüzey/gölge yok), sabit 21rem, brand, gruplu nav, 8px primary border-left aksanı; .l-sidebar-drawer mobil panel override'ları (§9)
+│   ├── layout/_topbar.scss    .l-topbar kabuğu — transparan (start cluster, aksiyon chip'leri, yalnız-:focus-visible odak) (§9)
+│   ├── modules/_card.scss     .card RAISED yüzey (card-bg + 1px border + hafif gölge, radius 8px, padding 14px) (§9)
+│   ├── utils/_tokens.scss   v10 tema değişkenlerinin + app-* özel token'larının SCSS alias'ları (bileşen SCSS'i için)
+│   └── theme/_dark.scss     Özel app token'ları (:root + .dark) — app-ground/card/radii/sidebar-width + mod-bağımsız --glow-* pattern token'ları; --app-background serin ground'a katlandı (FOUC) (§9)
 ├── types/
 │   ├── route.types.ts       AppRouteHandle { titleKey; title?(args) } (§6)
 │   ├── i18n.types.ts        TranslationKey (en.json'dan DotPaths) — taşınabilir, i18next referansı yok (§8)
@@ -253,7 +261,8 @@ src/
         ├── routes.tsx        DOCS_ROUTES constant'ları + route dizisi
         └── index.ts          barrel
 
-Repo kökü: index.html (<link id="app-theme"> + paint-öncesi theme-mode script'i tutar, §9),
+Repo kökü: index.html (<link id="app-theme"> + paint-öncesi theme-mode script'i + favicon link'i tutar, §9),
+public/favicon.svg (app işareti; index.html referans alır),
 README.md, .env.example, .nvmrc, vercel.json,
 package.json, vite.config.ts, tsconfig.json (+ tsconfig.app/node/test.json; test.json = src/__test__ *.test.ts için node-tipli config), eslint.config.js, tailwind.config.ts,
 postcss.config.js, stylelint.config.js, commitlint.config.js, .husky/,
@@ -305,8 +314,14 @@ referans verir; asla yeniden uygulamaz.
 - `form/Form*` — Formik↔PrimeReact alan wrapper'ları (`FormInputText`,
   `FormDropdown`, `FormCalendar`, `FormInputNumber`, `FormCheckbox`,
   `FormChips`); i18n label + hata gösterimi gömülü.
-- `layout/App*` — `AppLayout`, `AppSidebar`, `AppTopbar`,
-  `AppLanguageSwitcher`, `AppThemeToggle`.
+- `layout/App*` — `AppLayout`, `AppSidebar`, `AppTopbar`, `AppLogo`,
+  `AppLanguageSwitcher`, `AppThemeToggle`. `AppLogo` marka işaretidir (token-renkli
+  inline SVG + `BRAND_NAME` constant wordmark — özel ad, i18n değil);
+  `AppLanguageSwitcher` YALNIZ aktif dil kodunu (`TR`/`EN`) gösteren tek bir metin
+  chip'idir; tıklanınca `i18n.changeLanguage` ile diğerine geçer (§8). `AppThemeToggle`
+  ile birlikte dairesel `.l-topbar-chip` yüzey stilini paylaşır (§9).
+  Kabuk stili `styles/layout/_sidebar.scss` + `_topbar.scss`'te; yeniden-kullanılır
+  içerik yüzeyi `.card` modülüdür (`styles/modules/_card.scss`, §9).
 
 **Composables** (`src/composables`): `useMenu` (tek menü kaynağı — her modülün
 route constant'larını barrel üzerinden + docs registry'yi toplar, `menuOrder`'a
@@ -583,6 +598,109 @@ YALNIZCA uygun bir tema değişkeni yokken VEYA net bir işlevsel neden varken t
 (ör. tema link'i yüklenmeden önce gereken bir değer). Muhakeme kullan: önce mevcut
 bir değişkene uzan; paleti paralel custom renklerle parçalama.
 
+### App kabuğu özel token'ları (Atlantis-esinli)
+
+Kabuk, `theme/_dark.scss`'te uygulamaya-özel custom token'lar ekler (renk token'ları
+her iki mod, `:root` + `.dark`; radius/genişlik/`--glow-*` mod-bağımsız, yalnız
+`:root`); `utils/_tokens.scss`'te alias'lanır ve TSX'in kullandığı yerde
+`tailwind.config.ts`'te Tailwind'e açılır (`bg-app-ground`, `w-sidebar`). Renk
+literal'leri YALNIZCA bu tanımlarda yaşar (dosya
+konvansiyonuna uymak için hex değil `rgb()` yazılır); her tüketici token'ı kullanır:
+
+| Token | Açık | Koyu |
+| --- | --- | --- |
+| `--app-ground` (wrapper/body bg) | `rgb(248 250 252)` | `rgb(9 9 11)` |
+| `--app-background` (FOUC, = ground) | `var(--app-ground)` | `var(--app-ground)` |
+| `--app-card-bg` (raised kart yüzeyi) | `rgb(255 255 255)` | `rgb(24 24 27)` |
+| `--app-card-border` | `rgb(226 232 240)` | `rgb(63 63 70)` |
+| `--app-card-shadow` | `0 1px 2px rgb(15 23 42 / 4%), 0 1px 3px rgb(15 23 42 / 6%)` | `none` |
+| `--app-menu-item-hover-bg` (sidebar hover/active overlay) | `rgb(100 116 139 / 10%)` | `rgb(255 255 255 / 5%)` |
+| `--app-radius-card` / `-item` | `8px` / `8px` | aynı |
+| `--app-radius-sidebar` / `-drawer` (masaüstü panel / mobil drawer sağ köşeleri) | `16px` / `16px` | aynı |
+| `--app-sidebar-width` | `21rem` (sidebar genişliği; içerik offset'i `+ 1rem` = 22rem) | aynı |
+| `--glow-image` (pattern asset'i) | `url('../images/pattern.png')` | aynı |
+| `--glow-blend` (pattern blend) | `hard-light, multiply` | aynı |
+
+**Yüzey modeli (Atlantis görünümünün özü): SIDEBAR DÜZ katmandır, KARTLAR RAISED
+katmandır.** Sidebar'ın arka planı, border'ı, gölgesi YOK — menü doğrudan ground
+üzerinde durur ve dekoratif desen arkasından görünür. Tek yükseltilmiş yüzey `.card`
+modülüdür: `--app-card-bg` (ground'dan farklı) + 1px `--app-card-border` + hafif
+`--app-card-shadow` (koyuda `none`'a iner, ayrımı border taşır). `--app-background` ilk
+boyama eşleşsin diye ground'a katlanır. Favicon/Inter/`pattern.png` asset'leri sabit
+marka/dekoratif literal'lerdir, tema token'ı DEĞİL — tek onaylı token-dışı renkler.
+
+### Statik layout + dekoratif arka plan
+
+`.l-layout` (wrapper, `position: relative`, `bg-app-ground`, `min-block-size: 100vh`)
+sabit sidebar'ı ve `.l-content`'i — içerik kolonunu (`padding: 2rem`, `position: relative`,
+`z-index: 1`, `overflow-x: hidden`) — tutar. `>= lg`'de kolon, sabit sidebar'ın sağına
+`margin-inline-start: calc(var(--app-sidebar-width) + 1rem)` (= 22rem) ile offset'lenir;
+bu `_layout.scss`'te tanımlıdır (Tailwind utility değil, böylece collapse onu
+transition'layabilir). **Topbar `.l-content` İÇİNDE yaşar** (`.l-topbar`: transparan,
+`justify-content: space-between`, `margin-block-end: 2rem`; `.l-topbar-start` = hamburger
+2.5rem + başlık, gap 1.5rem; avatar/search yok). Sağ küme (`.l-topbar-actions`) dil + tema
+**chip'leridir**: `.l-topbar-chip` = dairesel (`border-radius: 50%`), `2.5rem`,
+`--surface-card` arka plan, `--surface-100` hover. Hamburger NÖTR bir ikondur
+(`.l-topbar-iconbtn` → `--text-color-secondary`, Lara text-button primary'sini
+`tw-components` katmanıyla yener), primary değil. Tüm topbar butonları
+**yalnız-`:focus-visible`**'dır: `.l-topbar-iconbtn:focus` PrimeReact
+box-shadow/outline'ını temizler (fare tıklamasında halka yok), `:focus-visible` klavye
+odağı için 2px primary halkayı geri getirir (§16).
+**Sidebar** (`.l-sidebar` + `.l-sidebar-fixed`): **transparan**, fixed, tam yükseklik,
+`21rem`, `border-radius: 0 var(--app-radius-sidebar) var(--app-radius-sidebar) 0` (16px),
+gölge/border YOK; menü padding `0 1.5rem`,
+gruplar `margin-bottom: 2.25rem` (ilki `margin-top: 2rem`), section etiketi
+`0.857rem`/600/uppercase/muted, item'lar `padding: 0.5rem 1rem` +
+`border-inline-start: 8px solid transparent`; **aktif = `border-inline-start-color: primary`
+(8px yeşil aksan) + `--app-menu-item-hover-bg`** (metin rengi değişmez), hover = aynı
+overlay.
+**Sidebar toggle.** Topbar hamburger'ı tüm genişliklerde görünür. `>= lg`'de `.l-layout`
+üzerinde bir `.is-collapsed` modifier'ı toggle eder (state `AppLayout`'ta,
+`useMediaQuery('(min-width: 1024px)')` ile dallanır): collapsed → `.l-sidebar-fixed`
+`transform: translateX(-100%)` ve `.l-content` `margin-inline-start: 0` (içerik tam
+genişliğe akar), ikisi de `0.3s cubic-bezier(0,0,0.2,1)` transition'lı. `lg` altında
+hamburger yerine **mobil drawer'ı** açar — `showCloseIcon`'lu PrimeReact `<Sidebar>`,
+`pt.root` + `.l-sidebar-drawer` ile yeniden stillenir: OPAK `--app-ground` panel (Lara
+yüzeyini override eder, iki modda da sayfa ground'uyla eşleşir), `border-radius: 0
+var(--app-radius-drawer) var(--app-radius-drawer) 0` (16px), `box-shadow: none` (ayrımı
+backdrop sağlar), `overflow: hidden`, genişlik `w-sidebar` + `max-w-[85vw]` sınırı.
+`.p-sidebar-header`'ı sağ-üstte ABSOLUTE konumludur (`padding: 1rem`, `z-index: 1`),
+böylece kapatma (X) yüzer ve dikey yer kaplamaz — drawer aynı `SidebarContent`'i (logo +
+menü) render eder, logo en üstte, masaüstü offset'inde (`.l-sidebar-brand` padding'i).
+Drawer route değişiminde kapanır; collapse transform `>= lg`'ye kapılıdır. Dekoratif arka
+plan doğrudan `.l-layout` üzerindedir: **self-hosted** `images/pattern.png` (lisanslı
+PrimeVue/Atlantis pattern asset'i, Inter fontu gibi self-hosted — asla hot-link değil),
+mod-bağımsız `--glow-image` + `--glow-blend` token'larıyla —
+`background-image: var(--glow-image)`, `background-blend-mode: var(--glow-blend)`
+(`hard-light, multiply`), `background-position: top`, `background-repeat: no-repeat`,
+`background-size: auto 20rem` — elemanın `--app-ground` `background-color`'ına karşı
+blend'lenir (blend'in bir tabanı olsun diye `.l-layout` üzerinde KALMALI); böylece TEK
+asset iki moda da uyum sağlar. Transparan sidebar + topbar'ın arkasında görünür; opak
+drawer onu örter. Atlantis breakpoint'i 992px; biz Tailwind `lg` (1024px) kullanırız ki
+drawer eşiği mobil kuralımızla uyuşsun.
+
+### Custom SCSS doğru cascade katmanına gider (`@layer`-merge mekanizması)
+
+Sass `@use` üst-düzey olmalı; bu yüzden custom kuralları doğru CSS cascade katmanına
+indirmek için her kabuk/modül partial'ı **kurallarını `@layer tw-components { … }`
+içine sarar** (aynı adlı katmanlar kaynak konumundan bağımsız birleşir); `@font-face`
+ve `:root`/`.dark` custom-property blokları KATMANSIZ kalır (onlar için doğru).
+`main.scss` partial'ları `@use`'lar (`base/_typography`, `layout/_layout`,
+`layout/_sidebar`, `layout/_topbar`, `modules/_card`). Katman SIRASI `index.html` inline anchor'ı ile
+kilitli kalır (§9 Cascade (b)), bu yüzden partial'ların bundle içi `@layer`
+ifadesinden önce görünmesi sorun değildir. Artık kullanılan SMACSS klasörleri:
+`base/` (tipografi), `layout/` (`l-*` kabuk), `modules/` (`.card`); state bir
+`is-active` sınıfıyla. Sınıf adları kebab-case'dir (SMACSS `l-`/`is-`), BEM `__`/`--`
+DEĞİL; böylece Stylelint config değişikliği olmadan `selector-class-pattern` geçer.
+
+### Tipografi (Inter, self-hosted)
+
+`base/_typography.scss` **self-hosted Inter variable woff2**'yi `@font-face`'ler (latin
++ latin-ext alt kümeleri `styles/fonts/`'ta, `unicode-range` ile; latin-ext Türkçe
+ğ/ş/ı/İ glyph'lerini kapsar) — **npm bağımlılığı yok**, tek eklenti font asset'idir.
+`Inter` Tailwind config'te ilk `fontFamily.sans` girdisidir (preflight onu kullansın
+diye) ve `main.scss` **14px** base boyutu + antialiasing'i `@layer tw-base`'te set eder.
+
 ### Token boru hattı
 
 ```
@@ -620,7 +738,10 @@ export default {
         'surface-border': 'var(--surface-border)',
         text: 'var(--text-color)',
         'text-secondary': 'var(--text-color-secondary)',
+        'app-ground': 'var(--app-ground)',
       },
+      width: { sidebar: 'var(--app-sidebar-width)' },
+      fontFamily: { sans: ['Inter', 'system-ui', /* … platform fallback'leri */ 'sans-serif'] },
     },
   },
   plugins: [typography],
@@ -737,17 +858,27 @@ Detay: `docs/tr/STATE_MANAGEMENT.md`, `docs/tr/modules/PATIENTS.md`.
 
 ## 11. Test
 
-Vitest + React Testing Library + MSW. Testler audit adımında (§15) PLANLANIR ve
+Runner, **Node'un yerleşik test runner'ıdır** (`node --test`, `node:test` +
+`node:assert/strict` modülleri), **saf-mantık** spec'leri üzerinde — **Vitest, React
+Testing Library, MSW, jsdom YOK**. Testler audit adımında (§15) PLANLANIR ve
 implementation'da kodla birlikte YAZILIR.
 
-- **Ağ** — GET, MSW ile mock'lanır; testte gerçek ağ yok.
-- **Düzen** — test dosyaları kaynak ağacını yansıtarak `src/__test__/` altında
-  `*.test.ts(x)` olarak yaşar. Value import'lar göreli yol kullanır (node:test `@/`
-  alias'ını çözmez); yalnız-tip import'lar `@/` kullanabilir. Tooling RuleTester
-  testi `tools/eslint/` içinde kalır.
-- **Coverage** — zorunlu eşik yok; öncelik hedefleri saf `lib/` (mapper,
-  `pickLocalized`, `formatDate`, Türkçe normalize), composable'ların
-  CRUD-on-storage davranışı ve custom lint kuralıdır (`RuleTester`).
+- **Node 24 gerekir.** Spec'ler TypeScript'tir (`*.test.ts`), Node'un yerel
+  type-stripping'i ile çalışır; bu **Node 24** ister (`.nvmrc`; CI onu kullanır).
+  Daha eski Node'da (ör. 20) `node --test` `.ts` spec'lerini sessizce atlar ve yalnız
+  JS tooling testi çalışır — testleri Node 24'te çalıştır (`nvm use`) ya da CI'a güven.
+- **Ne test edilir** — saf fonksiyonlar: `lib/` (mapper, `pickLocalized`,
+  `formatDate`, Türkçe normalize), saf composable çekirdekleri (`useMenu.lib`
+  gruplama, `useNotify.lib`, `theme.lib`, `AppDataTable.lib`, form `validation`),
+  locale parity ve custom lint kuralı (`RuleTester`). **Bileşenler, hook'lar ve
+  DOM/etkileşim unit-test EDİLMEZ** (renderer yok) — kabuk/görsel davranış `validate`
+  (type-check + ESLint + Stylelint + Prettier) + manuel QA ile kapsanır. Bileşen
+  smoke testleri için bir DOM harness (Vitest/RTL/jsdom) eklemek ayrı bir chore olur.
+- **Düzen** — spec'ler kaynak ağacını yansıtarak `src/__test__/` altında `*.test.ts`
+  olarak yaşar. Value import'lar `.ts` uzantılı göreli yol kullanır (node:test `@/`
+  alias'ını çözmez); yalnız-tip import'lar `@/` kullanabilir. Tooling RuleTester testi
+  `tools/eslint/` içinde kalır.
+- **Coverage** — zorunlu eşik yok.
 
 Detay: `docs/tr/TESTING.md`.
 
