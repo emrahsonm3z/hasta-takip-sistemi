@@ -1,0 +1,11 @@
+@use '../utils/tokens' as *;
+
+@layer tw-components {
+  .card {
+    background-color: $app-card-bg;
+    border: 1px solid $app-card-border;
+    border-radius: $app-radius-card;
+    box-shadow: $app-card-shadow;
+    padding: 14px;
+  }
+}

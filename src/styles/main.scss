@@ -1,4 +1,9 @@
 @use 'theme/dark';
+@use 'base/typography';
+@use 'layout/layout';
+@use 'layout/sidebar';
+@use 'layout/topbar';
+@use 'modules/card';
 @import 'primeicons/primeicons.css';
 @layer tw-base, primereact, tw-components, tw-utilities;
 
@@ -7,6 +12,12 @@
 
   html {
     background-color: var(--app-background);
+    font-size: 14px;
+  }
+
+  body {
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
   }
 }
 

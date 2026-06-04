@@ -1,7 +1,24 @@
 :root {
-  --app-background: white;
+  --app-background: rgb(248 250 252);
+  --app-card-bg: rgb(255 255 255);
+  --app-card-border: rgb(226 232 240);
+  --app-card-shadow: 0 1px 2px rgb(15 23 42 / 4%), 0 1px 3px rgb(15 23 42 / 6%);
+  --app-ground: rgb(248 250 252);
+  --app-menu-item-hover-bg: rgb(100 116 139 / 10%);
+  --app-radius-card: 8px;
+  --app-radius-drawer: 16px;
+  --app-radius-item: 8px;
+  --app-radius-sidebar: 16px;
+  --app-sidebar-width: 21rem;
+  --glow-blend: hard-light, multiply;
+  --glow-image: url('../images/pattern.png');
 }
 
 .dark {
-  --app-background: black;
+  --app-background: rgb(9 9 11);
+  --app-card-bg: rgb(24 24 27);
+  --app-card-border: rgb(63 63 70);
+  --app-card-shadow: none;
+  --app-ground: rgb(9 9 11);
+  --app-menu-item-hover-bg: rgb(255 255 255 / 5%);
 }

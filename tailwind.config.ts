@@ -27,6 +27,22 @@ export default {
         'surface-border': 'var(--surface-border)',
         text: 'var(--text-color)',
         'text-secondary': 'var(--text-color-secondary)',
+        'app-ground': 'var(--app-ground)',
+      },
+      width: {
+        sidebar: 'var(--app-sidebar-width)',
+      },
+      fontFamily: {
+        sans: [
+          'Inter',
+          'system-ui',
+          '-apple-system',
+          'Segoe UI',
+          'Roboto',
+          'Helvetica',
+          'Arial',
+          'sans-serif',
+        ],
       },
     },
   },
