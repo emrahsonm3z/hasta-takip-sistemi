@@ -173,9 +173,12 @@ export default {
             'thead th:last-child': {
               paddingRight: '0.875rem',
             },
-            'tbody td': {
+            'tbody td, tfoot td': {
               border: '1px solid var(--surface-border)',
-              padding: '0.55rem 0.875rem',
+              paddingTop: '0.55rem',
+              paddingRight: '0.875rem',
+              paddingBottom: '0.55rem',
+              paddingLeft: '0.875rem',
               verticalAlign: 'top',
             },
             'tbody td:first-child': {
