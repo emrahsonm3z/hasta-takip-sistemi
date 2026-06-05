@@ -73,10 +73,7 @@ Sections: <CLAUDE.md §referansları>   ·   Paths: <dokunulan ana yollar>
 Next: <mevcut/sıradaki alt-madde — bağlam olmadan başlamaya yetecek kadar net>
 ```
 
-### Active: 1.1 Patients veri katmanı · branch: feat/patients-data-layer · status: in-progress
-
-Sections: §2 §3 §7 §8 §10 §11 · Paths: src/modules/patients/\*\*, src/locales/\*, src/\_\_test\_\_/modules/patients/\*
-Next: model + mapper + storage servisi + testler (seed kaynağı doğrulandı: canlı VITE_API_URL GET)
+_(Devam eden aktif iş yok.)_
 
 ## 1. Proje Genel Bakış
 

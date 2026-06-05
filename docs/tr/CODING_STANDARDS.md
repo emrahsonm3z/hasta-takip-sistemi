@@ -18,10 +18,10 @@ değildir; anlamsız kısaltma sorundur (`submitNewPatientButton`, asla
 | Klasörler | kebab-case | `modules/patients/` |
 | Bileşenler | PascalCase.tsx | `AppDataTable.tsx` |
 | Composable'lar | useCamelCase.ts | `useMenu.ts` |
-| API modülleri | camelCase.api.ts | `patients.api.ts` *(planlı, 1.1)* |
-| Storage | camelCase.storage.ts | `patients.storage.ts` *(planlı, 1.1)* |
-| Modeller | camelCase.model.ts | `patient.model.ts` *(planlı, 1.1)* |
-| Mapper'lar | camelCase.mapper.ts | `patient.mapper.ts` *(planlı, 1.1)* |
+| API modülleri | camelCase.api.ts | `patients.api.ts` |
+| Storage | camelCase.storage.ts | `patients.storage.ts` |
+| Modeller | camelCase.model.ts | `patient.model.ts` |
+| Mapper'lar | camelCase.mapper.ts | `patient.mapper.ts` |
 | Saf yardımcılar | camelCase.ts | `pickLocalized.ts` |
 | Sabitler | kebab-case.constants.ts | `docs-registry.ts`, `query-keys.ts` |
 | Rotalar | routes.tsx | `routes.tsx` |

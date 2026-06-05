@@ -342,7 +342,7 @@ SPRINT_PLAN paths); locale parity.
 Outcome: list + add + edit + delete patients, bilingual, Turkish-aware, persisted
 in `localStorage`, seeded once from the GET.
 
-### 1.1 ⬜ Patients data layer
+### 1.1 ✅ Patients data layer
 **Goal:** Model, mapper, read-only GET, storage CRUD service, query keys, and the
 seed + mutation composables (§10).
 **Depends on:** 0.3, 0.7

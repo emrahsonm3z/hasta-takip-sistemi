@@ -4,11 +4,10 @@ This document explains where the patient data comes from, where it is kept,
 and what happens when a record is added, edited, or deleted. The big picture
 needs no developer background; the contracts below it are exact.
 
-**Honest status note:** the patient data layer described in the second half
-(model, mapper, storage service, query keys, composables) is the **designed
-contract for Sprint 1.1** and is not in the repository yet. What ships today
-is the architecture itself plus one working example of it — the documentation
-module's own data flow. Everything is labelled accordingly.
+**Status:** the patient data layer (model, mapper, storage service, query
+keys, composables) **shipped in Sprint 1.1** — everything below is real code
+from the repository. Only the screens that will consume it are still planned
+(the list is 1.2, the form is 1.3).
 
 ---
 
@@ -21,9 +20,9 @@ initial list.
 
 ```
 remote API (GET, once)
-      │  raw snake_case rows
+      │  raw rows (Turkish display values, note_tr/_en pairs)
       ▼
-   mapper (pure)                      ← planned, 1.1
+   mapper (pure)
       │  typed camelCase PatientRecord[]
       ▼
 localStorage  ──────────────►  React Query cache  ──────────►  screens
@@ -91,33 +90,53 @@ invalidation can never miss a spelling.
 
 ---
 
-## The patient data layer — planned (Sprint 1.1)
+## The patient data layer (shipped, Sprint 1.1)
 
-The contracts below are the agreed design (see the sprint plan); files and
-code land in 1.1.
+**Storage service**: the pure core `createPatientStorage`
+(`lib/patient-storage.lib.ts`, unit-tested against an in-memory backend) is
+bound to the real browser storage in one line
+(`api/patients.storage.ts`):
 
-**Storage service** (`modules/patients/api/patients.storage.ts`):
+```ts
+export const patientStorage = createPatientStorage(window.localStorage)
+```
+
 `patientStorage.{read, write, add, update, remove, clear}` over a JSON value
-at `STORAGE_KEY = 'patients'`. `read` returns `[]` on missing or corrupt JSON
-instead of crashing; `write` reports a quota failure through a toast.
+at key `'patients'`. `read` returns `[]` on missing, corrupt, or non-array
+JSON instead of crashing; a quota failure on `write` surfaces as the
+mutation's error toast.
 
-**Seed flow** (`composables/usePatients.ts`) — on first visit:
+**Seed flow** (`composables/usePatients.ts`) — exactly as shipped:
 
-1. `useQuery` reads `patientStorage.read()`.
-2. Empty? Fetch the GET once, run the mapper, write the result to storage.
-3. Return the list. Seeding is idempotent (safe under React StrictMode's
-   double-invoke).
+```ts
+async function readOrSeedPatients(): Promise<PatientRecord[]> {
+  const stored = patientStorage.read()
+  if (stored.length > 0) {
+    return stored
+  }
+  const rawRows = await fetchRawPatients()
+  const patients = mapRawPatients(rawRows)
+  patientStorage.write(patients)
+  return patients
+}
+```
 
-**Writes** (`composables/usePatientMutations.ts`): every mutation calls the
-storage service, then `queryClient.invalidateQueries(patientKeys.all())` —
+First visit: one GET to `VITE_API_URL`, mapped, persisted. Afterwards:
+storage only. Idempotent under React StrictMode's double-invoke (the second
+seed writes identical data).
+
+**Writes** (`composables/usePatientMutations.ts`): `addPatient`,
+`updatePatient`, `removePatient` — each calls the storage service, then
+`queryClient.invalidateQueries({ queryKey: patientKeys.all() })` —
 invalidation-only, no manual cache patching. Success and failure both speak
-through `useNotify` toasts.
+through `useNotify` toasts (typed keys).
 
-**Mapper boundary:** the API returns raw snake_case rows; the pure mapper
-(`lib/patient.mapper.ts`) produces the typed camelCase `PatientRecord` and
-runs **only on the seed path**. Storage round-trips the already-mapped model.
-There is no storage migration — if the model changes, clear and re-seed
-(acceptable for mock data).
+**Mapper boundary:** the API returns Turkish display values and snake_case
+localized pairs; the pure mapper (`lib/patient.mapper.ts`) produces the typed
+camelCase `PatientRecord` — throwing on unknown enum values — and runs **only
+on the seed path**. Storage round-trips the already-mapped model. There is no
+storage migration — if the model changes, clear and re-seed (acceptable for
+mock data). Full detail: the Patients Module doc.
 
 ---
 
@@ -127,5 +146,5 @@ There is no storage migration — if the model changes, clear and re-seed
 | --- | --- |
 | Seed GET fails | In-page `ErrorState` with retry (query `retry: 1` first) |
 | Stored JSON corrupt | Treated as empty — the app re-seeds rather than crashing |
-| Storage quota exceeded | Error toast via `useNotify` *(planned, 1.1)* |
+| Storage quota exceeded | The mutation fails → `errors.saveFailed` toast via `useNotify` |
 | A document file fails to load | Same `ErrorState` pattern in the docs viewer (live today) |

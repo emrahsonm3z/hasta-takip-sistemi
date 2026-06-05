@@ -18,8 +18,7 @@ a case study reviewed as-is.
 
 ## Directory structure
 
-What is in the repository today. The patients data layer (api, models, lib,
-composables) is **planned for Sprint 1.1** and not yet on disk.
+What is in the repository today.
 
 ```
 src/
@@ -46,8 +45,8 @@ src/
 ├── types/                   Route handle + TranslationKey typing
 ├── __test__/                node:test specs mirroring the source tree
 └── modules/
-    ├── patients/            Routes + page shell today; data layer lands in 1.1
-    │   ├── pages/PatientsPage.tsx
+    ├── patients/            Patient tracking (data layer shipped; screens land in 1.2/1.3)
+    │   ├── api/  composables/  constants/  lib/  models/  pages/
     │   ├── routes.tsx
     │   └── index.ts
     └── docs/                This documentation viewer (see its own doc)
