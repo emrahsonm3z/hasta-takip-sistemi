@@ -87,7 +87,63 @@
     }
   },
   "docs": {
-    "title": "Dokümanlar"
+    "title": "Dokümanlar",
+    "lead": "Bu uygulamanın nasıl yapıldığı ve nasıl çalıştığımız hakkında her şey — yalnızca geliştiriciler için değil, herkesin okuyabileceği şekilde yazıldı.",
+    "backToList": "Tüm dokümanlar",
+    "doc": {
+      "architecture": {
+        "title": "Mimari",
+        "description": "Uygulama nasıl organize edildi: yapı taşları ve birbirine nasıl oturdukları."
+      },
+      "components": {
+        "title": "Ortak Bileşenler",
+        "description": "Her ekranın kullandığı yeniden kullanılabilir yapı taşları — tablolar, formlar, mesajlar."
+      },
+      "codingStandards": {
+        "title": "Kodlama Standartları",
+        "description": "Kod yazarken uyduğumuz kurallar; her şey tutarlı ve okunur kalsın diye."
+      },
+      "styling": {
+        "title": "Stil ve Tema",
+        "description": "Renkler, yazı tipleri, boşluklar ve açık/koyu modun nasıl çalıştığı."
+      },
+      "stateManagement": {
+        "title": "Veri ve Saklama",
+        "description": "Hasta verisi nereden gelir, nerede tutulur, değişiklikler nasıl kaydedilir."
+      },
+      "i18n": {
+        "title": "Diller (TR / EN)",
+        "description": "Uygulama her şeyi Türkçe ve İngilizce olarak nasıl gösteriyor."
+      },
+      "testing": {
+        "title": "Test",
+        "description": "Uygulamanın doğru çalıştığını nasıl kontrol ediyoruz."
+      },
+      "workflow": {
+        "title": "Nasıl Çalışıyoruz",
+        "description": "Bir değişikliğin izlediği yol: fikirden incelemeye, oradan yayına."
+      },
+      "versioning": {
+        "title": "Sürümler ve Yayınlar",
+        "description": "Sürüm numaraları nasıl büyür, yeni bir sürüm nasıl yayınlanır."
+      },
+      "sprintPlan": {
+        "title": "Sprint Planı",
+        "description": "İş planı: ne bitti, ne devam ediyor, sırada ne var."
+      },
+      "changelog": {
+        "title": "Değişiklik Günlüğü",
+        "description": "Uygulamada nelerin değiştiğinin sürüm sürüm listesi. (Yalnızca İngilizce.)"
+      },
+      "modulePatients": {
+        "title": "Hasta Modülü",
+        "description": "Hasta takip ekranlarına ve davranışlarına yakından bakış."
+      },
+      "moduleDocs": {
+        "title": "Doküman Modülü",
+        "description": "Bu doküman görüntüleyicinin kendisi nasıl çalışıyor."
+      }
+    }
   },
   "menu": {
     "section": {

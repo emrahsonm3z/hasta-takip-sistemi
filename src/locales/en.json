@@ -87,7 +87,63 @@
     }
   },
   "docs": {
-    "title": "Documentation"
+    "title": "Documentation",
+    "lead": "Everything about how this application is built and how we work — written so everyone can read it, not just developers.",
+    "backToList": "All documentation",
+    "doc": {
+      "architecture": {
+        "title": "Architecture",
+        "description": "How the application is organised: its building blocks and how they fit together."
+      },
+      "components": {
+        "title": "Shared Components",
+        "description": "The reusable building blocks every screen is made of — tables, forms, messages."
+      },
+      "codingStandards": {
+        "title": "Coding Standards",
+        "description": "The rules we follow when writing code, so everything stays consistent and readable."
+      },
+      "styling": {
+        "title": "Styling & Theme",
+        "description": "Colours, fonts, spacing, and how light and dark mode work."
+      },
+      "stateManagement": {
+        "title": "Data & Storage",
+        "description": "Where patient data comes from, where it is kept, and how changes are saved."
+      },
+      "i18n": {
+        "title": "Languages (TR / EN)",
+        "description": "How the app shows everything in both Turkish and English."
+      },
+      "testing": {
+        "title": "Testing",
+        "description": "How we check that the application works correctly."
+      },
+      "workflow": {
+        "title": "How We Work",
+        "description": "The path a change travels: from idea, through review, to going live."
+      },
+      "versioning": {
+        "title": "Versions & Releases",
+        "description": "How version numbers grow and how a new release is published."
+      },
+      "sprintPlan": {
+        "title": "Sprint Plan",
+        "description": "The work plan: what is done, what is in progress, and what comes next."
+      },
+      "changelog": {
+        "title": "Changelog",
+        "description": "A version-by-version list of what changed in the application. (English only.)"
+      },
+      "modulePatients": {
+        "title": "Patients Module",
+        "description": "A closer look at the patient tracking screens and how they behave."
+      },
+      "moduleDocs": {
+        "title": "Docs Module",
+        "description": "How this documentation viewer itself works."
+      }
+    }
   },
   "menu": {
     "section": {
