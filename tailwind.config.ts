@@ -165,12 +165,24 @@ export default {
               fontWeight: '600',
               textAlign: 'left',
               whiteSpace: 'nowrap',
-              padding: '0.55rem 0.875rem',
+              padding: '0.6rem 0.875rem',
+            },
+            'thead th:first-child': {
+              paddingLeft: '0.875rem',
+            },
+            'thead th:last-child': {
+              paddingRight: '0.875rem',
             },
             'tbody td': {
               border: '1px solid var(--surface-border)',
               padding: '0.55rem 0.875rem',
               verticalAlign: 'top',
+            },
+            'tbody td:first-child': {
+              paddingLeft: '0.875rem',
+            },
+            'tbody td:last-child': {
+              paddingRight: '0.875rem',
             },
             'tbody tr:nth-child(even)': {
               backgroundColor: 'var(--surface-50)',
