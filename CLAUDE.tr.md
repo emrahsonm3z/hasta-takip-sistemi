@@ -1095,10 +1095,11 @@ branch'lerine elle yazılmaz; böylece eşzamanlı iş onda çakışmaz.
 ## 15. Workflow
 
 Bir takım workflow'u. Repo sahibi takım yöneticisidir: hiçbir şey onların
-incelemesi olmadan `main`'e ulaşmaz. Claude Code asla onay olmadan commit ya da
-merge yapmaz ve asla pull request açmaz — akışı commit + docs:sync + push'ta
-BİTER; PR'ı GitHub'da sahip açar. Detay: `docs/tr/WORKFLOW.md` (CI / Vercel /
-release mekaniğini de kapsar).
+incelemesi olmadan `main`'e ulaşmaz. Claude Code asla merge yapmaz ve asla pull
+request açmaz — ve sahip commit'lenmemiş diff'i onaylayana dek COMMIT bile
+yapmaz (commit-öncesi diff incelemesi, Geliştirici adım 2/4). Onaydan sonra
+akışı commit + docs:sync + push'ta biter; PR'ı GitHub'da sahip açar. Detay:
+`docs/tr/WORKFLOW.md` (CI / Vercel / release mekaniğini de kapsar).
 
 ### Backlog
 
@@ -1121,20 +1122,26 @@ taşıyabilir.
 1. **Audit / Plan** — kod yok. Kapsam + alt-adım kırılımı + test planı + danışılan
    dokümanlar + drift. Sohbette netleşir; onayda TOPIC için §0.1 Active Work maddesi
    oluşur.
-2. **Implementation, her seferinde bir alt-madde** — bir branch TEK bir topic'tir
-   (≈ bir SPRINT_PLAN görevi ya da sıkı ilişkili alt-adımlar grubu) ve BİRDEN ÇOK
-   commit taşır, incelenmiş her alt-madde için bir tane. Her alt-madde için: Claude
-   Code kod + test yazar → **geliştirici self code-review** (sorun → düzelt → tekrar
-   incele döngüsü) → emin olununca bir Conventional Commit (commitlint her commit'te
-   çalışır, §12). Claude Code açık onay olmadan asla commit'lemez. §0.1 Active Work
-   `Next` / `status`, alt-maddeler indikçe güncellenir.
+2. **Implementation, her seferinde bir alt-madde — henüz hiçbir şey
+   commit'lenmez.** Bir branch TEK bir topic'tir (≈ bir SPRINT_PLAN görevi ya da
+   sıkı ilişkili alt-adımlar grubu) ve incelenmiş alt-madde başına bir tane olmak
+   üzere BİRDEN ÇOK commit taşıyacaktır. Her alt-madde için: Claude Code kod +
+   test yazar → **geliştirici self code-review** (sorun → düzelt → tekrar incele
+   döngüsü). İş, commit-öncesi diff incelemesine (adım 4) dek COMMIT'LENMEMİŞ
+   birikir. §0.1 Active Work `Next` / `status`, alt-maddeler indikçe güncellenir.
 3. **Topic'in son commit'inde docs:sync** — docs (iki dil, §13.3) + `SPRINT_PLAN.md`
    ✅ + Active Work silinmesi, topic'in SON commit'inde (ya da kendi `docs:` /
    `chore:` commit'inde) yer alır; Conventional mesajla (§14).
-4. **Topic'i bitir.** Branch'i **push** et ve DUR — geliştirici akışı burada
-   BİTER. Claude Code pull request'i AÇMAZ; sahip açar (aşağıdaki Yönetici adım
-   5). Push'tan sonra agent, önerilen PR başlığını ve gövdesini (sözleşmeyi) son
-   raporunda çıktılar; sahip PR'ı GitHub'da bu metni kullanarak açar.
+4. **Commit-öncesi diff incelemesi, sonra bitir.** Topic tamam ama
+   COMMIT'LENMEMİŞKEN (adım-3 docs:sync düzenlemeleri dahil), Claude Code tam
+   `git diff`'i, planlanan commit kırılımını (hangi hunk'lar → hangi
+   Conventional Commit, hangi sırayla) ve önerilen PR başlık + gövdesini
+   (sözleşmeyi) çıktılar — sonra DURUR; henüz commit'lemez. Sahip fiilî diff'i
+   inceler (sorun → düzelt → tekrar incele döngüsü). YALNIZ onaydan sonra:
+   planlanan atomik alt-commit'ler yapılır (commit başına commitlint, §12) ve
+   branch **push**'lanır — geliştirici akışı burada BİTER. Claude Code pull
+   request'i AÇMAZ; sahip açar (Yönetici adım 5), önceden incelenmiş başlık +
+   gövdeyle.
 
 ### Otomatik kapı (CI)
 
@@ -1149,9 +1156,9 @@ PR merge edilemez** (required status check). İnsanlar sonra özü inceler.
    agent'ın son raporunda önerdiği başlık ve gövdeyi kullanarak (Geliştirici adım
    4). CI'nin `gate` job'u PR'da çalışır ve review öncesi yeşil olmalı (aşağıdaki
    Otomatik kapı + Merge stratejisi).
-6. **İnceleme** sözleşmeye karşı (plan, kabul kriteri, kod, docs), topic'in
-   sub-commit'leri boyunca — *hedef:* CI yeşil ile PR üzerinde; *geçici:* yerel
-   branch/commit'ler üzerinde. Sorun → geliştiriciye geri.
+6. **Son kontrol** sözleşmeye karşı (plan, kabul kriteri, docs), CI yeşilken PR
+   üzerinde — asıl kod incelemesi commit'ten önce diff üzerinde zaten yapıldı
+   (Geliştirici adım 4). Sorun → geliştiriciye geri.
 7. **`main`'e merge**, sub-commit'leri koruyarak (aşağıdaki Merge stratejisi) →
    production deploy (Vercel) + release-please Release PR'ı açar/günceller (§14).
 
@@ -1181,8 +1188,9 @@ düzeltme `fix/*` ile, aynı akış hızlandırılmış.
 ### Fast path
 
 Trivial, düşük-riskli değişiklikler (Dependabot bump'ları dahil) formal audit /
-Active Work seremonisini atlar (implement → self-review → Conventional commit) — ama
-kapılar asla atlanmaz: sahibin açtığı PR + CI `gate` + sahibin merge'i. Yalnız
+Active Work seremonisini atlar (implement → self-review → commit-öncesi diff
+incelemesi → Conventional commit) — ama kapılar asla atlanmaz: commit-öncesi
+diff incelemesi, sahibin açtığı PR, CI `gate` ve sahibin merge'i. Yalnız
 audit hafifler.
 
 ### Git konvansiyonları
@@ -1270,5 +1278,5 @@ döner: başarısız self-review implementation'a, başarısız inceleme gelişt
     (`docsRegistry` dahil).
 14. Sürümleme (§14) — net bir Conventional Commit (release-please bump'ı türetir);
     sürüm / bağımlılık-major kayması yok (§1.1).
-15. Workflow (§15) — ön-iş docs danışıldı; self-commit/merge yok; kapılar ve
-    PR-sözleşme korunur.
+15. Workflow (§15) — ön-iş docs danışıldı; sahip HER commit'ten önce tam
+    diff'i inceler; self-commit/merge yok; kapılar ve PR-sözleşme korunur.
