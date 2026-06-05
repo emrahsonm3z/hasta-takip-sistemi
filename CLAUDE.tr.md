@@ -115,6 +115,8 @@ Veri kaynağı (GET, salt-okunur, tek-seferlik seed):
 - Diğer bağımlılıklar caret major kullanır; lockfile commit edilir ve her yerde
   (yerel, CI, Vercel) `npm ci` kullanılır.
 - Docs-render dep'leri: `react-markdown` (^10), `remark-gfm` (^4),
+  `rehype-highlight` (^7) + `highlight.js` (^11, `github-dark` stylesheet'i —
+  her-zaman-koyu kod bloğu istisnası, §9) ve
   `@tailwindcss/typography` (^0.5) — sonuncusu Tailwind config `plugins`'ine
   bağlanır (§9).
 - Dependabot (`.github/dependabot.yml`, ENFORCE edildiği yer) beş tam-pinli kritik
@@ -258,7 +260,7 @@ src/
     │   ├── routes.tsx        PATIENT_ROUTES constant'ları + route dizisi (§6)
     │   └── index.ts          barrel (public API + routes + route constant'ları)
     └── docs/                 Uygulama-içi dokümantasyon görüntüleyici (§13)
-        ├── components/       MarkdownRenderer.tsx (react-markdown + remark-gfm, prose)
+        ├── components/       MarkdownRenderer.tsx (react-markdown + remark-gfm + rehype-highlight, prose)
         ├── composables/      useDocContent.ts (lazy glob yükleyici üzerinde useQuery)
         ├── lib/
         │   ├── doc-path.ts      saf resolveDocPath(entry, language) + findDocEntry (birim-testli)
@@ -730,10 +732,19 @@ eklentisi render edilen docs'u biçimler (§13): config'in `typography` tema
 uzantısı HER `--tw-prose-*` rengini v10 değişkenlerine eşler (`--text-color`,
 `--primary-color`, `--surface-border`, `--surface-100`, …); böylece prose, tema
 takasıyla mod-doğrudur — **asla `prose-invert` kullanma** (§9'un yasakladığı
-`dark:` mekanizmasıdır). Aynı blok okuma genişliğini (`maxWidth: '70ch'`),
-1.75 satır yüksekliğini ve code/pre/blockquote/başlık inceltmelerini kurar;
-doküman prose'u her zaman bir `.card` yüzeyinin içinde render edilir
-(`DocViewerPage`).
+`dark:` mekanizmasıdır). Aynı blok referans-stili okuma tasarımını kurar:
+1.7 satır yüksekliğinde 0.9375rem gövde; çizgili başlıklar (h1 2px / h2 soluk
+1px alt çizgi, h2 üst 2rem / alt 0.75rem asimetrisi); tam-ızgaralı
+token-kenarlıklı tablolar (surface-100 başlık, çift satır zebra, hover tonu);
+primary-vurgulu blockquote callout'u (4px sol kenarlık + surface-50 zemin);
+satır-içi kod çipi (surface-100 zemin + 1px surface-border). Doküman prose'u
+içerik yüzeyinin ÜZERİNE doğrudan oturur — kart yok, SOLA hizalı,
+`max-w-[57.5rem]` ile sınırlı (`MarkdownRenderer`). **Onaylı §9 istisnası —
+çitli kod blokları HER ZAMAN KOYUDUR:** `rehype-highlight` + highlight.js
+`github-dark` stylesheet'i kodu İKİ modda da `rgb(13 17 23)` üzerinde
+`rgb(201 209 217)` metinle çizer; bu iki literal (`tailwind.config.ts`'teki
+`--tw-prose-pre-bg` / pre-code rengi) artı o import edilen stylesheet, token
+tanımları dışında izin verilen TEK token-dışı renklerdir.
 
 ```ts
 import type { Config } from 'tailwindcss'

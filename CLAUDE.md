@@ -110,8 +110,9 @@ Data source (GET, read-only, one-time seed):
 - Other dependencies use caret majors; the lockfile is committed and `npm ci` is
   used everywhere (local, CI, Vercel).
 - Docs-rendering deps: `react-markdown` (^10), `remark-gfm` (^4),
-  `@tailwindcss/typography` (^0.5) — the last is wired into the Tailwind config
-  `plugins` (§9).
+  `rehype-highlight` (^7) + `highlight.js` (^11, the `github-dark` stylesheet —
+  the dark-always code-block exception, §9), and `@tailwindcss/typography`
+  (^0.5) — the last is wired into the Tailwind config `plugins` (§9).
 - Dependabot (`.github/dependabot.yml`, where this is ENFORCED) **ignores ALL
   update types** for the five exact-pinned criticals — `react`, `react-dom`,
   `primereact`, `primeicons`, `tailwindcss` — so they never drift, and **ignores
@@ -255,7 +256,7 @@ src/
     │   ├── routes.tsx        PATIENT_ROUTES constants + route array (§6)
     │   └── index.ts          barrel (public API + routes + route constants)
     └── docs/                 In-app documentation viewer (§13)
-        ├── components/       MarkdownRenderer.tsx (react-markdown + remark-gfm, prose)
+        ├── components/       MarkdownRenderer.tsx (react-markdown + remark-gfm + rehype-highlight, prose)
         ├── composables/      useDocContent.ts (useQuery over the lazy glob loader)
         ├── lib/
         │   ├── doc-path.ts      pure resolveDocPath(entry, language) + findDocEntry (unit-tested)
@@ -727,10 +728,19 @@ typography plugin styles rendered docs (§13): the config's `typography` theme
 extension maps EVERY `--tw-prose-*` colour onto the v10 variables
 (`--text-color`, `--primary-color`, `--surface-border`, `--surface-100`, …), so
 prose is mode-correct via the theme swap — **never use `prose-invert`** (it is
-the `dark:` mechanism §9 forbids). The same block sets the reading measure
-(`maxWidth: '70ch'`), line-height 1.75, and the code/pre/blockquote/heading
-refinements; doc prose always renders inside a `.card` surface
-(`DocViewerPage`).
+the `dark:` mechanism §9 forbids). The same block sets the reference-style
+reading design: 0.9375rem body at 1.7 line-height; ruled headings (h1 2px /
+h2 faint 1px bottom rules, h2 top 2rem / bottom 0.75rem asymmetry); full-grid
+token-bordered tables (surface-100 header, zebra even rows, hover tint); the
+primary-accent blockquote callout (4px left border + surface-50 bg); the
+inline-code chip (surface-100 bg + 1px surface-border). Doc prose sits
+DIRECTLY on the content surface — no card, LEFT-aligned, capped at
+`max-w-[57.5rem]` (`MarkdownRenderer`). **Sanctioned §9 exception — fenced
+code blocks are DARK-ALWAYS:** `rehype-highlight` + the highlight.js
+`github-dark` stylesheet render code on `rgb(13 17 23)` with `rgb(201 209 217)`
+text in BOTH modes; these two literals (`--tw-prose-pre-bg` / pre-code colour
+in `tailwind.config.ts`) plus that imported stylesheet are the ONLY
+non-token colours allowed outside token definitions.
 
 ```ts
 import type { Config } from 'tailwindcss'
