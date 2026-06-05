@@ -888,7 +888,7 @@ Tek entegre zincir; Prettier tek formatter'dır.
 
 | Araç                | Sahiplendiği                           | Çakışma çözümü                            |
 | ------------------- | -------------------------------------- | ----------------------------------------- |
-| typescript-eslint   | TS/React doğruluğu, kural ihlalleri    | —                                         |
+| typescript-eslint   | TS/React doğruluğu, kural ihlalleri; no-`any` politikası (aşağıda) | —             |
 | eslint-plugin-i18next | `no-literal-string` (JSX-only, §8)   | —                                         |
 | eslint-plugin-jsx-a11y | erişilebilirlik zemini (§16)        | —                                         |
 | eslint-plugin-simple-import-sort | import + export sırası (zorunlu, `eslint --fix` ile otomatik düzeltilir; §5'e göre gruplar: side-effect'ler, `node:`, harici paketler (önce react), `@/` alias, göreli) | — |
@@ -910,6 +910,15 @@ referansları, Vite `@vite-ignore` magic yorumu (yalnızca Vite — webpack yok)
 shebang ve boş yorumlar. Kural yerel olarak `tools/eslint/no-explanatory-comments.js`'te
 uygulanır ve `eslint.config.js`'e inline `local` plugin olarak bağlanır
 (`plugins: { local: { rules: { … } } }`), `RuleTester` birim testiyle.
+
+**`any` yok.** `@typescript-eslint/no-explicit-any`, TÜM TS dosyaları için
+(`eslint.config.js`'teki `src` bloğu + `vite.config.ts` bloğu) `error` olarak
+sabitlenmiştir. Recommended preset'ler bunu zaten içerir; açık sabitleme,
+politikanın herhangi bir preset değişikliğinden etkilenmemesini sağlar. Örtük
+taraf, iki tsconfig'deki `strict: true` (`noImplicitAny` dahil) ile kapsanır. Bir
+ihlal DOĞRU DÜZGÜN bir tiple düzeltilir — kesin bir tip, `unknown` + daraltma ya
+da bir generic — asla `eslint-disable`, `@ts-ignore` / `@ts-expect-error` ya da
+`any`'ye yeniden cast ile susturulmaz.
 
 Tek script her şeyi çalıştırır: `validate` = `type-check` + `lint` + `lint:style`
 + `format:check`. CI `validate` + testler + `build` + `npm audit --audit-level=high`

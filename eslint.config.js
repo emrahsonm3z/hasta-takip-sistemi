@@ -75,6 +75,7 @@ export default tseslint.config(
     },
     plugins: { i18next },
     rules: {
+      '@typescript-eslint/no-explicit-any': 'error',
       'i18next/no-literal-string': [
         'error',
         {
@@ -153,6 +154,9 @@ export default tseslint.config(
     languageOptions: {
       sourceType: 'module',
       globals: { ...globals.node },
+    },
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'error',
     },
   },
 
