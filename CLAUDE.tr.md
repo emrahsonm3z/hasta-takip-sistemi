@@ -73,10 +73,7 @@ Sections: <CLAUDE.md §referansları>   ·   Paths: <dokunulan ana yollar>
 Next: <mevcut/sıradaki alt-madde — bağlam olmadan başlamaya yetecek kadar net>
 ```
 
-### Active: 0.9 Docs modülü + registry + iskelet docs + README · branch: feat/docs-module · status: in-progress
-
-Sections: §2 §3 §3.1 §6 §8 §9 §10 §11 §13 · Paths: src/modules/docs/\*\*, src/composables/useMenu.ts, docs/{en,tr}/\*\*, README.md, tailwind.config.ts
-Next: docs:sync son commit (kural dosyaları §1.1 §3 §6 §9 §13.4, SPRINT_PLAN ✅, Active Work silme)
+_(Devam eden aktif iş yok.)_
 
 ## 1. Proje Genel Bakış
 
@@ -114,7 +111,7 @@ Veri kaynağı (GET, salt-okunur, tek-seferlik seed):
   yok (§9).
 - Diğer bağımlılıklar caret major kullanır; lockfile commit edilir ve her yerde
   (yerel, CI, Vercel) `npm ci` kullanılır.
-- Docs-render dep'leri: `react-markdown` (^9), `remark-gfm` (^4),
+- Docs-render dep'leri: `react-markdown` (^10), `remark-gfm` (^4),
   `@tailwindcss/typography` (^0.5) — sonuncusu Tailwind config `plugins`'ine
   bağlanır (§9).
 - Dependabot (`.github/dependabot.yml`, ENFORCE edildiği yer) beş tam-pinli kritik
@@ -211,7 +208,7 @@ src/
 │       ├── AppLanguageSwitcher.tsx  aktif-dil metin chip'i (TR/EN) → i18n.changeLanguage diğerine geçirir (tek dil akışı §8)
 │       └── AppThemeToggle.tsx       → plugins/theme setThemeMode + 'theme-mode' (§9)
 ├── composables/
-│   ├── useMenu.ts           tek menü kaynağı: modül route constant'ları + docs registry, section atar (§6)
+│   ├── useMenu.ts           tek menü kaynağı: barrel üzerinden modül route constant'ları (docs = tek OVERVIEW maddesi), section atar (§6)
 │   ├── useMenu.lib.ts       saf buildMenu(sources, translate) — gruplu section'lar, sırala + etiketle (unit-test'li)
 │   ├── useNotify.ts         success / error / info toast; yalnız-anahtar TranslationKey API (§3.1)
 │   ├── useNotify.lib.ts     saf normalizeErrorKey(error) → TranslationKey (unit-test'li)
@@ -258,10 +255,16 @@ src/
     │   ├── routes.tsx        PATIENT_ROUTES constant'ları + route dizisi (§6)
     │   └── index.ts          barrel (public API + routes + route constant'ları)
     └── docs/                 Uygulama-içi dokümantasyon görüntüleyici (§13)
-        ├── components/       Markdown renderer (react-markdown + remark-gfm)
-        ├── constants/        docs-registry.ts (slug + titleKey; tek kaynak)
-        ├── pages/            DocsOverviewPage.tsx (/docs), DocViewerPage.tsx (/docs/:slug)
-        ├── routes.tsx        DOCS_ROUTES constant'ları + route dizisi
+        ├── components/       MarkdownRenderer.tsx (react-markdown + remark-gfm, prose)
+        ├── composables/      useDocContent.ts (lazy glob yükleyici üzerinde useQuery)
+        ├── lib/
+        │   ├── doc-path.ts      saf resolveDocPath(entry, language) + findDocEntry (birim-testli)
+        │   └── docs-loader.ts   import.meta.glob(['/docs/**/*.md', '/CHANGELOG.md', '/SPRINT_PLAN.md', '/SPRINT_PLAN.tr.md'], ?raw) + loadDocContent
+        ├── constants/
+        │   ├── docs-registry.ts  DocEntry { slug, titleKey, descriptionKey, icon, order, paths.{en,tr} } (tek kaynak, §13.4)
+        │   └── query-keys.ts     docsKeys factory (§10)
+        ├── pages/            DocsOverviewPage.tsx (/docs kart-grid indeksi), DocViewerPage.tsx (/docs/:slug; bilinmeyen slug → NotFound)
+        ├── routes.tsx        DOCS_ROUTES constant'ları (OVERVIEW + build(slug)'lı ve registry üzerinden dinamik başlıklı VIEWER) + route dizisi
         └── index.ts          barrel
 
 Repo kökü: index.html (<link id="app-theme"> + paint-öncesi theme-mode script'i + favicon link'i tutar, §9),
@@ -327,9 +330,9 @@ referans verir; asla yeniden uygulamaz.
   içerik yüzeyi `.card` modülüdür (`styles/modules/_card.scss`, §9).
 
 **Composables** (`src/composables`): `useMenu` (tek menü kaynağı — her modülün
-route constant'larını barrel üzerinden + docs registry'yi toplar, `menuOrder`'a
-göre sıralar, etiketleri `t(titleKey)` ile çözer; `AppSidebar` yalnız onu render
-eder); `useNotify` (success/error/info; YALNIZ bir `TranslationKey` kabul eder —
+route constant'larını barrel üzerinden toplar (docs = tek OVERVIEW maddesi, §13.4),
+`menuOrder`'a göre sıralar, etiketleri `t(titleKey)` ile çözer; `AppSidebar` yalnız
+onu render eder); `useNotify` (success/error/info; YALNIZ bir `TranslationKey` kabul eder —
 literal derleme hatasıdır, §8; `useNotify.lib`'deki saf `normalizeErrorKey`
 bilinmeyen hatayı `errors.unexpected`'e eşler); `useMediaQuery` (responsive UI için
 matchMedia hook'u, ör. AppDataTable paginator'ı).
@@ -404,9 +407,10 @@ route'ları ve bir 404'tür. Varsayılan index route'u `patients`'e yönlendirir
   Yalnızca başlık — menü handle'da DEĞİL.
 - **Menü route constant'larından türetilir (drift yok).** `useMenu` composable'ı
   (`src/composables`) tek menü kaynağıdır: her modülün route constant'larını
-  barrel üzerinden toplar, `menuOrder`'a göre sıralar, etiketi `t(titleKey)`'den
-  çözer ve docs grubunu docs registry'den (§13) ekler. `AppSidebar` yalnız
-  `useMenu`'nun döndürdüğünü render eder — asla elle-yazılmış dizi.
+  barrel üzerinden toplar (tek `DOCS_ROUTES.OVERVIEW` maddesi dahil — tekil
+  dokümanlar menüde değil, `/docs` genel bakış sayfasında indekslenir, §13.4),
+  `menuOrder`'a göre sıralar ve etiketi `t(titleKey)`'den çözer. `AppSidebar`
+  yalnız `useMenu`'nun döndürdüğünü render eder — asla elle-yazılmış dizi.
 - **Dinamik parametreler.** Path'te bildirilir (`/patients/:patientId`), tipli bir
   `build(patientId)` yardımcısıyla; parametreler string okunur, tüketildiği yerde
   parse edilir.
@@ -414,7 +418,7 @@ route'ları ve bir 404'tür. Varsayılan index route'u `patients`'e yönlendirir
 Path'ler dil-nötr İngilizce'dir (`/patients`); etiketler i18n'den handle ile
 gelir, asla path'ten değil.
 
-```ts
+```tsx
 export const PATIENT_ROUTES = {
   LIST: {
     name: 'patients',
@@ -425,10 +429,12 @@ export const PATIENT_ROUTES = {
   },
 } as const
 
+const PatientsPage = lazy(() => import('./pages/PatientsPage'))
+
 export const patientRoutes: RouteObject[] = [
   {
     path: PATIENT_ROUTES.LIST.path,
-    lazy: async () => ({ Component: (await import('./pages/PatientsPage')).default }),
+    element: <PatientsPage />,
     handle: { titleKey: PATIENT_ROUTES.LIST.titleKey } satisfies AppRouteHandle,
   },
 ]
@@ -717,7 +723,14 @@ Lara Green tema CSS (lara-light-green / lara-dark-green, plugins/theme ile ?url-
 
 Tailwind'in kendi paleti yoktur; renkleri v10 değişkenlerini gösterir ve
 `darkMode`, `<html>` `dark` sınıfıyla eşleşen `class` stratejisidir. Typography
-eklentisi render edilen docs'u biçimler (§13).
+eklentisi render edilen docs'u biçimler (§13): config'in `typography` tema
+uzantısı HER `--tw-prose-*` rengini v10 değişkenlerine eşler (`--text-color`,
+`--primary-color`, `--surface-border`, `--surface-100`, …); böylece prose, tema
+takasıyla mod-doğrudur — **asla `prose-invert` kullanma** (§9'un yasakladığı
+`dark:` mekanizmasıdır). Aynı blok okuma genişliğini (`maxWidth: '70ch'`),
+1.75 satır yüksekliğini ve code/pre/blockquote/başlık inceltmelerini kurar;
+doküman prose'u her zaman bir `.card` yüzeyinin içinde render edilir
+(`DocViewerPage`).
 
 ```ts
 import type { Config } from 'tailwindcss'
@@ -931,8 +944,12 @@ Tek script her şeyi çalıştırır: `validate` = `type-check` + `lint` + `lint
 
 Referans haritası. Herhangi bir değişiklik için güncellenecek dokümanlar burada
 aranır, tahmin edilmez. Tüm dokümanlar `docs` modülü (§3 dizin) tarafından
-uygulama-içinde de render edilir; Vite `import.meta.glob('/docs/**/*.md',
-{ query: '?raw', import: 'default' })` ile yüklenir, aktif dile göre seçilir.
+uygulama-içinde de render edilir; Vite
+`import.meta.glob(['/docs/**/*.md', '/CHANGELOG.md', '/SPRINT_PLAN.md', '/SPRINT_PLAN.tr.md'], { query: '?raw', import: 'default' })`
+ile yüklenir — kök-seviye `CHANGELOG.md` ve `SPRINT_PLAN(.tr).md` repo kökünde
+kalır (release-please ve workflow o yollara bağlıdır) ve registry'nin
+girdi-başına `paths.{en,tr}` alanı bu düzensizliği soğurur — aktif dile göre
+seçilir.
 
 ### 13.1 Hedef kitle ve açıklık
 
@@ -1000,7 +1017,9 @@ birden fazla yerden referans verilen bağımsız bir mesele olduğunda oluşturu
      ona yönlensin.
   4. Bir CLAUDE.md bölümü ona işaret etmeliyse, §0 tablosuna pointer ekle.
   5. Uygulama-içi `docsRegistry`'ye (`modules/docs/constants`) bir girdi ekle ki
-     sidebar'da görünsün ve `/docs/:slug`'tan erişilebilsin.
+     `/docs` genel bakış indeksinde görünsün (kart-grid; sidebar doküman başına
+     bir madde değil, tek bir Dokümanlar maddesi taşır) ve `/docs/:slug`'tan
+     erişilebilsin.
 - **Kural**: indekste (§13.2), eşleştirme tablosunda (§13.3) VE `docsRegistry`'de
   olmayan bir referans noktası yoktur. Kayıtsız doküman olmaz.
 

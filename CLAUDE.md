@@ -68,10 +68,7 @@ Sections: <CLAUDE.md §refs>   ·   Paths: <key paths touched>
 Next: <the current/next sub-item — specific enough to start without context>
 ```
 
-### Active: 0.9 Docs module + registry + skeleton docs + README · branch: feat/docs-module · status: in-progress
-
-Sections: §2 §3 §3.1 §6 §8 §9 §10 §11 §13 · Paths: src/modules/docs/\*\*, src/composables/useMenu.ts, docs/{en,tr}/\*\*, README.md, tailwind.config.ts
-Next: docs:sync final commit (rule files §1.1 §3 §6 §9 §13.4, SPRINT_PLAN ✅, Active Work deletion)
+_(No active work in progress.)_
 
 ## 1. Project Overview
 
@@ -109,7 +106,7 @@ Data source (GET, read-only, one-time seed):
   vendored copy (§9).
 - Other dependencies use caret majors; the lockfile is committed and `npm ci` is
   used everywhere (local, CI, Vercel).
-- Docs-rendering deps: `react-markdown` (^9), `remark-gfm` (^4),
+- Docs-rendering deps: `react-markdown` (^10), `remark-gfm` (^4),
   `@tailwindcss/typography` (^0.5) — the last is wired into the Tailwind config
   `plugins` (§9).
 - Dependabot (`.github/dependabot.yml`, where this is ENFORCED) **ignores ALL
@@ -208,7 +205,7 @@ src/
 │       ├── AppLanguageSwitcher.tsx  active-language text chip (TR/EN) → i18n.changeLanguage toggles the other (single language flow §8)
 │       └── AppThemeToggle.tsx       → plugins/theme setThemeMode + 'theme-mode' (§9)
 ├── composables/
-│   ├── useMenu.ts           single menu source: module route constants + docs registry, assigns sections (§6)
+│   ├── useMenu.ts           single menu source: module route constants via barrels (docs = the single OVERVIEW item), assigns sections (§6)
 │   ├── useMenu.lib.ts       pure buildMenu(sources, translate) — grouped sections, sort + label (unit-tested)
 │   ├── useNotify.ts         success / error / info toasts; key-only TranslationKey API (§3.1)
 │   ├── useNotify.lib.ts     pure normalizeErrorKey(error) → TranslationKey (unit-tested)
@@ -255,10 +252,16 @@ src/
     │   ├── routes.tsx        PATIENT_ROUTES constants + route array (§6)
     │   └── index.ts          barrel (public API + routes + route constants)
     └── docs/                 In-app documentation viewer (§13)
-        ├── components/       Markdown renderer (react-markdown + remark-gfm)
-        ├── constants/        docs-registry.ts (slug + titleKey; single source)
-        ├── pages/            DocsOverviewPage.tsx (/docs), DocViewerPage.tsx (/docs/:slug)
-        ├── routes.tsx        DOCS_ROUTES constants + route array
+        ├── components/       MarkdownRenderer.tsx (react-markdown + remark-gfm, prose)
+        ├── composables/      useDocContent.ts (useQuery over the lazy glob loader)
+        ├── lib/
+        │   ├── doc-path.ts      pure resolveDocPath(entry, language) + findDocEntry (unit-tested)
+        │   └── docs-loader.ts   import.meta.glob(['/docs/**/*.md', '/CHANGELOG.md', '/SPRINT_PLAN.md', '/SPRINT_PLAN.tr.md'], ?raw) + loadDocContent
+        ├── constants/
+        │   ├── docs-registry.ts  DocEntry { slug, titleKey, descriptionKey, icon, order, paths.{en,tr} } (single source, §13.4)
+        │   └── query-keys.ts     docsKeys factory (§10)
+        ├── pages/            DocsOverviewPage.tsx (/docs card-grid index), DocViewerPage.tsx (/docs/:slug; unknown slug → NotFound)
+        ├── routes.tsx        DOCS_ROUTES constants (OVERVIEW + VIEWER with build(slug) + dynamic title via the registry) + route array
         └── index.ts          barrel
 
 Repo root: index.html (holds <link id="app-theme"> + pre-paint theme-mode script + favicon link, §9),
@@ -326,8 +329,8 @@ it never re-implements them.
   reusable content surface is the `.card` module (`styles/modules/_card.scss`, §9).
 
 **Composables** (`src/composables`): `useMenu` (the single menu source — collects
-each module's route constants via barrels + the docs registry, sorts by
-`menuOrder`, resolves labels via `t(titleKey)`; `AppSidebar` only renders it);
+each module's route constants via barrels (docs = the single OVERVIEW item, §13.4),
+sorts by `menuOrder`, resolves labels via `t(titleKey)`; `AppSidebar` only renders it);
 `useNotify` (success/error/info; accepts ONLY a `TranslationKey` — a literal is a
 compile error, §8; the pure `normalizeErrorKey` in `useNotify.lib` maps unknown
 errors to `errors.unexpected`); `useMediaQuery` (matchMedia hook for responsive UI,
@@ -403,8 +406,9 @@ and a 404. The default index route redirects to `patients`.
   Title only — the menu is NOT in the handle.
 - **Menu is derived from route constants (no drift).** The `useMenu` composable
   (`src/composables`) is the single menu source: it collects each module's route
-  constants via their barrels, sorts by `menuOrder`, resolves the label from
-  `t(titleKey)`, and appends the docs group from the docs registry (§13).
+  constants via their barrels (incl. the single `DOCS_ROUTES.OVERVIEW` item —
+  individual docs are indexed on the `/docs` overview page, not in the menu,
+  §13.4), sorts by `menuOrder`, and resolves the label from `t(titleKey)`.
   `AppSidebar` only renders what `useMenu` returns — never a hand-coded array.
 - **Dynamic params.** Declared in the path (`/patients/:patientId`) with a typed
   `build(patientId)` helper; params read as strings, parsed where consumed.
@@ -412,7 +416,7 @@ and a 404. The default index route redirects to `patients`.
 Paths are language-neutral English (`/patients`); labels come from i18n via the
 handle, never from the path.
 
-```ts
+```tsx
 export const PATIENT_ROUTES = {
   LIST: {
     name: 'patients',
@@ -423,10 +427,12 @@ export const PATIENT_ROUTES = {
   },
 } as const
 
+const PatientsPage = lazy(() => import('./pages/PatientsPage'))
+
 export const patientRoutes: RouteObject[] = [
   {
     path: PATIENT_ROUTES.LIST.path,
-    lazy: async () => ({ Component: (await import('./pages/PatientsPage')).default }),
+    element: <PatientsPage />,
     handle: { titleKey: PATIENT_ROUTES.LIST.titleKey } satisfies AppRouteHandle,
   },
 ]
@@ -714,7 +720,14 @@ Lara Green theme CSS (lara-light-green / lara-dark-green, ?url-swapped by plugin
 
 Tailwind defines no palette of its own; its colours point at the v10 variables,
 and `darkMode` is the `class` strategy matching the `<html>` `dark` class. The
-typography plugin styles rendered docs (§13).
+typography plugin styles rendered docs (§13): the config's `typography` theme
+extension maps EVERY `--tw-prose-*` colour onto the v10 variables
+(`--text-color`, `--primary-color`, `--surface-border`, `--surface-100`, …), so
+prose is mode-correct via the theme swap — **never use `prose-invert`** (it is
+the `dark:` mechanism §9 forbids). The same block sets the reading measure
+(`maxWidth: '70ch'`), line-height 1.75, and the code/pre/blockquote/heading
+refinements; doc prose always renders inside a `.card` surface
+(`DocViewerPage`).
 
 ```ts
 import type { Config } from 'tailwindcss'
@@ -925,8 +938,12 @@ One script runs everything: `validate` = `type-check` + `lint` + `lint:style` +
 
 The reference map. For any change, the docs to update are looked up here, not
 guessed. All docs are also rendered in-app by the `docs` module (§3 directory),
-loaded via Vite `import.meta.glob('/docs/**/*.md', { query: '?raw', import: 'default' })`,
-picked by the active language.
+loaded via Vite
+`import.meta.glob(['/docs/**/*.md', '/CHANGELOG.md', '/SPRINT_PLAN.md', '/SPRINT_PLAN.tr.md'], { query: '?raw', import: 'default' })`
+— the root-level `CHANGELOG.md` and `SPRINT_PLAN(.tr).md` stay at the repo root
+(release-please and the workflow depend on those paths) and the registry's
+per-entry `paths.{en,tr}` absorb the irregularity — picked by the active
+language.
 
 ### 13.1 Audience and clarity
 
@@ -995,7 +1012,9 @@ AND is a standalone concern referenced from more than one place.
   3. Add a row to the change-type table (§13.3) so future changes route to it.
   4. If a CLAUDE.md section should point to it, add the pointer in the §0 table.
   5. Add an entry to the in-app `docsRegistry` (`modules/docs/constants`) so it
-     appears in the sidebar and is reachable at `/docs/:slug`.
+     appears on the `/docs` overview index (the card-grid; the sidebar holds a
+     single Documentation item, not one item per doc) and is reachable at
+     `/docs/:slug`.
 - **Rule**: a reference point not in the index (§13.2), the mapping table
   (§13.3), AND the `docsRegistry` does not exist. No unregistered docs.
 

@@ -237,30 +237,41 @@ linkler Vercel'de çalışır (refresh'te 404 yok).
 **Test:** yok (ilk gerçek PR'da pipeline-doğrulamalı).
 **DoD:** + global DoD. Commit `ci: add CI gate, release-please, dependabot, and SPA rewrite`.
 
-### 0.9 ⬜ Docs modülü + registry + iskelet docs + README
+### 0.9 ✅ Docs modülü + registry + iskelet docs + README
 **Hedef:** Uygulama-içi docs viewer çalışır ve her §13.2 dokümanı iki dilde
 (iskelet) var olur, kayıtlı.
 **Bağımlılık:** 0.6
-**Alt-adımlar:**
-- `modules/docs/`: markdown renderer bileşeni (`react-markdown` + `remark-gfm`,
-  `@tailwindcss/typography` prose stilleri), aktif dile göre anahtarlanmış
-  `import.meta.glob('/docs/**/*.md', { query: '?raw', import: 'default' })` ile
-  loader; `constants/docs-registry.ts` (slug + `titleKey`, tek kaynak);
-  `routes.tsx` (`DOCS_ROUTES`): `/docs` genel bakış + `/docs/:slug` viewer;
-  `pages/`, `index.ts` barrel.
-- Docs route'larını `router/index.tsx`'e bağla; `useMenu` docs grubunu ekler.
-- Her §13.2 dosyası için iskelet `docs/en/*` + `docs/tr/*` oluştur, her biri §13.1
-  sade özetiyle açılır (içerik 2.1'de doldurulur). `CHANGELOG.md` repo kökünde
-  yalnız İngilizce (§13.5).
+**Alt-adımlar (indiği hâliyle):**
+- `modules/docs/`: `MarkdownRenderer` (`react-markdown` + `remark-gfm`,
+  `@tailwindcss/typography` prose'u v10 tema değişkenlerine eşlenmiş —
+  `prose-invert` yok, §9); aktif dile göre anahtarlanmış
+  `import.meta.glob(['/docs/**/*.md', '/CHANGELOG.md', '/SPRINT_PLAN.md', '/SPRINT_PLAN.tr.md'], { query: '?raw', import: 'default' })`
+  ile loader (kök dosyalar kökte kalır; registry `paths.{en,tr}` bunu soğurur);
+  `constants/docs-registry.ts` (slug + `titleKey` + `descriptionKey` + `icon` +
+  `order` + `paths`, tek kaynak) + `query-keys.ts`; `lib/doc-path` (saf) +
+  `lib/docs-loader`; `composables/useDocContent` (useQuery); `routes.tsx`
+  (`DOCS_ROUTES`): `/docs` genel bakış + `/docs/:slug` viewer (handle ile
+  dinamik başlık, bilinmeyen slug → `NotFound`); `pages/`, `index.ts` barrel.
+- Menü (incelemede kararlaştırıldı): sidebar TEK bir Dokümanlar maddesi taşır →
+  `/docs`; tüm dokümanların indeksi genel bakıştaki kart-grid'dir (§13.4 adım 5
+  buna göre değiştirildi). `useMenu`, `DOCS_ROUTES.OVERVIEW`'u okur.
+- Her §13.2 dosyası için `docs/en/*` + `docs/tr/*`, her biri §13.1 sade özetiyle
+  açılır, geliştirici-olmayanlar için sade dille yazılmıştır; WORKFLOW,
+  VERSIONING ve CODING_STANDARDS tam rehber olarak çıktı (PR'ı-sahip-açar akışı,
+  release-PR yeniden-açma yolu, no-`any` politikası); kalanlar iskelet (içerik
+  2.1'de doldurulur). `CHANGELOG.md` repo kökünde yalnız İngilizce kalır (§13.5).
 - `README.md`: kurulum, script'ler, env (`VITE_API_URL`), deploy.
-**Dosyalar:** `src/modules/docs/**`, `docs/en/*.md`, `docs/tr/*.md`,
-`docs/en/modules/*.md`, `docs/tr/modules/*.md`, `README.md`.
+**Dosyalar:** `src/modules/docs/**`, `src/composables/useMenu.ts`,
+`docs/en/*.md`, `docs/tr/*.md`, `docs/en/modules/*.md`, `docs/tr/modules/*.md`,
+`README.md`, `tailwind.config.ts`, `src/__test__/modules/docs/*`.
 **Kabul:** `/docs` tüm dokümanları listeler; `/docs/:slug` aktif-dil markdown'ı
-render eder; dil değiştirmek içeriği değiştirir; sidebar docs grubunu gösterir;
-her kayıtlı doküman erişilebilir; kayıtsız-doküman kuralı geçerli.
+render eder; dil değiştirmek içeriği değiştirir; sidebar tek docs maddesini
+gösterir; her kayıtlı doküman erişilebilir; kayıtsız-doküman kuralı geçerli.
 **Test:** docs-registry slug↔dosya bütünlüğü (her registry slug'ı var olan bir en
-+ tr dosyasına çözülür).
-**DoD:** + global DoD. Commit `feat: add in-app docs module with bilingual skeletons`.
++ tr dosyasına çözülür), slug benzersizliği, `resolveDocPath` + `findDocEntry`
+birimleri.
+**DoD:** + global DoD. `feat/docs-module` üzerinde `feat(docs)`/`docs:`
+alt-commit'leri olarak indi.
 
 ### 0.10 ✅ Kabuk tasarım geçişi (Atlantis-esinli)
 **Hedef:** Uygulama kabuğunu Atlantis-esinli tasarıma (§9) göre yeniden stillemek:

@@ -226,30 +226,42 @@ work on Vercel (no 404 on refresh).
 **Tests:** none (pipeline-verified on the first real PR).
 **DoD:** + global DoD. Commit `ci: add CI gate, release-please, dependabot, and SPA rewrite`.
 
-### 0.9 ⬜ Docs module + registry + skeleton docs + README
+### 0.9 ✅ Docs module + registry + skeleton docs + README
 **Goal:** The in-app docs viewer works and every §13.2 doc exists (skeleton) in
 both languages, registered.
 **Depends on:** 0.6
-**Sub-steps:**
-- `modules/docs/`: markdown renderer component (`react-markdown` + `remark-gfm`,
-  `@tailwindcss/typography` prose styles), loader via
-  `import.meta.glob('/docs/**/*.md', { query: '?raw', import: 'default' })` keyed
-  by active language; `constants/docs-registry.ts` (slug + `titleKey`, single
-  source); `routes.tsx` (`DOCS_ROUTES`): `/docs` overview + `/docs/:slug` viewer;
-  `pages/`, `index.ts` barrel.
-- Wire docs routes into `router/index.tsx`; `useMenu` appends the docs group.
-- Create skeleton `docs/en/*` + `docs/tr/*` for every §13.2 file, each opening
-  with the §13.1 plain summary (content filled in 2.1). `CHANGELOG.md` is
-  English-only at repo root (§13.5).
+**Sub-steps (as landed):**
+- `modules/docs/`: `MarkdownRenderer` (`react-markdown` + `remark-gfm`,
+  `@tailwindcss/typography` prose mapped onto the v10 theme vars — no
+  `prose-invert`, §9); loader via
+  `import.meta.glob(['/docs/**/*.md', '/CHANGELOG.md', '/SPRINT_PLAN.md', '/SPRINT_PLAN.tr.md'], { query: '?raw', import: 'default' })`
+  keyed by active language (root files stay at root; registry `paths.{en,tr}`
+  absorb it); `constants/docs-registry.ts` (slug + `titleKey` +
+  `descriptionKey` + `icon` + `order` + `paths`, single source) +
+  `query-keys.ts`; `lib/doc-path` (pure) + `lib/docs-loader`;
+  `composables/useDocContent` (useQuery); `routes.tsx` (`DOCS_ROUTES`):
+  `/docs` overview + `/docs/:slug` viewer (dynamic title via the handle,
+  unknown slug → `NotFound`); `pages/`, `index.ts` barrel.
+- Menu (decided in review): the sidebar carries a SINGLE Documentation item →
+  `/docs`; the overview card-grid is the index of all docs (§13.4 step 5
+  amended accordingly). `useMenu` reads `DOCS_ROUTES.OVERVIEW`.
+- `docs/en/*` + `docs/tr/*` for every §13.2 file, each opening with the §13.1
+  plain summary, written plain-language for non-developers; WORKFLOW,
+  VERSIONING, and CODING_STANDARDS shipped as full guides (owner-opens-PRs
+  flow, release-PR reopen path, no-`any` policy); the rest are skeletons
+  (content filled in 2.1). `CHANGELOG.md` stays English-only at repo root
+  (§13.5).
 - `README.md`: setup, scripts, env (`VITE_API_URL`), deploy.
-**Files:** `src/modules/docs/**`, `docs/en/*.md`, `docs/tr/*.md`,
-`docs/en/modules/*.md`, `docs/tr/modules/*.md`, `README.md`.
+**Files:** `src/modules/docs/**`, `src/composables/useMenu.ts`, `docs/en/*.md`,
+`docs/tr/*.md`, `docs/en/modules/*.md`, `docs/tr/modules/*.md`, `README.md`,
+`tailwind.config.ts`, `src/__test__/modules/docs/*`.
 **Acceptance:** `/docs` lists all docs; `/docs/:slug` renders the active-language
-markdown; switching language swaps content; sidebar shows the docs group; every
-registered doc is reachable; unregistered doc rule holds.
+markdown; switching language swaps content; sidebar shows the single docs item;
+every registered doc is reachable; unregistered doc rule holds.
 **Tests:** docs-registry slug↔file integrity (every registry slug resolves to an
-existing en + tr file).
-**DoD:** + global DoD. Commit `feat: add in-app docs module with bilingual skeletons`.
+existing en + tr file), slug uniqueness, `resolveDocPath` + `findDocEntry` units.
+**DoD:** + global DoD. Landed as `feat(docs)`/`docs:` sub-commits on
+`feat/docs-module`.
 
 ### 0.10 ✅ Shell design pass (Atlantis-inspired)
 **Goal:** Restyle the app shell to the Atlantis-inspired design (§9): transparent
