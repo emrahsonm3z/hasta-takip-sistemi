@@ -73,10 +73,7 @@ Sections: <CLAUDE.md §referansları>   ·   Paths: <dokunulan ana yollar>
 Next: <mevcut/sıradaki alt-madde — bağlam olmadan başlamaya yetecek kadar net>
 ```
 
-### Active: 0.11 Docs revizyonu — teknik derinlik, iç içe menü, kaydırma bölgesi · branch: feat/docs-module · status: in-progress
-
-Sections: §2 §3 §3.1 §6 §8 §9 §13 · Paths: src/components/layout/\*\*, src/composables/useMenu\*, src/styles/layout/\*\*, src/modules/docs/\*\*, docs/{en,tr}/\*\*, README.md
-Next: faz 2 — TESTING/WORKFLOW/VERSIONING/modules yeniden yazımı + Türkçe README + son docs:sync
+_(Devam eden aktif iş yok.)_
 
 ## 1. Proje Genel Bakış
 
