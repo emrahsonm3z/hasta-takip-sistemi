@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.6.0](https://github.com/emrahsonm3z/hasta-takip-sistemi/compare/v0.5.0...v0.6.0) (2026-06-05)
+
+
+### Features
+
+* **components:** app dialog shell and richer form field wrappers ([387bb81](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/387bb8140c8fbf59eed51a3d3bcd48f07490c8f9))
+* **patients:** patient dialog with create and edit ([cfef6d9](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/cfef6d95a66546c3a8dfe21b7a9396bd34c92295))
+* **patients:** patient form schema and value mapping ([43606cd](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/43606cdd9184d822176b9a8e8a9cf05096479b07))
+* **patients:** row actions with delete confirmation ([b34025b](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/b34025b9d28cbc5ab4c527be0d5749bc5d39f635))
+
+
+### Bug Fixes
+
+* **styles:** zinc surfaces for dialog and frozen cells ([b2d25e8](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/b2d25e8fbc16be176707fb27af97e1309f189737))
+
 ## [0.5.0](https://github.com/emrahsonm3z/hasta-takip-sistemi/compare/v0.4.0...v0.5.0) (2026-06-05)
 
 
