@@ -1063,16 +1063,14 @@ hand-edited into feature branches, so concurrent work never conflicts on it.
   (`.github/workflows/release.yml`, config in `release-please-config.json` +
   `.release-please-manifest.json`) opens/updates a single **Release PR** that
   bumps the version and regenerates `CHANGELOG.md` from the commits since the last
-  release. That Release PR is opened by the `GITHUB_TOKEN`, so it does **not**
-  trigger the `gate` check (GitHub anti-recursion: a token-opened PR cannot start
-  Actions). The owner has two ways to merge it: (a) because branch protection
-  keeps administrators exempt (§15), merge this mechanical version + `CHANGELOG`
-  PR directly, without the check; or (b) **CLOSE + REOPEN the Release PR in the
-  GitHub UI** — a human-initiated reopen is outside the `GITHUB_TOKEN`
-  anti-recursion rule, so it triggers CI, `gate` runs, and the PR merges with a
-  real green check. The reopen path is the one that yields a green `gate`.
-  Merging it performs the version bump + git tag. The app is private — there is
-  **no npm publish**. Detail: `docs/en/VERSIONING.md`.
+  release. That Release PR is opened with the **`RELEASE_PLEASE_TOKEN`** repo
+  secret (passed as `token:` to the release-please-action step) — deliberately
+  NOT the default `GITHUB_TOKEN`, whose PRs cannot start Actions (GitHub
+  anti-recursion), which would leave the required `gate` stuck at "waiting for
+  status". With the dedicated token **`gate` runs on the Release PR
+  automatically**, and the owner merges it like any other PR, on a real green
+  check. Merging it performs the version bump + git tag. The app is private —
+  there is **no npm publish**. Detail: `docs/en/VERSIONING.md`.
 - **0.x during initial development.** release-please is kept in the pre-1.0 range.
   The manifest is seeded at `0.0.1`, **not** `0.0.0` — at `0.0.0` release-please
   ignores the pre-major options and jumps straight to `1.0.0`
@@ -1083,10 +1081,11 @@ hand-edited into feature branches, so concurrent work never conflicts on it.
   release therefore lands at `0.1.0`. The move to `1.0.0` is **deliberate**, taken
   when the app is feature-complete — not triggered automatically by a breaking
   change.
-- **Required repo setting.** Because release-please opens its Release PR with the
-  `GITHUB_TOKEN`, **Settings → Actions → General → Workflow permissions → "Allow
-  GitHub Actions to create and approve pull requests"** must be ENABLED, or the
-  Action cannot open the Release PR.
+- **Repo prerequisites.** The `RELEASE_PLEASE_TOKEN` repository secret must
+  exist (a PAT with repo scope, owned by the owner). The **Settings → Actions →
+  General → "Allow GitHub Actions to create and approve pull requests"** toggle
+  is only load-bearing for `GITHUB_TOKEN`-opened PRs; with the dedicated token
+  it is not required (harmless to leave enabled).
 
 ## 15. Workflow
 
@@ -1164,9 +1163,11 @@ branch and `git checkout main && git pull`.
 require a pull request before merging; require the `gate` status check to pass;
 require linear history (so only **Rebase and merge** is possible — no merge
 commits, no squash); block force-pushes and branch deletion. **Do NOT enable "Do
-not allow bypassing the above settings"** — administrators stay exempt so the
-owner can merge the release-please Release PR, which (opened by `GITHUB_TOKEN`)
-never runs the `gate` check (§14). Solo note: GitHub does not let you approve your
+not allow bypassing the above settings"** — administrators stay exempt as the
+owner's escape hatch (historically required when the Release PR ran no checks;
+since the Release PR is opened with `RELEASE_PLEASE_TOKEN` and runs `gate`
+itself (§14), the exemption is a safety valve, not a requirement). Solo note:
+GitHub does not let you approve your
 own PR, so the gate is the required `gate` status check (CI green); enable required
 approvals (1+) when a teammate joins. Rollback: Vercel instant rollback to a
 previous deployment; urgent fix via `fix/*`, same flow expedited.

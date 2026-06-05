@@ -1069,16 +1069,14 @@ branch'lerine elle yazılmaz; böylece eşzamanlı iş onda çakışmaz.
   (`.github/workflows/release.yml`, config `release-please-config.json` +
   `.release-please-manifest.json`) tek bir **Release PR** açar/günceller; bu PR
   sürümü yükseltir ve son release'ten beri olan commit'lerden `CHANGELOG.md`'yi
-  yeniden üretir. Bu Release PR'ı `GITHUB_TOKEN` açar; bu yüzden `gate` kontrolünü
-  **tetiklemez** (GitHub anti-recursion: token'ın açtığı PR Actions başlatamaz).
-  Sahibin onu merge etmek için iki yolu vardır: (a) branch koruması yöneticileri
-  muaf tuttuğu için (§15), bu mekanik sürüm + `CHANGELOG` PR'ını kontrol olmadan
-  doğrudan merge etmek; ya da (b) **Release PR'ını GitHub arayüzünde KAPATIP
-  YENİDEN AÇMAK** — insan eliyle yapılan yeniden açma `GITHUB_TOKEN`
-  anti-recursion kuralının dışındadır; bu yüzden CI'yi tetikler, `gate` çalışır ve
-  PR gerçek bir yeşil kontrolle merge olur. Yeşil `gate` veren yol, yeniden açma
-  yoludur. Onu merge etmek sürüm bump'ı + git tag'i yapar. Uygulama özeldir —
-  **npm publish yok**. Detay: `docs/tr/VERSIONING.md`.
+  yeniden üretir. Bu Release PR, **`RELEASE_PLEASE_TOKEN`** repo secret'ıyla
+  açılır (release-please-action adımına `token:` olarak geçirilir) — bilinçli
+  olarak varsayılan `GITHUB_TOKEN` ile DEĞİL: onun açtığı PR'lar Actions
+  başlatamaz (GitHub anti-recursion) ve zorunlu `gate` "waiting for status"ta
+  takılı kalırdı. Özel token'la **`gate` Release PR'da otomatik çalışır** ve
+  sahip onu diğer her PR gibi, gerçek bir yeşil kontrolle merge eder. Onu merge
+  etmek sürüm bump'ı + git tag'i yapar. Uygulama özeldir — **npm publish yok**.
+  Detay: `docs/tr/VERSIONING.md`.
 - **İlk geliştirmede 0.x.** release-please 1.0 öncesi aralıkta tutulur. Manifest
   `0.0.0` değil **`0.0.1`** ile başlatılır — `0.0.0`'da release-please pre-major
   seçeneklerini yoksayar ve doğrudan `1.0.0`'a atlar
@@ -1088,10 +1086,11 @@ branch'lerine elle yazılmaz; böylece eşzamanlı iş onda çakışmaz.
   yükseltir (örn. `0.1.0` → `0.2.0`, 0.x'te kalır), `fix:` ise **patch**'i. İlk
   release böylece `0.1.0` olur. `1.0.0`'a geçiş **bilinçlidir**, uygulama
   feature-complete olunca yapılır — bir breaking değişiklikle otomatik tetiklenmez.
-- **Gerekli repo ayarı.** release-please Release PR'ını `GITHUB_TOKEN` ile açtığı
-  için, **Settings → Actions → General → Workflow permissions → "Allow GitHub
-  Actions to create and approve pull requests"** ETKİN olmalı, yoksa Action Release
-  PR'ını açamaz.
+- **Repo önkoşulları.** `RELEASE_PLEASE_TOKEN` repository secret'ı var olmalı
+  (sahibe ait, repo kapsamlı bir PAT). **Settings → Actions → General → "Allow
+  GitHub Actions to create and approve pull requests"** anahtarı yalnız
+  `GITHUB_TOKEN`'ın açtığı PR'lar için yük taşır; özel token'la gerekli
+  değildir (açık bırakmak zararsızdır).
 
 ## 15. Workflow
 
@@ -1170,9 +1169,11 @@ ve `git checkout main && git pull`.
 önce pull request zorunlu; `gate` status check'inin geçmesi zorunlu; lineer geçmiş
 zorunlu (yani yalnız **Rebase and merge** mümkün — merge commit'i yok, squash yok);
 force-push ve branch silme engelli. **"Do not allow bypassing the above settings"'i
-ETKİNLEŞTİRME** — yöneticiler muaf kalsın ki sahip, (`GITHUB_TOKEN`'ın açtığı için)
-`gate` kontrolünü hiç çalıştırmayan release-please Release PR'ını merge edebilsin
-(§14). Solo not: GitHub kendi PR'ını onaylamana izin vermez; bu yüzden kapı zorunlu
+ETKİNLEŞTİRME** — yöneticiler sahibin kaçış kapısı olarak muaf kalır (tarihsel
+olarak Release PR hiç kontrol çalıştırmazken gerekliydi; Release PR artık
+`RELEASE_PLEASE_TOKEN` ile açılıp `gate`'i kendisi çalıştırdığından (§14),
+muafiyet bir gereklilik değil emniyet supabıdır). Solo not: GitHub kendi
+PR'ını onaylamana izin vermez; bu yüzden kapı zorunlu
 `gate` status check'idir (CI yeşil); bir takım arkadaşı katılınca required
 approvals'ı (1+) etkinleştir. Rollback: Vercel anında önceki deploy'a döner; acil
 düzeltme `fix/*` ile, aynı akış hızlandırılmış.

@@ -41,6 +41,7 @@ jobs:
     steps:
       - uses: googleapis/release-please-action@v4
         with:
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 ```
@@ -72,11 +73,13 @@ squash) nedeni budur: her commit'in tipi sürüm sinyalidir.
 3. Sahip o Release PR'ı merge eder — sürüm artık vardır: numara yükselir ve
    commit etiketlenir (örn. `v0.2.0`).
 
-Bilinmeye değer tek tuhaflık: Release PR'ı bir robot token'ı açar; CI kapısı
-onda kendiliğinden çalışmaz. Sahip onu **GitHub arayüzünde kapatıp yeniden
-açar** — insan eliyle yeniden açma kapıyı tetikler ve PR gerçek bir yeşil
-kontrolle merge olur. (Yedek: yönetici muafiyetiyle doğrudan merge; güvenli,
-çünkü Release PR yalnız sürüme ve değişiklik günlüğüne dokunur.)
+Bilinmeye değer bir ayrıntı: robot, Release PR'ını varsayılan workflow
+token'ı yerine özel bir token'la (`RELEASE_PLEASE_TOKEN`, bir repo secret'ı)
+açar. Bu önemlidir, çünkü GitHub, varsayılan token'ın açtığı pull
+request'lerde workflow çalıştırmayı engeller (bir anti-recursion güvenlik
+kuralı) — zorunlu kapı hiç başlamazdı. Özel token'la **CI kapısı Release
+PR'da otomatik çalışır** ve sahip onu diğer her pull request gibi, gerçek
+bir yeşil kontrolle merge eder.
 
 ---
 

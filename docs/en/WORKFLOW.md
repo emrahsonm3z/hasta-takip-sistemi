@@ -88,16 +88,16 @@ exempt — needed for the release flow below.
 
 ---
 
-## Release PRs and the close + reopen trick
+## Release PRs
 
 After merges land on `main`, the release-please robot opens a **Release PR**
-(version bump + changelog — see "Versions & Releases"). That PR is created by
-the `GITHUB_TOKEN`, and GitHub's anti-recursion rule means a robot-opened PR
-does not trigger the CI gate by itself. The owner's preferred move: **close
-the Release PR and reopen it in the GitHub UI** — a human-initiated reopen IS
-allowed to trigger workflows, the gate runs, and the PR merges with a real
-green check. (Fallback: admin-exempt direct merge — acceptable because the
-Release PR only ever touches the version number and the changelog.)
+(version bump + changelog — see "Versions & Releases"). The robot opens it
+with a dedicated token (`RELEASE_PLEASE_TOKEN`, a repository secret) instead
+of the default workflow token — deliberately: GitHub's anti-recursion rule
+blocks workflows from running on pull requests opened by the default token,
+which would leave the required gate stuck at "waiting for status". With the
+dedicated token, **the gate runs on the Release PR automatically**, and the
+owner merges it like any other pull request, on a real green check.
 
 ---
 
