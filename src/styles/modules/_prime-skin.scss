@@ -49,6 +49,19 @@
     color: $text-color;
   }
 
+  .p-datatable .p-datatable-thead > tr > th.p-frozen-column,
+  .p-datatable .p-datatable-tbody > tr > td.p-frozen-column {
+    background: $app-card-bg;
+  }
+
+  .p-datatable.p-datatable-hoverable-rows
+    .p-datatable-tbody
+    > tr:not(.p-highlight):hover
+    > td.p-frozen-column {
+    background-color: $app-card-bg;
+    background-image: linear-gradient($surface-hover, $surface-hover);
+  }
+
   .p-paginator .p-paginator-element {
     color: $text-color-secondary;
   }
@@ -197,6 +210,59 @@
   }
 
   .p-chip {
+    background: $surface-100;
+    color: $text-color;
+  }
+
+  .p-dialog {
+    border: 1px solid $surface-border;
+    border-radius: $app-radius-dialog;
+  }
+
+  .p-dialog .p-dialog-header {
+    background: $surface-card;
+    border-start-end-radius: $app-radius-dialog;
+    border-start-start-radius: $app-radius-dialog;
+    color: $text-color;
+  }
+
+  .p-dialog .p-dialog-content {
+    background: $surface-card;
+    color: $text-color;
+  }
+
+  .app-dialog .p-dialog-header {
+    border-block-end: 1px solid $surface-border;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .app-dialog .p-dialog-content {
+    overflow-y: auto;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .app-dialog .p-dialog-footer {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .p-dialog .p-dialog-content:last-of-type {
+    border-end-end-radius: $app-radius-dialog;
+    border-end-start-radius: $app-radius-dialog;
+  }
+
+  .p-dialog .p-dialog-footer {
+    background: $surface-card;
+    border-block-start: 1px solid $surface-border;
+    color: $text-color;
+  }
+
+  .p-chips .p-chips-multiple-container {
+    background: $surface-ground;
+    border-color: $surface-border;
+    color: $text-color;
+  }
+
+  .p-chips .p-chips-multiple-container .p-chips-token {
     background: $surface-100;
     color: $text-color;
   }
