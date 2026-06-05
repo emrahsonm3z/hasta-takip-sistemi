@@ -15,6 +15,7 @@ asla ham PrimeReact bileşenini kullanmaz; eksik bir yetenek yerel geçici
 | --- | --- | --- |
 | `AppDataTable` | `components/AppDataTable.tsx` | Tek tablo — Türkçe bilen sıralama/filtre/arama |
 | `AppDataTableFilters` | `components/AppDataTableFilters.tsx` | Ortak menü-filtre öğe fabrikaları (enum/multiselect/tarih/sayı/boolean) |
+| `AppDialog` | `components/AppDialog.tsx` | Dialog kabuğu: 800px taban, sınırlı yükseklik, sabit başlık/altlık, kayan içerik |
 | `AppToastProvider` | `components/AppToastProvider.tsx` | Tek `<Toast/>`'u monte eder; `useNotify`'ı besler |
 | `Loading` | `components/Loading.tsx` | Lazy rotalar ve ilk yüklemeler için spinner |
 | `ErrorState` | `components/ErrorState.tsx` | Beklenen veri hataları için sayfa-içi "başarısız, yeniden dene" |
@@ -82,19 +83,35 @@ aşağıdaki hata yüzeylerine aittir. Saf çekirdeği `buildInitialFilters`
 
 ---
 
+## Dialog'lar
+
+`AppDialog`, her uygulama dialog'unun geçtiği kabuktur (PatientDialog tüm
+iskeletini onun üzerinden kurar). Başlığı ve `footer` yuvasını sabitler
+(eylem düğmeleri oraya konur — form DOM'unun dışındaki kaydet düğmesi
+Formik'in `innerRef`'i üzerinden gönderir) ve içerik bölgesini tek kaydırma
+alanı yapar. Boyutlandırma kabukta yaşar: 800px masaüstü taban genişlik,
+`min(750px, 70vh)` max-yükseklik, 12px köşe yarıçapı, 960→75vw / 640→95vw
+kırılımları. Zinc dialog yüzeyleri `_prime-skin.scss`'tedir; dolgu/kaydırma
+ayrıntıları `app-dialog` sınıfı altında kapsamlanır. PrimeReact
+`ConfirmDialog` bunun üzerinden GEÇMEZ (kendi kabul/ret API'si vardır) —
+ortak `.p-dialog` zinc kaplamasını miras alır.
+
 ## Form alanları
 
 Formik'e bağlı altı alan tek bir kabuğu (`FormField`) paylaşır: i18n etiketini
-çizer, `htmlFor`/`id` bağlar (etiketsiz girdi yok) ve Yup hatalarını çözer:
+çizer, `htmlFor`/`id` bağlar (etiketsiz girdi yok), Yup hatalarını çözer ve
+SABİT tek satırlık mesaj yuvası ayırır — beliren bir hata alttaki alanları
+asla kaydırmaz. Tüm alanlar tipli `placeholderKey` kabul eder (düz literal
+placeholder derleme hatasıdır):
 
-| Alan | Sardığı |
-| --- | --- |
-| `FormInputText` | InputText |
-| `FormInputNumber` | InputNumber |
-| `FormDropdown` | Dropdown |
-| `FormCalendar` | Calendar |
-| `FormCheckbox` | Checkbox |
-| `FormChips` | Chips |
+| Alan | Sardığı | Ekstra |
+| --- | --- | --- |
+| `FormInputText` | InputText | |
+| `FormInputNumber` | InputNumber | |
+| `FormDropdown` | Dropdown | generic `optionTemplate` özel seçeneği VE seçili değeri çizer (ör. severity Tag'leri) |
+| `FormCalendar` | Calendar | `minDate` |
+| `FormCheckbox` | Checkbox | satır içi yerleşim: kutu + etiket tek satırda (üstte etiket yok, hata yuvası yok) |
+| `FormChips` | Chips | |
 
 Doğrulama mesajları serileştirilmiş `{ key, values }` JSON'u olarak gelir
 (`plugins/yup.ts` yazar) ve çizim anında çevrilir:

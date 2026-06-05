@@ -436,31 +436,48 @@ derived localized rows, distinct tag/score collectors, option builders,
 render/interaction by manual QA (§11 — no DOM harness).
 **DoD:** + global DoD; `modules/PATIENTS.md` updated.
 
-### 1.3 ⬜ Patient add / edit / delete form
+### 1.3 ✅ Patient add / edit / delete form
 **Goal:** A bilingual form (all fields side by side) in a dialog, validated by
 Yup, wired to the mutations, with delete confirmation.
 **Depends on:** 1.1, 1.2
-**Sub-steps:**
-- `lib/patient.form.ts`: form values ↔ model (ISO↔`Date` for calendars; defaults
-  for create).
-- `lib/patient-form.schema.ts`: Yup schema using `yup.setLocale` keys (no literal
-  messages); required/format rules for the fields.
-- `components/PatientForm.tsx`: Formik + `Form*` fields for every field incl.
-  both `noteTr`/`noteEn` and `diagnosisTr`/`diagnosisEn` shown together (no tabs).
-- `components/PatientDialog.tsx`: PrimeReact Dialog (focus-trap, `aria-labelledby`,
-  focus return) hosting the form for create + edit.
-- Wire list actions: add (toolbar), edit (row), delete (row → confirm) to
-  `usePatientMutations`; success/error toasts; `dataKey` stable id.
-**Files:** `src/modules/patients/lib/{patient.form,patient-form.schema}.ts`,
-`src/modules/patients/components/{PatientForm,PatientDialog}.tsx` (+ wiring in
-`PatientList`/`PatientsPage`).
-**Acceptance:** create adds a row (persisted); edit updates it; delete (after
-confirm) removes it; validation errors show localized messages; both-language
-fields save; dialog is keyboard-accessible; toasts fire on success/error.
-**Tests:** schema validation (missing required, bad date); form↔model mapping
-round-trip; create/edit/delete update storage + list (RTL + MSW).
-**DoD:** + global DoD; `modules/PATIENTS.md` updated. Commit
-`feat(patients): add create, edit, and delete form`.
+**As landed:**
+- `lib/patient.form.ts`: `PatientFormValues` + `createEmptyFormValues` /
+  `toFormValues` / `toPatientRecord(values, system)` (ISO↔`Date`; trims; the
+  system fields `id`/`createdAt`/`notes` injected — `notes` is NOT
+  user-editable, preserved on edit, `null` on create).
+- `lib/patient-form.schema.ts`: MODE-AWARE `buildPatientFormSchema(mode)` —
+  required/enum-membership rules, birthDate not in the future, appointment
+  ≥ birthDate in both modes PLUS ≥ today (date-only) in CREATE only (edit
+  keeps past appointments editable; the Calendar mirrors this via `minDate`);
+  score integer 1–5; diagnosis required in both languages; notes optional.
+  All messages via the typed `message()` keys.
+- `components/AppDialog.tsx` (GLOBAL): the reusable dialog shell — 800px
+  desktop base, max-height `min(750px, 70vh)`, pinned header + footer slots,
+  content as the single scroll area, zinc skin rows in `_prime-skin.scss`.
+- `components/PatientForm.tsx` + `PatientDialog.tsx`: ONE dialog for create
+  + edit (title / initial values / mutation differ by mode); section-grouped
+  two-column layout collapsing to one column on mobile (the three boolean
+  checkboxes stay inline at ALL widths); localized placeholders everywhere;
+  status/priority dropdowns render the shared severity Tags (options +
+  selected value, `PatientTags.tsx` — also used by the 1.2 columns/filters);
+  footer Kaydet submits via Formik `innerRef`. `FormField` reserves a fixed
+  one-line error slot (no layout shift); `FormCheckbox` is inline;
+  `placeholderKey` / `minDate` / generic `optionTemplate` added to the
+  wrappers.
+- Row actions: frozen-right column with aria-labelled edit/delete icon
+  buttons (opaque frozen-cell skin + layered hover); edit pre-fills the
+  dialog; delete via `confirmDialog()` naming the patient → remove mutation
+  + toasts. NO row-click navigation (decided here).
+**Tests:** pure `node:test` only — schema valid/invalid per field incl. the
+create/edit mode split, mapping round-trip, empty-values defaults, trim/drop,
+incomplete-values throw (the old RTL + MSW line predated the §11 decision and
+was wrong).
+**DoD:** met — `validate` + 88/88 tests + build green; docs synced
+(PATIENTS/COMPONENTS + rule files, both languages).
+Commits: `feat(patients): patient form schema and value mapping`,
+`feat(patients): patient dialog with create and edit`, `feat(patients): row
+actions with delete confirmation`, `fix(styles): zinc surfaces for dialog and
+frozen cells`, `docs: …`.
 
 ---
 

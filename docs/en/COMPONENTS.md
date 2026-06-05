@@ -15,6 +15,7 @@ wrapper, not worked around locally.
 | --- | --- | --- |
 | `AppDataTable` | `components/AppDataTable.tsx` | The only table — Turkish-aware sort/filter/search |
 | `AppDataTableFilters` | `components/AppDataTableFilters.tsx` | Shared menu-filter element factories (enum/multiselect/date/numeric/boolean) |
+| `AppDialog` | `components/AppDialog.tsx` | The dialog shell: 800px base, capped height, pinned header/footer, scrolling content |
 | `AppToastProvider` | `components/AppToastProvider.tsx` | Mounts the single `<Toast/>`; backs `useNotify` |
 | `Loading` | `components/Loading.tsx` | Spinner for lazy routes and initial loads |
 | `ErrorState` | `components/ErrorState.tsx` | In-page "failed, retry" for expected data errors |
@@ -82,20 +83,35 @@ composables and the error surfaces below. Its pure core,
 
 ---
 
+## Dialogs
+
+`AppDialog` is the shell every app dialog goes through (PatientDialog routes
+its whole chrome through it). It pins the header and the `footer` slot (put
+action buttons there — a submit button outside the form DOM submits via
+Formik's `innerRef`), and makes the content region the single scroll area.
+Sizing lives in the shell: 800px desktop base width, max-height
+`min(750px, 70vh)`, 12px radius, breakpoints 960→75vw / 640→95vw. The zinc
+dialog surfaces live in `_prime-skin.scss`; padding/scroll specifics are
+scoped under the `app-dialog` class. PrimeReact's `ConfirmDialog` does NOT
+route through it (it has its own accept/reject API) — it inherits the shared
+`.p-dialog` zinc skin.
+
 ## Form fields
 
 Six Formik-connected fields share one shell (`FormField`) that renders the
-i18n label, wires `htmlFor`/`id` (no unlabelled inputs), and resolves Yup
-errors:
+i18n label, wires `htmlFor`/`id` (no unlabelled inputs), resolves Yup errors,
+and reserves a FIXED one-line message slot so an appearing error never shifts
+the fields below. All fields accept a typed `placeholderKey` (a raw literal
+placeholder is a compile error):
 
-| Field | Wraps |
-| --- | --- |
-| `FormInputText` | InputText |
-| `FormInputNumber` | InputNumber |
-| `FormDropdown` | Dropdown |
-| `FormCalendar` | Calendar |
-| `FormCheckbox` | Checkbox |
-| `FormChips` | Chips |
+| Field | Wraps | Extras |
+| --- | --- | --- |
+| `FormInputText` | InputText | |
+| `FormInputNumber` | InputNumber | |
+| `FormDropdown` | Dropdown | generic `optionTemplate` renders custom option AND selected value (e.g. severity Tags) |
+| `FormCalendar` | Calendar | `minDate` |
+| `FormCheckbox` | Checkbox | inline layout: box + label on one row (no stacked label, no error slot) |
+| `FormChips` | Chips | |
 
 Validation messages arrive as serialized `{ key, values }` JSON (written by
 `plugins/yup.ts`) and are translated at render time:

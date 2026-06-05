@@ -249,9 +249,41 @@ The mechanics:
 
 ---
 
-## Planned — Sprint 1.3: add / edit / delete
+## The form (shipped, Sprint 1.3): add / edit / delete
 
-A PrimeReact Dialog form built from the shared `Form*` fields, Yup validation
-with typed bilingual messages, both language variants of note/diagnosis side
-by side, delete with confirmation, row action buttons in the list — all wired
-to `usePatientMutations`. Row-click navigation is also a 1.3 decision.
+ONE reusable dialog serves both create and edit — `PatientDialog` hosts
+`PatientForm` inside the global `AppDialog` shell (800px desktop base,
+max-height `min(750px, 70vh)`, pinned header + footer with only the content
+scrolling, 75vw/95vw responsive breakpoints). Only three things differ by
+mode: the title ("Yeni Hasta" / "Hasta Düzenle"), the initial values
+(`createEmptyFormValues()` / `toFormValues(record)`), and the submit target
+(add / update mutation).
+
+- **Form.** Built ONLY from the shared `Form*` wrappers. Sections (uppercase
+  muted heading + hairline, i18n `patients.form.sections.*`): patient info
+  (fullName full-width; birthDate + bloodType), appointment (department +
+  status; priority + appointmentDate; score), diagnosis TR/EN side by side,
+  note TR/EN side by side, the three boolean checkboxes in ONE row at all
+  widths (inline box + label), tags as a Chips input. Everything else
+  collapses to a single column on narrow widths. Status/priority dropdowns
+  render the severity Tags (options + selected value) from the shared
+  `PatientTags` source. Every input has a localized placeholder
+  (`patients.form.placeholders.*`).
+- **Validation** (`buildPatientFormSchema(mode)`, Yup, all messages via the
+  typed `message()` helper): fullName required 2–120; the four enums required
+  + `oneOf` membership; birthDate required, not in the future; appointment
+  required, ≥ birthDate in BOTH modes, and in CREATE mode additionally ≥
+  today (date-only; the Calendar also sets `minDate`) — EDIT keeps past
+  appointments editable; score required integer 1–5; diagnosis required in
+  BOTH languages (min 2); notes optional; tags optional, trimmed.
+- **System fields.** `id` (`pat-` + UUID) and `createdAt` are generated on
+  create; on edit they are preserved, as is the non-editable `notes` field.
+  The pure `toPatientRecord(values, system)` merges them and is unit-tested.
+- **Row actions.** A frozen-right actions column (always visible under the
+  horizontal scroll; the frozen cells get an opaque card background with a
+  layered hover tint in `_prime-skin.scss`) with aria-labelled edit + delete
+  icon buttons. Edit opens the dialog pre-filled; delete runs
+  `confirmDialog()` naming the patient ("{{name}} silinsin mi?"), accept →
+  the remove mutation. There is NO row-click navigation (decided in 1.3).
+- **Data.** Everything goes through `usePatientMutations` (storage →
+  invalidate → toasts); the data layer was not touched.
