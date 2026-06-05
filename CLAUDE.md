@@ -71,7 +71,7 @@ Next: <the current/next sub-item — specific enough to start without context>
 ### Active: 0.11 Docs revision — technical depth, nested menu, scroll region · branch: feat/docs-module · status: in-progress
 
 Sections: §2 §3 §3.1 §6 §8 §9 §13 · Paths: src/components/layout/\*\*, src/composables/useMenu\*, src/styles/layout/\*\*, src/modules/docs/\*\*, docs/{en,tr}/\*\*, README.md
-Next: technical-depth rewrite of the six core docs (EN + TR)
+Next: phase 2 — TESTING/WORKFLOW/VERSIONING/modules rewrite + Turkish README + final docs:sync
 
 ## 1. Project Overview
 
