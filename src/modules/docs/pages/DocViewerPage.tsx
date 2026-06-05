@@ -35,7 +35,7 @@ export default function DocViewerPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-4xl">
+    <div className="w-full">
       <Link
         to={DOCS_ROUTES.OVERVIEW.path}
         className="inline-flex items-center gap-2 rounded text-sm font-medium text-text-secondary transition-colors hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
@@ -43,7 +43,7 @@ export default function DocViewerPage() {
         <i className="pi pi-arrow-left text-xs" aria-hidden="true" />
         {t('docs.backToList')}
       </Link>
-      <div className="card mt-4 px-5 py-8 sm:px-10 sm:py-10 lg:px-14 lg:py-12">
+      <div className="mt-6">
         <DocContent entry={entry} />
       </div>
     </div>
