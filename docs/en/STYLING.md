@@ -94,8 +94,8 @@ no background, no border, no shadow; the menu sits directly on the page
 ground with the decorative pattern showing behind it. The **cards are the
 raised layer** — `.card` (`styles/modules/_card.scss`) is the only elevated
 surface: card background + 1px border + a faint shadow that collapses to
-`none` in dark mode. Documentation prose, tables, and forms all live on
-cards.
+`none` in dark mode. Forms and panels live on cards; documentation prose sits
+directly on the content surface, left-aligned.
 
 The shell is viewport-locked: the window never scrolls; `<main>` is the
 single scroll region, so the sidebar and topbar stay put on long pages.
@@ -140,6 +140,8 @@ The typeface is **Inter** (variable woff2, self-hosted in `styles/fonts/` —
 no CDN), with `latin-ext` covering the Turkish glyphs ğ ş ı İ. The base size
 is 14px, set in `main.scss`. Rendered documentation uses the
 `@tailwindcss/typography` plugin with every `--tw-prose-*` colour mapped onto
-the theme variables in `tailwind.config.ts` — a ~70-character reading
-measure, and one more place where dark mode costs nothing extra
-(`prose-invert` is unnecessary and unused).
+the theme variables in `tailwind.config.ts` — left-aligned on the content
+surface, capped at ~920px — and one more place where dark mode costs nothing
+extra (`prose-invert` is unnecessary and unused). The single sanctioned
+exception: fenced code blocks render **dark in both modes** (highlight.js
+`github-dark`), so code always reads on its familiar dark canvas.
