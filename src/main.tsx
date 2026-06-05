@@ -5,14 +5,13 @@ import '@/styles/main.scss'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { QueryClientProvider } from '@tanstack/react-query'
-import { PrimeReactProvider } from 'primereact/api'
 
 import App from '@/App'
 import { AppErrorBoundary } from '@/components/AppErrorBoundary'
+import { AppPrimeReactProvider } from '@/components/AppPrimeReactProvider'
 import { AppToastProvider } from '@/components/AppToastProvider'
 import { ConfigErrorScreen } from '@/components/ConfigErrorScreen'
 import { EnvConfigError, validateRequiredEnvVars } from '@/config/env'
-import { primeReactConfig } from '@/plugins/primereact'
 import { queryClient } from '@/plugins/react-query'
 import { applyTheme } from '@/plugins/theme'
 
@@ -32,11 +31,11 @@ root.render(
   <StrictMode>
     <AppErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <PrimeReactProvider value={primeReactConfig}>
+        <AppPrimeReactProvider>
           <AppToastProvider>
             <App />
           </AppToastProvider>
-        </PrimeReactProvider>
+        </AppPrimeReactProvider>
       </QueryClientProvider>
     </AppErrorBoundary>
   </StrictMode>,

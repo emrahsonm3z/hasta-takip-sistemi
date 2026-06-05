@@ -8,6 +8,7 @@ export function buildInitialFilters(
   const base = includeGlobal
     ? { global: { value: null, matchMode: globalMatchMode } }
     : {}
+  const defaults = defaultFilters ? structuredClone(defaultFilters) : {}
 
-  return { ...base, ...defaultFilters } as unknown as DataTableFilterMeta
+  return { ...base, ...defaults } as unknown as DataTableFilterMeta
 }

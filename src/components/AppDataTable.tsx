@@ -12,7 +12,6 @@ import { InputText } from 'primereact/inputtext'
 
 import { Loading } from '@/components/Loading'
 import { useMediaQuery } from '@/composables/useMediaQuery'
-import { NFC_CONTAINS } from '@/plugins/primereact'
 import type { TranslationKey } from '@/types/i18n.types'
 
 import { buildInitialFilters } from './AppDataTable.lib'
@@ -25,7 +24,6 @@ interface AppDataTableProps<T extends object> {
   toolbar?: ReactNode
   showSearchBox?: boolean
   globalFilterFields?: string[]
-  filterDisplay?: 'row' | 'menu'
   defaultFilters?: DataTableFilterMeta
   sortField?: string
   sortOrder?: 1 | 0 | -1 | null
@@ -51,7 +49,6 @@ export function AppDataTable<T extends object>({
   toolbar,
   showSearchBox = true,
   globalFilterFields,
-  filterDisplay,
   defaultFilters,
   sortField,
   sortOrder,
@@ -61,32 +58,32 @@ export function AppDataTable<T extends object>({
   rowsPerPageOptions = [10, 20, 50],
   rowClass,
   rowHover = true,
-  stripedRows = true,
+  stripedRows = false,
   emptyMessageKey = 'common.noResults',
 }: AppDataTableProps<T>) {
   const { t } = useTranslation()
   const isMobile = useMediaQuery('(max-width: 640px)')
   const [filters, setFilters] = useState<DataTableFilterMeta>(() =>
-    buildInitialFilters(NFC_CONTAINS, defaultFilters, showSearchBox),
+    buildInitialFilters(FilterMatchMode.CONTAINS, defaultFilters, showSearchBox),
   )
 
   const globalValue =
     (filters.global as { value?: string | null } | undefined)?.value ?? ''
-  const clearable = showSearchBox || Boolean(filterDisplay)
-  const showHeader = Boolean(toolbar) || showSearchBox || Boolean(filterDisplay)
 
   const setGlobal = (value: string) => {
     setFilters((prev) => ({
       ...prev,
-      global: { value, matchMode: NFC_CONTAINS as FilterMatchMode },
+      global: { value, matchMode: FilterMatchMode.CONTAINS },
     }))
   }
 
   const clearAll = () => {
-    setFilters(buildInitialFilters(NFC_CONTAINS, defaultFilters, showSearchBox))
+    setFilters(
+      buildInitialFilters(FilterMatchMode.CONTAINS, defaultFilters, showSearchBox),
+    )
   }
 
-  const header = showHeader ? (
+  const header = (
     <div className="flex flex-wrap items-center gap-2">
       {toolbar}
       <div className="ml-auto flex items-center gap-2">
@@ -94,24 +91,23 @@ export function AppDataTable<T extends object>({
           <InputText
             value={globalValue}
             placeholder={t('common.search')}
+            aria-label={t('common.search')}
             onChange={(event) => {
               setGlobal(event.target.value)
             }}
           />
         ) : null}
-        {clearable ? (
-          <Button
-            icon="pi pi-filter-slash"
-            severity="secondary"
-            outlined
-            aria-label={t('common.clearFilters')}
-            tooltip={t('common.clearFilters')}
-            onClick={clearAll}
-          />
-        ) : null}
+        <Button
+          icon="pi pi-filter-slash"
+          severity="secondary"
+          outlined
+          aria-label={t('common.clearFilters')}
+          tooltip={t('common.clearFilters')}
+          onClick={clearAll}
+        />
       </div>
     </div>
-  ) : undefined
+  )
 
   if (loading && data.length === 0) {
     return <Loading />
@@ -130,7 +126,7 @@ export function AppDataTable<T extends object>({
       }
       currentPageReportTemplate="{first} - {last} / {totalRecords}"
       filters={filters}
-      filterDisplay={filterDisplay}
+      filterDisplay="menu"
       onFilter={(event: DataTableStateEvent) => {
         setFilters(event.filters)
       }}

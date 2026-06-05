@@ -35,3 +35,20 @@ test('merges default column filters alongside the global entry', () => {
   assert.equal('global' in filters, true)
   assert.equal('department' in filters, true)
 })
+
+test('buildInitialFilters deep-clones the defaults so resets cannot share state', () => {
+  const defaults = {
+    status: { operator: 'and', constraints: [{ value: null, matchMode: 'equals' }] },
+    isInsured: { value: null, matchMode: 'equals' },
+  } as unknown as Parameters<typeof buildInitialFilters>[1]
+  const first = buildInitialFilters('contains', defaults, true)
+  const second = buildInitialFilters('contains', defaults, true)
+  const firstStatus = first?.status as { constraints: { value: unknown }[] }
+  firstStatus.constraints[0].value = 'waiting'
+  const secondStatus = second?.status as { constraints: { value: unknown }[] }
+  const defaultStatus = (defaults as Record<string, unknown>).status as {
+    constraints: { value: unknown }[]
+  }
+  assert.equal(secondStatus.constraints[0].value, null)
+  assert.equal(defaultStatus.constraints[0].value, null)
+})

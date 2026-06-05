@@ -1,6 +1,9 @@
 import dayjs from 'dayjs'
 
-export function formatDate(value: string | null | undefined, pattern = 'L'): string {
+export function formatDate(
+  value: string | Date | null | undefined,
+  pattern = 'L',
+): string {
   if (!value) {
     return ''
   }
