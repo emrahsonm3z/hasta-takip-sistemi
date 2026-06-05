@@ -144,7 +144,7 @@ mock data). Full detail: the Patients Module doc.
 
 | Failure | Behaviour |
 | --- | --- |
-| Seed GET fails | In-page `ErrorState` with retry (query `retry: 1` first) |
+| Seed GET fails | In-page `ErrorState` with retry (the global `retry: 1` default runs first) |
 | Stored JSON corrupt | Treated as empty — the app re-seeds rather than crashing |
 | Storage quota exceeded | The mutation fails → `errors.saveFailed` toast via `useNotify` |
 | A document file fails to load | Same `ErrorState` pattern in the docs viewer (live today) |

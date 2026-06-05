@@ -144,7 +144,7 @@ veri için kabul edilebilir). Tam ayrıntı: Hasta Modülü dokümanı.
 
 | Hata | Davranış |
 | --- | --- |
-| Seed GET başarısız | Yeniden-dene düğmeli sayfa-içi `ErrorState` (önce query `retry: 1`) |
+| Seed GET başarısız | Yeniden-dene düğmeli sayfa-içi `ErrorState` (önce global `retry: 1` varsayılanı çalışır) |
 | Saklanan JSON bozuk | Boş sayılır — uygulama çökmek yerine yeniden tohumlar |
 | Depo kotası aşıldı | Mutation başarısız olur → `useNotify` ile `errors.saveFailed` toast'u |
 | Bir doküman dosyası yüklenemedi | Doküman görüntüleyicide aynı `ErrorState` deseni (bugün canlı) |

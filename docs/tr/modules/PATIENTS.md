@@ -137,7 +137,9 @@ export function usePatients() {
 İlk ziyaret: `VITE_API_URL`'e tek GET, eşlenir, kalıcılaştırılır. Sonraki her
 ziyaret: yalnız depo. React StrictMode'un çift çağırması zararsızdır — ikinci
 tohumlama birebir aynı veriyi yazar. Başarısız bir GET, yeniden-dene düğmeli
-standart `ErrorState`'i çizer (`throwOnError: false`, `retry: 1`).
+standart `ErrorState`'i çizer — `throwOnError: false` ve `retry: 1` davranışı
+global QueryClient varsayılanlarından gelir (`plugins/react-query.ts`);
+hook'un kendisi yalnız anahtarı ve query fonksiyonunu kurar.
 
 ---
 
