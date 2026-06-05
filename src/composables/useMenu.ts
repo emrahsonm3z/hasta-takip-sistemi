@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { docsRegistry } from '@/modules/docs'
+import { DOCS_ROUTES } from '@/modules/docs'
 import { PATIENT_ROUTES } from '@/modules/patients'
 import type { TranslationKey } from '@/types/i18n.types'
 
@@ -20,15 +20,15 @@ function menuSources(): MenuSource[] {
       sectionKey: GENERAL_SECTION_KEY,
       sectionOrder: GENERAL_SECTION_ORDER,
     },
-    ...docsRegistry.map((entry) => ({
-      key: entry.slug,
-      titleKey: entry.titleKey,
-      path: entry.path,
-      icon: entry.icon,
-      menuOrder: entry.menuOrder,
+    {
+      key: DOCS_ROUTES.OVERVIEW.name,
+      titleKey: DOCS_ROUTES.OVERVIEW.titleKey,
+      path: DOCS_ROUTES.OVERVIEW.path,
+      icon: DOCS_ROUTES.OVERVIEW.icon,
+      menuOrder: DOCS_ROUTES.OVERVIEW.menuOrder,
       sectionKey: GENERAL_SECTION_KEY,
       sectionOrder: GENERAL_SECTION_ORDER,
-    })),
+    },
   ]
 }
 
