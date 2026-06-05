@@ -148,6 +148,7 @@
   "menu": {
     "section": {
       "general": "Genel"
-    }
+    },
+    "toggleSubmenu": "Alt menüyü aç/kapat"
   }
 }

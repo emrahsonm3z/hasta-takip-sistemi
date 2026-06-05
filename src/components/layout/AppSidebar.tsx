@@ -1,13 +1,89 @@
-import { NavLink } from 'react-router-dom'
+import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { NavLink, useLocation } from 'react-router-dom'
 import { Sidebar } from 'primereact/sidebar'
 
 import { useMenu } from '@/composables/useMenu'
+import type { MenuItem } from '@/composables/useMenu.lib'
 
 import { AppLogo } from './AppLogo'
 
 interface AppSidebarProps {
   mobileOpen: boolean
   onMobileClose: () => void
+}
+
+interface SidebarLeafLinkProps {
+  item: MenuItem
+  nested?: boolean
+  onNavigate?: () => void
+}
+
+function SidebarLeafLink({ item, nested, onNavigate }: SidebarLeafLinkProps) {
+  return (
+    <NavLink
+      to={item.path}
+      onClick={onNavigate}
+      className={({ isActive }) =>
+        `l-sidebar-item${nested ? ' l-sidebar-subitem' : ''}${isActive ? ' is-active' : ''}`
+      }
+    >
+      <i className={item.icon} aria-hidden="true" />
+      <span>{item.label}</span>
+    </NavLink>
+  )
+}
+
+interface SidebarDisclosureProps {
+  item: MenuItem
+  onNavigate?: () => void
+}
+
+function SidebarDisclosure({ item, onNavigate }: SidebarDisclosureProps) {
+  const { t } = useTranslation()
+  const location = useLocation()
+  const [override, setOverride] = useState<boolean | undefined>(undefined)
+
+  const expanded = override ?? location.pathname.startsWith(item.path)
+  const submenuId = `l-sidebar-submenu-${item.key}`
+
+  return (
+    <div>
+      <div className="l-sidebar-row">
+        <NavLink
+          to={item.path}
+          end
+          onClick={onNavigate}
+          className={({ isActive }) => `l-sidebar-item${isActive ? ' is-active' : ''}`}
+        >
+          <i className={item.icon} aria-hidden="true" />
+          <span>{item.label}</span>
+        </NavLink>
+        <button
+          type="button"
+          className={`l-sidebar-chevron${expanded ? ' is-expanded' : ''}`}
+          aria-expanded={expanded}
+          aria-controls={submenuId}
+          aria-label={t('menu.toggleSubmenu')}
+          onClick={() => setOverride(!expanded)}
+        >
+          <i className="pi pi-chevron-down" aria-hidden="true" />
+        </button>
+      </div>
+      {expanded ? (
+        <div id={submenuId} className="l-sidebar-subnav">
+          {item.children?.map((child) => (
+            <SidebarLeafLink
+              key={child.key}
+              item={child}
+              nested
+              onNavigate={onNavigate}
+            />
+          ))}
+        </div>
+      ) : null}
+    </div>
+  )
 }
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
@@ -22,19 +98,13 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         {groups.map((group) => (
           <div key={group.key} className="l-sidebar-group">
             <p className="l-sidebar-section">{group.label}</p>
-            {group.items.map((item) => (
-              <NavLink
-                key={item.key}
-                to={item.path}
-                onClick={onNavigate}
-                className={({ isActive }) =>
-                  `l-sidebar-item${isActive ? ' is-active' : ''}`
-                }
-              >
-                <i className={item.icon} aria-hidden="true" />
-                <span>{item.label}</span>
-              </NavLink>
-            ))}
+            {group.items.map((item) =>
+              item.children?.length ? (
+                <SidebarDisclosure key={item.key} item={item} onNavigate={onNavigate} />
+              ) : (
+                <SidebarLeafLink key={item.key} item={item} onNavigate={onNavigate} />
+              ),
+            )}
           </div>
         ))}
       </nav>

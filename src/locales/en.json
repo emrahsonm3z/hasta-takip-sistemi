@@ -148,6 +148,7 @@
   "menu": {
     "section": {
       "general": "General"
-    }
+    },
+    "toggleSubmenu": "Toggle submenu"
   }
 }
