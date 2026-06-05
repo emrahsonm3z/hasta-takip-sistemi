@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FilterMatchMode, FilterOperator } from 'primereact/api'
+import { Button } from 'primereact/button'
 import { Chip } from 'primereact/chip'
 import { Column, type ColumnSortEvent } from 'primereact/column'
-import { Tag } from 'primereact/tag'
 
 import { AppDataTable } from '@/components/AppDataTable'
 import {
@@ -12,17 +12,12 @@ import {
   createEnumFilterElement,
   createMultiSelectFilterElement,
   createNumericFilterElement,
-  type FilterSelectOption,
 } from '@/components/AppDataTableFilters'
 import { formatDate } from '@/lib/date'
 import { pickLocalized } from '@/lib/pickLocalized'
 import { compareTurkish, sortRowsByTurkishValue } from '@/lib/text'
 import { ARRAY_CONTAINS_ANY } from '@/plugins/primereact'
 
-import {
-  PRIORITY_TAG_SEVERITY,
-  STATUS_TAG_SEVERITY,
-} from '../constants/patient-tag.constants'
 import {
   buildBloodTypeFilterOptions,
   buildDepartmentFilterOptions,
@@ -36,15 +31,15 @@ import {
   sortRowsByValueOrder,
   STATUS_SORT_ORDER,
 } from '../lib/patient-list.lib'
-import type {
-  PatientPriority,
-  PatientRecord,
-  PatientStatus,
-} from '../models/patient.model'
+import type { PatientRecord } from '../models/patient.model'
+import { PriorityTag, PriorityTagOption, StatusTag, StatusTagOption } from './PatientTags'
 
 interface PatientListProps {
   patients: PatientRecord[]
   loading: boolean
+  onAddPatient: () => void
+  onEditPatient: (id: string) => void
+  onDeletePatient: (id: string) => void
 }
 
 const GLOBAL_FILTER_FIELDS = ['fullName', 'diagnosisTr', 'diagnosisEn']
@@ -70,23 +65,6 @@ const DEFAULT_FILTERS = {
   isVaccinated: { value: null, matchMode: FilterMatchMode.EQUALS },
   tags: { value: null, matchMode: ARRAY_CONTAINS_ANY as FilterMatchMode },
   createdAt: menuConstraint(FilterMatchMode.DATE_IS),
-}
-
-function StatusTag({ status }: { status: PatientStatus }) {
-  const { t } = useTranslation()
-  return (
-    <Tag value={t(`patients.status.${status}`)} severity={STATUS_TAG_SEVERITY[status]} />
-  )
-}
-
-function PriorityTag({ priority }: { priority: PatientPriority }) {
-  const { t } = useTranslation()
-  return (
-    <Tag
-      value={t(`patients.priority.${priority}`)}
-      severity={PRIORITY_TAG_SEVERITY[priority]}
-    />
-  )
 }
 
 function TagChips({ patient }: { patient: PatientListRow }) {
@@ -120,18 +98,44 @@ const statusTagBody = (patient: PatientListRow) => <StatusTag status={patient.st
 const priorityTagBody = (patient: PatientListRow) => (
   <PriorityTag priority={patient.priority} />
 )
-const statusOptionTemplate = (option: FilterSelectOption<PatientStatus>) => (
-  <StatusTag status={option.value} />
-)
-const priorityOptionTemplate = (option: FilterSelectOption<PatientPriority>) => (
-  <PriorityTag priority={option.value} />
-)
 const tagsBody = (patient: PatientListRow) => <TagChips patient={patient} />
 const insuredBody = (patient: PatientListRow) => <YesNoIcon value={patient.isInsured} />
 const followUpBody = (patient: PatientListRow) => <YesNoIcon value={patient.isFollowUp} />
 const vaccinatedBody = (patient: PatientListRow) => (
   <YesNoIcon value={patient.isVaccinated} />
 )
+
+function createActionsBody(
+  editLabel: string,
+  deleteLabel: string,
+  onEdit: (id: string) => void,
+  onDelete: (id: string) => void,
+) {
+  return (row: PatientListRow) => (
+    <div className="flex gap-1">
+      <Button
+        icon="pi pi-pencil"
+        rounded
+        text
+        severity="secondary"
+        aria-label={editLabel}
+        onClick={() => {
+          onEdit(row.id)
+        }}
+      />
+      <Button
+        icon="pi pi-trash"
+        rounded
+        text
+        severity="danger"
+        aria-label={deleteLabel}
+        onClick={() => {
+          onDelete(row.id)
+        }}
+      />
+    </div>
+  )
+}
 
 const turkishSortBy =
   (getValue: (row: PatientListRow) => string) =>
@@ -163,7 +167,13 @@ const prioritySort = (event: ColumnSortEvent): PatientListRow[] =>
     event.order === -1 ? -1 : 1,
   )
 
-export function PatientList({ patients, loading }: PatientListProps) {
+export function PatientList({
+  patients,
+  loading,
+  onAddPatient,
+  onEditPatient,
+  onDeletePatient,
+}: PatientListProps) {
   const { t, i18n } = useTranslation()
 
   const rows = useMemo(
@@ -194,13 +204,13 @@ export function PatientList({ patients, loading }: PatientListProps) {
     translateOptions(buildStatusFilterOptions()),
     t('patients.fields.status'),
     selectPlaceholder,
-    statusOptionTemplate,
+    StatusTagOption,
   )
   const priorityFilterElement = createEnumFilterElement(
     translateOptions(buildPriorityFilterOptions()),
     t('patients.fields.priority'),
     selectPlaceholder,
-    priorityOptionTemplate,
+    PriorityTagOption,
   )
   const bloodTypeFilterElement = createEnumFilterElement(
     translateOptions(buildBloodTypeFilterOptions()),
@@ -235,6 +245,13 @@ export function PatientList({ patients, loading }: PatientListProps) {
     t('patients.fields.isVaccinated'),
     'patient-filter-vaccinated',
   )
+  const actionsBody = createActionsBody(
+    t('patients.actions.edit'),
+    t('patients.actions.delete'),
+    onEditPatient,
+    onDeletePatient,
+  )
+
   const tagsFilterElement = useMemo(
     () =>
       createMultiSelectFilterElement(
@@ -255,6 +272,13 @@ export function PatientList({ patients, loading }: PatientListProps) {
       dataKey="id"
       globalFilterFields={GLOBAL_FILTER_FIELDS}
       defaultFilters={DEFAULT_FILTERS}
+      toolbar={
+        <Button
+          label={t('patients.actions.add')}
+          icon="pi pi-plus"
+          onClick={onAddPatient}
+        />
+      }
     >
       <Column
         field="fullName"
@@ -389,6 +413,7 @@ export function PatientList({ patients, loading }: PatientListProps) {
         filterElement={createdAtFilterElement}
         body={(patient: PatientListRow) => formatDate(patient.createdAt)}
       />
+      <Column frozen alignFrozen="right" body={actionsBody} />
     </AppDataTable>
   )
 }
