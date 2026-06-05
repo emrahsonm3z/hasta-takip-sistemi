@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.0](https://github.com/emrahsonm3z/hasta-takip-sistemi/compare/v0.3.0...v0.4.0) (2026-06-05)
+
+
+### Features
+
+* **patients:** patient model, mapper, and storage service ([0e8c494](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/0e8c494a969d70471bb49e3aab5612a0959f0f3f))
+* **patients:** seed query, mutations, and query-key factory ([1e52614](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/1e52614da3f82ad06e718053509019601c5c3e9a))
+
 ## [0.3.0](https://github.com/emrahsonm3z/hasta-takip-sistemi/compare/v0.2.0...v0.3.0) (2026-06-05)
 
 
