@@ -38,10 +38,43 @@
     "stringMin": "Must be at least {{min}} characters.",
     "stringMax": "Must be at most {{max}} characters.",
     "numberMin": "Must be at least {{min}}.",
-    "numberMax": "Must be at most {{max}}."
+    "numberMax": "Must be at most {{max}}.",
+    "birthDateInFuture": "Birth date cannot be in the future.",
+    "appointmentBeforeBirth": "Appointment date cannot be before the birth date.",
+    "appointmentInPast": "Appointment date cannot be in the past."
   },
   "patients": {
     "title": "Patients",
+    "form": {
+      "addTitle": "New Patient",
+      "editTitle": "Edit Patient",
+      "sections": {
+        "info": "Patient Information",
+        "appointment": "Appointment Details",
+        "diagnosis": "Diagnosis",
+        "note": "Note",
+        "flags": "Status Flags",
+        "tags": "Tags"
+      },
+      "placeholders": {
+        "fullName": "Full name",
+        "diagnosis": "Diagnosis",
+        "note": "Note",
+        "select": "Select",
+        "date": "mm/dd/yyyy",
+        "score": "1-5",
+        "tags": "Add a tag"
+      }
+    },
+    "actions": {
+      "add": "New Patient",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "confirmDelete": {
+      "header": "Delete Patient",
+      "message": "Are you sure you want to delete {{name}}?"
+    },
     "notifications": {
       "added": "Patient added.",
       "updated": "Patient updated.",
@@ -62,7 +95,11 @@
       "isInsured": "Insured",
       "isFollowUp": "Follow-up",
       "isVaccinated": "Vaccinated",
-      "tags": "Tags"
+      "tags": "Tags",
+      "diagnosisTr": "Diagnosis (TR)",
+      "diagnosisEn": "Diagnosis (EN)",
+      "noteTr": "Note (TR)",
+      "noteEn": "Note (EN)"
     },
     "status": {
       "waiting": "Waiting",

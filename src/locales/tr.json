@@ -38,10 +38,43 @@
     "stringMin": "En az {{min}} karakter olmalı.",
     "stringMax": "En fazla {{max}} karakter olmalı.",
     "numberMin": "En az {{min}} olmalı.",
-    "numberMax": "En fazla {{max}} olmalı."
+    "numberMax": "En fazla {{max}} olmalı.",
+    "birthDateInFuture": "Doğum tarihi gelecekte olamaz.",
+    "appointmentBeforeBirth": "Randevu tarihi doğum tarihinden önce olamaz.",
+    "appointmentInPast": "Randevu tarihi geçmişte olamaz."
   },
   "patients": {
     "title": "Hastalar",
+    "form": {
+      "addTitle": "Yeni Hasta",
+      "editTitle": "Hasta Düzenle",
+      "sections": {
+        "info": "Hasta Bilgileri",
+        "appointment": "Randevu Bilgileri",
+        "diagnosis": "Tanı",
+        "note": "Not",
+        "flags": "Durum Bilgileri",
+        "tags": "Etiketler"
+      },
+      "placeholders": {
+        "fullName": "Ad Soyad",
+        "diagnosis": "Tanı",
+        "note": "Not",
+        "select": "Seçiniz",
+        "date": "gg.aa.yyyy",
+        "score": "1-5",
+        "tags": "Etiket ekleyin"
+      }
+    },
+    "actions": {
+      "add": "Yeni Hasta",
+      "edit": "Düzenle",
+      "delete": "Sil"
+    },
+    "confirmDelete": {
+      "header": "Hastayı Sil",
+      "message": "{{name}} silinsin mi?"
+    },
     "notifications": {
       "added": "Hasta eklendi.",
       "updated": "Hasta güncellendi.",
@@ -62,7 +95,11 @@
       "isInsured": "Sigortalı",
       "isFollowUp": "Takipte",
       "isVaccinated": "Aşılı",
-      "tags": "Etiketler"
+      "tags": "Etiketler",
+      "diagnosisTr": "Tanı (TR)",
+      "diagnosisEn": "Tanı (EN)",
+      "noteTr": "Not (TR)",
+      "noteEn": "Not (EN)"
     },
     "status": {
       "waiting": "Bekliyor",
