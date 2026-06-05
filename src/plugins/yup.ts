@@ -2,7 +2,7 @@ import { setLocale } from 'yup'
 
 import type { TranslationKey } from '@/types/i18n.types'
 
-function message(key: TranslationKey, values?: Record<string, unknown>): string {
+export function message(key: TranslationKey, values?: Record<string, unknown>): string {
   return JSON.stringify({ key, values })
 }
 

@@ -32,7 +32,7 @@ export function FormField({ name, labelKey, children }: FormFieldProps) {
         {t(labelKey)}
       </label>
       {children({ id, invalid })}
-      {errorMessage ? <small className="p-error">{errorMessage}</small> : null}
+      <small className="p-error block min-h-5 leading-5">{errorMessage}</small>
     </div>
   )
 }

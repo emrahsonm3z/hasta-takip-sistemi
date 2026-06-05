@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useField } from 'formik'
 import { Chips } from 'primereact/chips'
 
@@ -8,9 +9,11 @@ import { FormField } from './FormField'
 interface FormChipsProps {
   name: string
   labelKey: TranslationKey
+  placeholderKey?: TranslationKey
 }
 
-export function FormChips({ name, labelKey }: FormChipsProps) {
+export function FormChips({ name, labelKey, placeholderKey }: FormChipsProps) {
+  const { t } = useTranslation()
   const [field, , helpers] = useField<string[]>(name)
 
   return (
@@ -19,6 +22,7 @@ export function FormChips({ name, labelKey }: FormChipsProps) {
         <Chips
           inputId={id}
           value={field.value ?? []}
+          placeholder={placeholderKey ? t(placeholderKey) : undefined}
           invalid={invalid}
           onChange={(event) => {
             void helpers.setValue(event.value ?? [])

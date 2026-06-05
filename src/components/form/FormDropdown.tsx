@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useField } from 'formik'
 import { Dropdown } from 'primereact/dropdown'
 
@@ -5,19 +7,31 @@ import type { TranslationKey } from '@/types/i18n.types'
 
 import { FormField } from './FormField'
 
-interface FormDropdownOption {
+interface FormDropdownOption<V> {
   label: string
-  value: unknown
+  value: V
 }
 
-interface FormDropdownProps {
+interface FormDropdownProps<V> {
   name: string
   labelKey: TranslationKey
-  options: FormDropdownOption[]
+  options: FormDropdownOption<V>[]
+  placeholderKey?: TranslationKey
+  optionTemplate?: (option: FormDropdownOption<V>) => ReactNode
 }
 
-export function FormDropdown({ name, labelKey, options }: FormDropdownProps) {
-  const [field, , helpers] = useField<unknown>(name)
+export function FormDropdown<V>({
+  name,
+  labelKey,
+  options,
+  placeholderKey,
+  optionTemplate,
+}: FormDropdownProps<V>) {
+  const { t } = useTranslation()
+  const [field, , helpers] = useField<V | null>(name)
+
+  const placeholder = placeholderKey ? t(placeholderKey) : undefined
+  const selectedOption = options.find((option) => option.value === field.value)
 
   return (
     <FormField name={name} labelKey={labelKey}>
@@ -27,8 +41,19 @@ export function FormDropdown({ name, labelKey, options }: FormDropdownProps) {
           value={field.value}
           options={options}
           invalid={invalid}
+          placeholder={placeholder}
+          itemTemplate={optionTemplate}
+          valueTemplate={
+            optionTemplate ? (
+              selectedOption ? (
+                optionTemplate(selectedOption)
+              ) : (
+                <span className="text-text-secondary">{placeholder}</span>
+              )
+            ) : undefined
+          }
           onChange={(event) => {
-            void helpers.setValue(event.value as unknown)
+            void helpers.setValue((event.value as V | undefined) ?? null)
           }}
           onBlur={() => {
             void helpers.setTouched(true)
