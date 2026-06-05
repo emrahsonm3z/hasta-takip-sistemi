@@ -34,6 +34,9 @@ function menuSources(): MenuSource[] {
         path: DOCS_ROUTES.VIEWER.build(entry.slug),
         icon: entry.icon,
         menuOrder: entry.order,
+        ...(entry.slug.startsWith('module-')
+          ? { subsectionKey: 'menu.section.modules' as const }
+          : {}),
       })),
     },
   ]

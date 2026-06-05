@@ -6,6 +6,7 @@ export interface MenuChildSource {
   path: string
   icon: string
   menuOrder: number
+  subsectionKey?: TranslationKey
 }
 
 export interface MenuSource extends MenuChildSource {
@@ -19,6 +20,7 @@ export interface MenuItem {
   label: string
   path: string
   icon: string
+  sectionLabel?: string
   children?: MenuItem[]
 }
 
@@ -36,6 +38,7 @@ const toMenuItem = (
   label: translate(source.titleKey),
   path: source.path,
   icon: source.icon,
+  ...(source.subsectionKey ? { sectionLabel: translate(source.subsectionKey) } : {}),
 })
 
 const toMenuItemWithChildren = (
