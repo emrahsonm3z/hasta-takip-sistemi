@@ -1087,7 +1087,8 @@ taşıyabilir.
    `chore:` commit'inde) yer alır; Conventional mesajla (§14).
 4. **Topic'i bitir.** Branch'i **push** et ve DUR — geliştirici akışı burada
    BİTER. Claude Code pull request'i AÇMAZ; sahip açar (aşağıdaki Yönetici adım
-   5).
+   5). Push'tan sonra agent, önerilen PR başlığını ve gövdesini (sözleşmeyi) son
+   raporunda çıktılar; sahip PR'ı GitHub'da bu metni kullanarak açar.
 
 ### Otomatik kapı (CI)
 
@@ -1098,9 +1099,10 @@ PR merge edilemez** (required status check). İnsanlar sonra özü inceler.
 ### Yönetici (sahip)
 
 5. **PR'ı GitHub'da aç; PR açıklaması sözleşmedir** (audit planı + ne yapıldı +
-   test notları + dokunulan docs + kabul kriteri + bağlı backlog maddesi). CI'nin
-   `gate` job'u PR'da çalışır ve review öncesi yeşil olmalı (aşağıdaki Otomatik
-   kapı + Merge stratejisi).
+   test notları + dokunulan docs + kabul kriteri + bağlı backlog maddesi),
+   agent'ın son raporunda önerdiği başlık ve gövdeyi kullanarak (Geliştirici adım
+   4). CI'nin `gate` job'u PR'da çalışır ve review öncesi yeşil olmalı (aşağıdaki
+   Otomatik kapı + Merge stratejisi).
 6. **İnceleme** sözleşmeye karşı (plan, kabul kriteri, kod, docs), topic'in
    sub-commit'leri boyunca — *hedef:* CI yeşil ile PR üzerinde; *geçici:* yerel
    branch/commit'ler üzerinde. Sorun → geliştiriciye geri.

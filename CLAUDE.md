@@ -1082,7 +1082,9 @@ carry acceptance criteria.
    their own `docs:` / `chore:` commit), with a Conventional message (§14).
 4. **Finish the topic.** **Push** the branch and STOP — the developer flow ENDS
    here. Claude Code does NOT open the pull request; the owner does (Manager step
-   5 below).
+   5 below). After pushing, the agent outputs the proposed PR title and body (the
+   contract) in its final report; the owner opens the PR on GitHub using that
+   text.
 
 ### Automated gate (CI)
 
@@ -1094,8 +1096,9 @@ unless `gate` is green** (required status check). Humans then review substance.
 
 5. **Open the PR on GitHub; the PR description is the contract** (audit plan +
    what was done + test notes + docs touched + acceptance criteria + linked
-   backlog item). CI's `gate` job runs on the PR and must be green before review
-   (Automated gate + Merge strategy below).
+   backlog item), using the title and body the agent proposed in its final report
+   (Developer step 4). CI's `gate` job runs on the PR and must be green before
+   review (Automated gate + Merge strategy below).
 6. **Review** against the contract (plan, acceptance criteria, code, docs) across the
    topic's sub-commits — *target:* on the PR with CI green; *interim:* on the local
    branch/commits. Issues → back to the developer.
