@@ -17,10 +17,10 @@ abbreviations are not (`submitNewPatientButton`, never `sbmtBtn`).
 | Folders | kebab-case | `modules/patients/` |
 | Components | PascalCase.tsx | `AppDataTable.tsx` |
 | Composables | useCamelCase.ts | `useMenu.ts` |
-| API modules | camelCase.api.ts | `patients.api.ts` *(planned, 1.1)* |
-| Storage | camelCase.storage.ts | `patients.storage.ts` *(planned, 1.1)* |
-| Models | camelCase.model.ts | `patient.model.ts` *(planned, 1.1)* |
-| Mappers | camelCase.mapper.ts | `patient.mapper.ts` *(planned, 1.1)* |
+| API modules | camelCase.api.ts | `patients.api.ts` |
+| Storage | camelCase.storage.ts | `patients.storage.ts` |
+| Models | camelCase.model.ts | `patient.model.ts` |
+| Mappers | camelCase.mapper.ts | `patient.mapper.ts` |
 | Pure helpers | camelCase.ts | `pickLocalized.ts` |
 | Constants | kebab-case.constants.ts | `docs-registry.ts`, `query-keys.ts` |
 | Routes | routes.tsx | `routes.tsx` |

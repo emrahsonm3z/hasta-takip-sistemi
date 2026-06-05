@@ -17,8 +17,7 @@ kendi cihazınızda tutar ve iki dil konuşur (Türkçe ve İngilizce). Giriş y
 
 ## Dizin yapısı
 
-Bugün depoda olan budur. Patients veri katmanı (api, models, lib,
-composables) **Sprint 1.1 için planlıdır** ve henüz diskte değildir.
+Bugün depoda olan budur.
 
 ```
 src/
@@ -45,8 +44,8 @@ src/
 ├── types/                   Route handle + TranslationKey tipleri
 ├── __test__/                Kaynak ağacını aynalayan node:test spec'leri
 └── modules/
-    ├── patients/            Bugün rotalar + sayfa iskeleti; veri katmanı 1.1'de
-    │   ├── pages/PatientsPage.tsx
+    ├── patients/            Hasta takibi (veri katmanı gönderildi; ekranlar 1.2/1.3'te)
+    │   ├── api/  composables/  constants/  lib/  models/  pages/
     │   ├── routes.tsx
     │   └── index.ts
     └── docs/                Bu doküman görüntüleyici (kendi dokümanına bakın)

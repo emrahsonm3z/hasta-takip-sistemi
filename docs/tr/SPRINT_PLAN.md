@@ -354,7 +354,7 @@ SPRINT_PLAN yolları); locale eşliği.
 Sonuç: hastaları listele + ekle + düzenle + sil, iki dilli, Türkçe-duyarlı,
 `localStorage`'da kalıcı, GET'ten bir kez seed'li.
 
-### 1.1 ⬜ Patients veri katmanı
+### 1.1 ✅ Patients veri katmanı
 **Hedef:** Model, mapper, salt-okunur GET, storage CRUD servisi, query key'ler ve
 seed + mutation composable'ları (§10).
 **Bağımlılık:** 0.3, 0.7
