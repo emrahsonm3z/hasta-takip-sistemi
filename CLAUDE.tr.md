@@ -1024,10 +1024,14 @@ branch'lerine elle yazılmaz; böylece eşzamanlı iş onda çakışmaz.
   sürümü yükseltir ve son release'ten beri olan commit'lerden `CHANGELOG.md`'yi
   yeniden üretir. Bu Release PR'ı `GITHUB_TOKEN` açar; bu yüzden `gate` kontrolünü
   **tetiklemez** (GitHub anti-recursion: token'ın açtığı PR Actions başlatamaz).
-  Branch koruması yöneticileri muaf tuttuğu için (§15), sahip bu mekanik sürüm +
-  `CHANGELOG` PR'ını kontrol olmadan doğrudan merge eder. Onu merge etmek sürüm
-  bump'ı + git tag'i yapar. Uygulama özeldir — **npm publish yok**. Detay:
-  `docs/tr/VERSIONING.md`.
+  Sahibin onu merge etmek için iki yolu vardır: (a) branch koruması yöneticileri
+  muaf tuttuğu için (§15), bu mekanik sürüm + `CHANGELOG` PR'ını kontrol olmadan
+  doğrudan merge etmek; ya da (b) **Release PR'ını GitHub arayüzünde KAPATIP
+  YENİDEN AÇMAK** — insan eliyle yapılan yeniden açma `GITHUB_TOKEN`
+  anti-recursion kuralının dışındadır; bu yüzden CI'yi tetikler, `gate` çalışır ve
+  PR gerçek bir yeşil kontrolle merge olur. Yeşil `gate` veren yol, yeniden açma
+  yoludur. Onu merge etmek sürüm bump'ı + git tag'i yapar. Uygulama özeldir —
+  **npm publish yok**. Detay: `docs/tr/VERSIONING.md`.
 - **İlk geliştirmede 0.x.** release-please 1.0 öncesi aralıkta tutulur. Manifest
   `0.0.0` değil **`0.0.1`** ile başlatılır — `0.0.0`'da release-please pre-major
   seçeneklerini yoksayar ve doğrudan `1.0.0`'a atlar
@@ -1046,8 +1050,9 @@ branch'lerine elle yazılmaz; böylece eşzamanlı iş onda çakışmaz.
 
 Bir takım workflow'u. Repo sahibi takım yöneticisidir: hiçbir şey onların
 incelemesi olmadan `main`'e ulaşmaz. Claude Code asla onay olmadan commit ya da
-merge yapmaz. Detay: `docs/tr/WORKFLOW.md` (CI / Vercel / release mekaniğini de
-kapsar).
+merge yapmaz ve asla pull request açmaz — akışı commit + docs:sync + push'ta
+BİTER; PR'ı GitHub'da sahip açar. Detay: `docs/tr/WORKFLOW.md` (CI / Vercel /
+release mekaniğini de kapsar).
 
 ### Backlog
 
@@ -1080,10 +1085,9 @@ taşıyabilir.
 3. **Topic'in son commit'inde docs:sync** — docs (iki dil, §13.3) + `SPRINT_PLAN.md`
    ✅ + Active Work silinmesi, topic'in SON commit'inde (ya da kendi `docs:` /
    `chore:` commit'inde) yer alır; Conventional mesajla (§14).
-4. **Topic'i bitir.** Branch'i **push** et → **PR aç; PR açıklaması sözleşmedir**
-   (audit planı + ne yapıldı + test notları + dokunulan docs + kabul kriteri + bağlı
-   backlog maddesi). CI'nin `gate` job'u PR'da çalışır ve review öncesi yeşil olmalı
-   (aşağıdaki Otomatik kapı + Merge stratejisi).
+4. **Topic'i bitir.** Branch'i **push** et ve DUR — geliştirici akışı burada
+   BİTER. Claude Code pull request'i AÇMAZ; sahip açar (aşağıdaki Yönetici adım
+   5).
 
 ### Otomatik kapı (CI)
 
@@ -1093,10 +1097,14 @@ PR merge edilemez** (required status check). İnsanlar sonra özü inceler.
 
 ### Yönetici (sahip)
 
-5. **İnceleme** sözleşmeye karşı (plan, kabul kriteri, kod, docs), topic'in
+5. **PR'ı GitHub'da aç; PR açıklaması sözleşmedir** (audit planı + ne yapıldı +
+   test notları + dokunulan docs + kabul kriteri + bağlı backlog maddesi). CI'nin
+   `gate` job'u PR'da çalışır ve review öncesi yeşil olmalı (aşağıdaki Otomatik
+   kapı + Merge stratejisi).
+6. **İnceleme** sözleşmeye karşı (plan, kabul kriteri, kod, docs), topic'in
    sub-commit'leri boyunca — *hedef:* CI yeşil ile PR üzerinde; *geçici:* yerel
    branch/commit'ler üzerinde. Sorun → geliştiriciye geri.
-6. **`main`'e merge**, sub-commit'leri koruyarak (aşağıdaki Merge stratejisi) →
+7. **`main`'e merge**, sub-commit'leri koruyarak (aşağıdaki Merge stratejisi) →
    production deploy (Vercel) + release-please Release PR'ı açar/günceller (§14).
 
 ### Merge stratejisi
@@ -1124,7 +1132,8 @@ düzeltme `fix/*` ile, aynı akış hızlandırılmış.
 
 Trivial, düşük-riskli değişiklikler (Dependabot bump'ları dahil) formal audit /
 Active Work seremonisini atlar (implement → self-review → Conventional commit) — ama
-kapılar asla atlanmaz: PR + CI `gate` + sahibin merge'i. Yalnız audit hafifler.
+kapılar asla atlanmaz: sahibin açtığı PR + CI `gate` + sahibin merge'i. Yalnız
+audit hafifler.
 
 ### Git konvansiyonları
 
