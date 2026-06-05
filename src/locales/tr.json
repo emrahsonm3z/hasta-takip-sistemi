@@ -92,6 +92,13 @@
       "B-": "B-"
     }
   },
+  "filters": {
+    "textPlaceholder": "Ara…",
+    "datePlaceholder": "gg.aa.yyyy",
+    "numberPlaceholder": "Sayı girin",
+    "selectPlaceholder": "Seçiniz",
+    "tagsPlaceholder": "Tümü"
+  },
   "docs": {
     "title": "Dokümanlar",
     "backToList": "Tüm dokümanlar",
