@@ -12,8 +12,8 @@ ve merge eder.**
 
 | Rol | Kim | Ne yapar |
 | --- | --- | --- |
-| Geliştirici | Gözetim altında çalışan Claude Code | Planlar, kod + test yazar, self-review yapar, (yalnız onayla) commit'ler, push'lar — sonra DURUR |
-| Sahip | Repo sahibi / takım yöneticisi | Planları ve kodu inceler, **pull request'i açar**, merge eder, her sürümün sahibidir |
+| Geliştirici | Gözetim altında çalışan Claude Code | Planlar, kod + test yazar, self-review yapar, **commit'lemeden önce tam diff'i sunar**, onaylanan kırılımı commit'ler, push'lar — sonra DURUR |
+| Sahip | Repo sahibi / takım yöneticisi | Planları ve **commit-öncesi diff'i** inceler, **pull request'i açar**, son kontrolü yapar, merge eder, her sürümün sahibidir |
 
 ---
 
@@ -22,21 +22,43 @@ ve merge eder.**
 ```
 fikir (sprint planı)
   → audit / plan (kod yok; sahip onaylar)
-    → her seferinde bir alt-madde implement edilir
-        → self-review → Conventional Commit (incelenmiş alt-madde başına bir)
-    → topic'in son commit'inde docs:sync (iki dil)
-  → branch push'lanır — geliştiricinin akışı burada BİTER
-    → PR'ı GitHub'da SAHİP açar (geliştiricinin son raporunda önerdiği
-      başlık + gövdeyle; açıklama sözleşmedir)
+    → alt-maddeler + testler birer birer implement edilir
+        → her biri self-review'dan geçer — henüz HİÇBİR ŞEY commit'lenmez
+    → docs:sync düzenlemeleri hazırlanır (iki dil), hâlâ commit'lenmemiş
+  → commit-öncesi inceleme: geliştirici tam diff'i, planlanan commit
+    kırılımını ve önerilen PR başlık + gövdesini çıktılar — sonra DURUR
+    → sahip fiilî diff'i inceler (sorun → düzelt → tekrar incele)
+  → onayla birlikte: atomik Conventional alt-commit'ler yapılır ve branch
+    push'lanır — geliştiricinin akışı burada BİTER
+    → PR'ı GitHub'da SAHİP açar (önceden incelenmiş açıklama sözleşmedir)
       → CI kapısı çalışır — yeşil olmak zorunda
-        → sahip sözleşmeye karşı inceler
+        → sahibin sözleşmeye karşı son kontrolü
           → Rebase and merge (alt-commit'ler korunur, asla squash)
             → Vercel main'i otomatik yayınlar
 ```
 
 Küçük, düşük riskli değişiklikler (bağımlılık bump'ları, yazım düzeltmeleri)
-resmî audit seremonisini atlayabilir — ama pull request'i, kapıyı ve sahibin
-merge'ini asla.
+resmî audit seremonisini atlayabilir — ama commit-öncesi diff incelemesini,
+pull request'i, kapıyı ve sahibin merge'ini asla.
+
+---
+
+## Commit-öncesi diff incelemesi
+
+Sahip, fiilî değişiklikleri **commit'lenmeden önce** inceler — yalnız pull
+request üzerinde değil. Bir topic'in işi tamamlandığında (kod, testler ve iki
+dilli dokümantasyon güncellemeleri), geliştirici üç şey sunar ve durur:
+
+1. commit'lenmemiş tam diff (`git diff`),
+2. planlanan commit kırılımı — hangi hunk'lar hangi Conventional Commit
+   olacak, hangi sırayla,
+3. önerilen pull request başlığı ve gövdesi (sözleşme).
+
+Sahip diff'i okur; sorunlar geliştiriciye döner, düzeltilmiş diff yeniden
+sunulur ve döngü sahip onaylayana dek sürer. Ancak ondan sonra planlanan
+atomik commit'ler yapılır ve branch push'lanır. Pull request'e sonraki bakış
+(kapı yeşilken) sözleşmeye karşı bir **son kontroldür** — asıl kod incelemesi
+burada çoktan yapılmıştır.
 
 ---
 

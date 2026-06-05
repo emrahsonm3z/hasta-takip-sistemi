@@ -1090,10 +1090,11 @@ hand-edited into feature branches, so concurrent work never conflicts on it.
 ## 15. Workflow
 
 A team workflow. The repository owner is the team manager: nothing reaches `main`
-without their review. Claude Code never commits or merges without explicit
-approval, and never opens pull requests — its flow ENDS at commit + docs:sync +
-push; the owner opens the PR on GitHub. Detail: `docs/en/WORKFLOW.md` (also
-covers the CI / Vercel / release mechanics).
+without their review. Claude Code never merges and never opens pull requests —
+and it does not even COMMIT until the owner has approved the uncommitted diff
+(the pre-commit diff review, Developer steps 2/4). After approval its flow ends
+at commit + docs:sync + push; the owner opens the PR on GitHub. Detail:
+`docs/en/WORKFLOW.md` (also covers the CI / Vercel / release mechanics).
 
 ### Backlog
 
@@ -1114,21 +1115,26 @@ carry acceptance criteria.
 1. **Audit / Plan** — no code. Scope + sub-step breakdown + test plan + consulted
    docs + drift. Refined in chat; on approval the §0.1 Active Work item is created
    for the TOPIC.
-2. **Implementation, one sub-item at a time** — a branch is ONE topic (≈ a
-   SPRINT_PLAN task, or a tight group of related sub-steps) and carries MULTIPLE
-   commits, one per reviewed sub-item. For each sub-item: Claude Code writes code +
-   tests → **developer self code-review** (issues → fix → re-review loop) → a
-   Conventional Commit when confident (commitlint runs per commit, §12). Claude Code
-   never commits without explicit approval. The §0.1 Active Work `Next` / `status` is
+2. **Implementation, one sub-item at a time — nothing committed yet.** A branch
+   is ONE topic (≈ a SPRINT_PLAN task, or a tight group of related sub-steps)
+   and will carry MULTIPLE commits, one per reviewed sub-item. For each
+   sub-item: Claude Code writes code + tests → **developer self code-review**
+   (issues → fix → re-review loop). The work accumulates UNCOMMITTED until the
+   pre-commit diff review (step 4). The §0.1 Active Work `Next` / `status` is
    updated as sub-items land.
 3. **docs:sync in the topic's final commit** — docs (both languages, §13.3) +
    `SPRINT_PLAN.md` ✅ + the Active Work deletion ride in the topic's LAST commit (or
    their own `docs:` / `chore:` commit), with a Conventional message (§14).
-4. **Finish the topic.** **Push** the branch and STOP — the developer flow ENDS
-   here. Claude Code does NOT open the pull request; the owner does (Manager step
-   5 below). After pushing, the agent outputs the proposed PR title and body (the
-   contract) in its final report; the owner opens the PR on GitHub using that
-   text.
+4. **Pre-commit diff review, then finish.** With the topic complete but
+   UNCOMMITTED (incl. the step-3 docs:sync edits), Claude Code outputs the full
+   `git diff`, the planned commit breakdown (which hunks → which Conventional
+   Commit, in what order), and the proposed PR title + body (the contract) —
+   then STOPS; it does NOT commit yet. The owner reviews the actual diff
+   (issues → fix → re-review loop). ONLY after approval: the planned atomic
+   sub-commits are made (commitlint per commit, §12) and the branch is
+   **pushed** — the developer flow ENDS here. Claude Code does NOT open the
+   pull request; the owner does (Manager step 5), using the already-reviewed
+   title + body.
 
 ### Automated gate (CI)
 
@@ -1143,9 +1149,9 @@ unless `gate` is green** (required status check). Humans then review substance.
    backlog item), using the title and body the agent proposed in its final report
    (Developer step 4). CI's `gate` job runs on the PR and must be green before
    review (Automated gate + Merge strategy below).
-6. **Review** against the contract (plan, acceptance criteria, code, docs) across the
-   topic's sub-commits — *target:* on the PR with CI green; *interim:* on the local
-   branch/commits. Issues → back to the developer.
+6. **Final check** against the contract (plan, acceptance criteria, docs) on the
+   PR with CI green — the substantive code review already happened pre-commit on
+   the diff (Developer step 4). Issues → back to the developer.
 7. **Merge to `main`** preserving the sub-commits (Merge strategy below) →
    production deploy (Vercel) + release-please opens/updates the Release PR (§14).
 
@@ -1175,9 +1181,9 @@ previous deployment; urgent fix via `fix/*`, same flow expedited.
 ### Fast path
 
 Trivial, low-risk changes (incl. Dependabot bumps) skip the formal audit / Active
-Work ceremony (implement → self-review → Conventional commit) — but the gates are
-never skipped: the owner-opened PR + CI `gate` + the owner's merge. Only the
-audit is lightened.
+Work ceremony (implement → self-review → pre-commit diff review → Conventional
+commit) — but the gates are never skipped: the pre-commit diff review, the
+owner-opened PR, CI `gate`, and the owner's merge. Only the audit is lightened.
 
 ### Git conventions
 
@@ -1262,5 +1268,5 @@ failed self-review returns to implementation; a failed review returns to the dev
     (incl. `docsRegistry`).
 14. Versioning (§14) — a clear Conventional Commit (release-please derives the
     bump); no version / dependency-major drift (§1.1).
-15. Workflow (§15) — pre-work docs consulted; no self-commits/merges; gates and
-    PR-contract respected.
+15. Workflow (§15) — pre-work docs consulted; the owner reviews the full diff
+    BEFORE any commit; no self-commits/merges; gates and PR-contract respected.

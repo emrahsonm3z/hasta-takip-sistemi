@@ -12,8 +12,8 @@ merges the pull request.**
 
 | Role | Who | Does |
 | --- | --- | --- |
-| Developer | Claude Code, working under supervision | Plans, writes code + tests, self-reviews, commits (only with approval), pushes — then STOPS |
-| Owner | The repository owner / team manager | Reviews plans and code, **opens the pull request**, merges, owns every release |
+| Developer | Claude Code, working under supervision | Plans, writes code + tests, self-reviews, **presents the full diff before committing**, commits the approved breakdown, pushes — then STOPS |
+| Owner | The repository owner / team manager | Reviews plans and **the pre-commit diff**, **opens the pull request**, does the final check, merges, owns every release |
 
 ---
 
@@ -22,20 +22,45 @@ merges the pull request.**
 ```
 idea (sprint plan)
   → audit / plan (no code; owner approves)
-    → implement one sub-item at a time
-        → self-review → Conventional Commit (one per reviewed sub-item)
-    → docs:sync (both languages) in the topic's final commit
-  → push the branch — the developer's flow ENDS here
-    → the OWNER opens the PR on GitHub (using the title + body the
-      developer proposed in its final report; the description is the contract)
+    → implement the sub-items + tests, one at a time
+        → self-review each — NOTHING is committed yet
+    → prepare the docs:sync edits (both languages), still uncommitted
+  → pre-commit review: the developer outputs the full diff, the planned
+    commit breakdown, and the proposed PR title + body — then STOPS
+    → the owner reviews the actual diff (issues → fix → re-review)
+  → on approval: the atomic Conventional sub-commits are made and the
+    branch is pushed — the developer's flow ENDS here
+    → the OWNER opens the PR on GitHub (the already-reviewed description
+      is the contract)
       → the CI gate runs — must be green
-        → owner reviews against the contract
+        → the owner's final check against the contract
           → Rebase and merge (sub-commits preserved, never squashed)
             → Vercel deploys main automatically
 ```
 
 Small, low-risk changes (dependency bumps, typo fixes) may skip the formal
-audit ceremony — but never the pull request, the gate, or the owner's merge.
+audit ceremony — but never the pre-commit diff review, the pull request, the
+gate, or the owner's merge.
+
+---
+
+## The pre-commit diff review
+
+The owner reviews the actual changes **before they are committed** — not only
+on the pull request. When a topic's work is complete (code, tests, and the
+bilingual documentation updates), the developer presents three things and
+stops:
+
+1. the full uncommitted diff (`git diff`),
+2. the planned commit breakdown — which hunks become which Conventional
+   Commit, in what order,
+3. the proposed pull-request title and body (the contract).
+
+The owner reads the diff; problems go back to the developer, the corrected
+diff is presented again, and the loop repeats until the owner approves. Only
+then are the planned atomic commits made and the branch pushed. The later
+look at the pull request (with the gate green) is a **final check** against
+the contract — the substantive code review has already happened here.
 
 ---
 
