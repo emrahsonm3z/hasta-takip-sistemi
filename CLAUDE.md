@@ -68,7 +68,10 @@ Sections: <CLAUDE.md §refs>   ·   Paths: <key paths touched>
 Next: <the current/next sub-item — specific enough to start without context>
 ```
 
-_(No active work in progress.)_
+### Active: 1.1 Patients data layer · branch: feat/patients-data-layer · status: in-progress
+
+Sections: §2 §3 §7 §8 §10 §11 · Paths: src/modules/patients/\*\*, src/locales/\*, src/\_\_test\_\_/modules/patients/\*
+Next: model + mapper + storage service + tests (seed source confirmed: live VITE_API_URL GET)
 
 ## 1. Project Overview
 
