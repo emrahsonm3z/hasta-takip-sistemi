@@ -76,7 +76,7 @@ Next: <mevcut/sıradaki alt-madde — bağlam olmadan başlamaya yetecek kadar n
 ### Active: 0.11 Docs revizyonu — teknik derinlik, iç içe menü, kaydırma bölgesi · branch: feat/docs-module · status: in-progress
 
 Sections: §2 §3 §3.1 §6 §8 §9 §13 · Paths: src/components/layout/\*\*, src/composables/useMenu\*, src/styles/layout/\*\*, src/modules/docs/\*\*, docs/{en,tr}/\*\*, README.md
-Next: iç içe Dokümanlar alt-menüsü (useMenu children + AppSidebar disclosure + SCSS)
+Next: lead kaldırma + SPRINT_PLAN'ı docs/{en,tr}'ye taşıma (glob, registry, referanslar)
 
 ## 1. Proje Genel Bakış
 

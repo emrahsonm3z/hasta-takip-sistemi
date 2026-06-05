@@ -50,6 +50,64 @@ test('buildMenu groups a section, sorts its items by menuOrder, resolves labels'
   assert.equal(groups[0].items[1].label, 'Dokümanlar')
 })
 
+test('buildMenu sorts children by menuOrder and resolves their labels', () => {
+  const sources: MenuSource[] = [
+    {
+      key: 'docs',
+      titleKey: 'docs.title',
+      path: '/docs',
+      icon: 'pi pi-book',
+      menuOrder: 2,
+      sectionKey: 'menu.section.general',
+      sectionOrder: 1,
+      children: [
+        {
+          key: 'second',
+          titleKey: 'common.actions',
+          path: '/docs/second',
+          icon: 'pi pi-tag',
+          menuOrder: 2,
+        },
+        {
+          key: 'first',
+          titleKey: 'patients.title',
+          path: '/docs/first',
+          icon: 'pi pi-users',
+          menuOrder: 1,
+        },
+      ],
+    },
+  ]
+
+  const groups = buildMenu(sources, translate)
+  const item = groups[0].items[0]
+
+  assert.deepEqual(
+    item.children?.map((child) => child.key),
+    ['first', 'second'],
+  )
+  assert.equal(item.children?.[0].label, 'Hastalar')
+  assert.equal(item.children?.[0].path, '/docs/first')
+})
+
+test('buildMenu leaves items without children flat', () => {
+  const sources: MenuSource[] = [
+    {
+      key: 'patients',
+      titleKey: 'patients.title',
+      path: '/patients',
+      icon: 'pi pi-users',
+      menuOrder: 1,
+      sectionKey: 'menu.section.general',
+      sectionOrder: 1,
+    },
+  ]
+
+  const groups = buildMenu(sources, translate)
+
+  assert.equal(groups[0].items[0].children, undefined)
+})
+
 test('buildMenu orders sections by sectionOrder', () => {
   const sources: MenuSource[] = [
     {
