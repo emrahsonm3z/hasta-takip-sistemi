@@ -883,7 +883,7 @@ One integrated chain; Prettier is the only formatter.
 
 | Tool                | Owns                                   | Conflict resolution                       |
 | ------------------- | -------------------------------------- | ----------------------------------------- |
-| typescript-eslint   | TS/React correctness, rule violations  | —                                         |
+| typescript-eslint   | TS/React correctness, rule violations; no-`any` policy (below) | —                  |
 | eslint-plugin-i18next | `no-literal-string` (JSX-only, §8)   | —                                         |
 | eslint-plugin-jsx-a11y | accessibility floor (§16)           | —                                         |
 | eslint-plugin-simple-import-sort | import + export order (enforced, auto-fixed by `eslint --fix`; groups per §5: side-effects, `node:`, externals (react first), `@/` alias, relative) | — |
@@ -906,6 +906,14 @@ shebang, and empty comments. The rule is implemented locally at
 `tools/eslint/no-explanatory-comments.js` and wired into `eslint.config.js` as an
 inline `local` plugin (`plugins: { local: { rules: { … } } }`), with a
 `RuleTester` unit test.
+
+**No `any`.** `@typescript-eslint/no-explicit-any` is pinned to `error` for ALL
+TS files (the `src` block + the `vite.config.ts` block in `eslint.config.js`).
+The recommended presets already include it; the explicit pin makes the policy
+survive any preset change. The implicit side is covered by `strict: true`
+(includes `noImplicitAny`) in both tsconfigs. A violation is fixed with a PROPER
+type — a precise type, `unknown` + narrowing, or a generic — never silenced with
+`eslint-disable`, `@ts-ignore` / `@ts-expect-error`, or a re-cast to `any`.
 
 One script runs everything: `validate` = `type-check` + `lint` + `lint:style` +
 `format:check`. CI runs `validate` + tests + `build` + `npm audit --audit-level=high`.
