@@ -92,6 +92,13 @@
       "B-": "B-"
     }
   },
+  "filters": {
+    "textPlaceholder": "Search…",
+    "datePlaceholder": "mm/dd/yyyy",
+    "numberPlaceholder": "Enter a number",
+    "selectPlaceholder": "Select",
+    "tagsPlaceholder": "All"
+  },
   "docs": {
     "title": "Documentation",
     "backToList": "All documentation",
