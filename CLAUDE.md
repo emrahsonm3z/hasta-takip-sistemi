@@ -1020,8 +1020,12 @@ hand-edited into feature branches, so concurrent work never conflicts on it.
   bumps the version and regenerates `CHANGELOG.md` from the commits since the last
   release. That Release PR is opened by the `GITHUB_TOKEN`, so it does **not**
   trigger the `gate` check (GitHub anti-recursion: a token-opened PR cannot start
-  Actions). Because branch protection keeps administrators exempt (§15), the owner
-  merges this mechanical version + `CHANGELOG` PR directly, without the check.
+  Actions). The owner has two ways to merge it: (a) because branch protection
+  keeps administrators exempt (§15), merge this mechanical version + `CHANGELOG`
+  PR directly, without the check; or (b) **CLOSE + REOPEN the Release PR in the
+  GitHub UI** — a human-initiated reopen is outside the `GITHUB_TOKEN`
+  anti-recursion rule, so it triggers CI, `gate` runs, and the PR merges with a
+  real green check. The reopen path is the one that yields a green `gate`.
   Merging it performs the version bump + git tag. The app is private — there is
   **no npm publish**. Detail: `docs/en/VERSIONING.md`.
 - **0.x during initial development.** release-please is kept in the pre-1.0 range.
@@ -1043,8 +1047,9 @@ hand-edited into feature branches, so concurrent work never conflicts on it.
 
 A team workflow. The repository owner is the team manager: nothing reaches `main`
 without their review. Claude Code never commits or merges without explicit
-approval. Detail: `docs/en/WORKFLOW.md` (also covers the CI / Vercel / release
-mechanics).
+approval, and never opens pull requests — its flow ENDS at commit + docs:sync +
+push; the owner opens the PR on GitHub. Detail: `docs/en/WORKFLOW.md` (also
+covers the CI / Vercel / release mechanics).
 
 ### Backlog
 
@@ -1075,10 +1080,9 @@ carry acceptance criteria.
 3. **docs:sync in the topic's final commit** — docs (both languages, §13.3) +
    `SPRINT_PLAN.md` ✅ + the Active Work deletion ride in the topic's LAST commit (or
    their own `docs:` / `chore:` commit), with a Conventional message (§14).
-4. **Finish the topic.** **Push** the branch → **open a PR; the PR description is
-   the contract** (audit plan + what was done + test notes + docs touched +
-   acceptance criteria + linked backlog item). CI's `gate` job runs on the PR and
-   must be green before review (Automated gate + Merge strategy below).
+4. **Finish the topic.** **Push** the branch and STOP — the developer flow ENDS
+   here. Claude Code does NOT open the pull request; the owner does (Manager step
+   5 below).
 
 ### Automated gate (CI)
 
@@ -1088,10 +1092,14 @@ unless `gate` is green** (required status check). Humans then review substance.
 
 ### Manager (the owner)
 
-5. **Review** against the contract (plan, acceptance criteria, code, docs) across the
+5. **Open the PR on GitHub; the PR description is the contract** (audit plan +
+   what was done + test notes + docs touched + acceptance criteria + linked
+   backlog item). CI's `gate` job runs on the PR and must be green before review
+   (Automated gate + Merge strategy below).
+6. **Review** against the contract (plan, acceptance criteria, code, docs) across the
    topic's sub-commits — *target:* on the PR with CI green; *interim:* on the local
    branch/commits. Issues → back to the developer.
-6. **Merge to `main`** preserving the sub-commits (Merge strategy below) →
+7. **Merge to `main`** preserving the sub-commits (Merge strategy below) →
    production deploy (Vercel) + release-please opens/updates the Release PR (§14).
 
 ### Merge strategy
@@ -1119,7 +1127,8 @@ previous deployment; urgent fix via `fix/*`, same flow expedited.
 
 Trivial, low-risk changes (incl. Dependabot bumps) skip the formal audit / Active
 Work ceremony (implement → self-review → Conventional commit) — but the gates are
-never skipped: PR + CI `gate` + the owner's merge. Only the audit is lightened.
+never skipped: the owner-opened PR + CI `gate` + the owner's merge. Only the
+audit is lightened.
 
 ### Git conventions
 
