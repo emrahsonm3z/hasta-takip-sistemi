@@ -1,0 +1,203 @@
+@use '../utils/tokens' as *;
+
+@layer tw-components {
+  .p-datatable .p-datatable-header,
+  .p-datatable .p-paginator {
+    background: transparent;
+    border: 0;
+    color: $text-color-secondary;
+  }
+
+  .p-datatable .p-datatable-thead,
+  .p-datatable .p-datatable-tfoot,
+  .p-datatable .p-datatable-scrollable-header,
+  .p-datatable .p-datatable-scrollable-footer {
+    background: transparent;
+  }
+
+  .p-datatable .p-datatable-footer {
+    background: transparent;
+    border-color: $surface-border;
+    color: $text-color-secondary;
+  }
+
+  .p-datatable .p-datatable-thead > tr > th {
+    background: transparent;
+    border-color: $surface-border;
+    color: $text-color-secondary;
+  }
+
+  .p-datatable .p-datatable-tfoot > tr > td {
+    background: transparent;
+    border-color: $surface-border;
+    color: $text-color-secondary;
+  }
+
+  .p-datatable .p-datatable-tbody > tr {
+    background: transparent;
+    color: $text-color;
+  }
+
+  .p-datatable .p-datatable-tbody > tr > td {
+    border-color: $surface-border;
+  }
+
+  .p-datatable.p-datatable-hoverable-rows
+    .p-datatable-tbody
+    > tr:not(.p-highlight):hover {
+    background: $surface-hover;
+    color: $text-color;
+  }
+
+  .p-paginator .p-paginator-element {
+    color: $text-color-secondary;
+  }
+
+  .p-paginator .p-paginator-element:not(.p-disabled, .p-highlight):hover {
+    background: $surface-hover;
+    color: $text-color;
+  }
+
+  .p-inputtext {
+    background: $surface-ground;
+    border-color: $surface-border;
+    color: $text-color;
+  }
+
+  .p-dropdown {
+    background: $surface-ground;
+    border-color: $surface-border;
+  }
+
+  .p-dropdown-panel {
+    background: $surface-overlay;
+    border: 1px solid $surface-border;
+  }
+
+  .p-dropdown-panel .p-dropdown-header {
+    background: transparent;
+    border-color: $surface-border;
+    color: $text-color;
+  }
+
+  .p-dropdown-panel .p-dropdown-items .p-dropdown-item-group {
+    background: transparent;
+    color: $text-color-secondary;
+  }
+
+  .p-dropdown-panel .p-dropdown-items .p-dropdown-item {
+    color: $text-color;
+  }
+
+  .p-dropdown-panel
+    .p-dropdown-items
+    .p-dropdown-item:not(.p-highlight, .p-disabled):hover {
+    background: $surface-hover;
+    color: $text-color;
+  }
+
+  .p-column-filter-overlay {
+    background: $surface-overlay;
+    border: 1px solid $surface-border;
+    color: $text-color;
+    inline-size: 16rem;
+  }
+
+  .p-column-filter-overlay-menu .p-column-filter-operator {
+    background: transparent;
+    border-color: $surface-border;
+    color: $text-color;
+    padding: 0.75rem;
+  }
+
+  .p-column-filter-overlay-menu .p-column-filter-constraint {
+    border-color: $surface-border;
+    padding: 0.75rem;
+  }
+
+  .p-column-filter-overlay-menu
+    .p-column-filter-constraint
+    .p-column-filter-matchmode-dropdown {
+    margin-block-end: 0.5rem;
+  }
+
+  .p-column-filter-overlay-menu .p-column-filter-add-rule {
+    padding: 0 0.75rem 0.75rem;
+  }
+
+  .p-column-filter-buttonbar {
+    border-color: $surface-border;
+    padding: 0.75rem;
+  }
+
+  .p-checkbox .p-checkbox-box {
+    background: $surface-ground;
+    border-color: $surface-border;
+  }
+
+  .app-tristate.is-true .p-checkbox-box {
+    border-color: $app-success;
+  }
+
+  .app-tristate.is-true .p-checkbox-box .p-checkbox-icon,
+  .app-tristate.is-true .p-checkbox-box svg {
+    color: $app-success;
+  }
+
+  .app-tristate.is-false .p-checkbox-box {
+    border-color: $app-danger;
+  }
+
+  .app-tristate.is-false .p-checkbox-box .p-checkbox-icon,
+  .app-tristate.is-false .p-checkbox-box svg {
+    color: $app-danger;
+  }
+
+  .p-multiselect {
+    background: $surface-ground;
+    border-color: $surface-border;
+  }
+
+  .p-multiselect-panel {
+    background: $surface-overlay;
+    border: 1px solid $surface-border;
+  }
+
+  .p-multiselect-panel .p-multiselect-header {
+    background: transparent;
+    border-color: $surface-border;
+    color: $text-color;
+  }
+
+  .p-multiselect-panel .p-multiselect-items .p-multiselect-item {
+    color: $text-color;
+  }
+
+  .p-multiselect-panel
+    .p-multiselect-items
+    .p-multiselect-item:not(.p-highlight, .p-disabled):hover {
+    background: $surface-hover;
+    color: $text-color;
+  }
+
+  .p-datepicker {
+    background: $surface-overlay;
+    border: 1px solid $surface-border;
+    color: $text-color;
+  }
+
+  .p-datepicker .p-datepicker-header {
+    background: transparent;
+    border-color: $surface-border;
+    color: $text-color;
+  }
+
+  .p-datepicker .p-datepicker-buttonbar {
+    border-color: $surface-border;
+  }
+
+  .p-chip {
+    background: $surface-100;
+    color: $text-color;
+  }
+}

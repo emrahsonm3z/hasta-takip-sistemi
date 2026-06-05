@@ -4,6 +4,7 @@
 @use 'layout/sidebar';
 @use 'layout/topbar';
 @use 'modules/card';
+@use 'modules/prime-skin';
 @import 'primeicons/primeicons.css';
 @layer tw-base, primereact, tw-components, tw-utilities;
 

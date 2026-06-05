@@ -28,6 +28,8 @@ export default {
         text: 'var(--text-color)',
         'text-secondary': 'var(--text-color-secondary)',
         'app-ground': 'var(--app-ground)',
+        success: 'var(--app-success)',
+        danger: 'var(--app-danger)',
       },
       width: {
         sidebar: 'var(--app-sidebar-width)',
