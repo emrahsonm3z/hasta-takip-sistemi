@@ -308,6 +308,39 @@ marka işareti, pattern arka planı, responsive drawer.
 **DoD:** + global DoD. Commit'ler `feat(layout): atlantis-style app shell` +
 `docs: sync rule files and sprint plan for the shell design pass`.
 
+### 0.11 ⬜ Docs revizyonu — teknik derinlik, iç içe menü, kaydırma bölgesi
+**Hedef:** 0.9 dokümanlarını referans çıtasına taşımak (sade anlatım korunur,
+gerçek teknik gösterimler eklenir — yalnız bu repodaki kod; planlı iş planlı
+olarak işaretlenir) ve kabuğu buna göre yeniden yapılandırmak.
+**Bağımlılık:** 0.9
+**Alt-adımlar:**
+- Viewport'a kilitli kabuk: `.l-layout`/`.l-content` viewport'a sabitlenir;
+  tek kaydırma bölgesi `<main>`; rota değişiminde en üste kaydırma
+  (yalnız window kaydırmasını izleyen `ScrollRestoration`'ın yerine geçer).
+- İç içe Dokümanlar alt-menüsü: `useMenu` öğeleri `children` kazanır (doc
+  çocukları registry'den); `AppSidebar` bir disclosure çizer (satır `/docs`'a
+  gider, chevron açar/kapar, `/docs` altında otomatik açık); §13.4 adım 5
+  yeniden değiştirildi.
+- Genel bakıştaki lead paragrafı kaldırıldı (`docs.lead` anahtarı silindi).
+- `SPRINT_PLAN`, `docs/{en,tr}/SPRINT_PLAN.md`'ye taşındı (doğrulandı: kök
+  yola release-please/CI bağımlılığı yok); glob + registry + kural dosyası
+  referansları güncellendi; `CHANGELOG.md` kökte kalır (release-please'in).
+- 11 dokümanın tamamının teknik-derinlik yeniden yazımı (EN + TR): gerçek kod
+  alıntıları, tablolar, ASCII ağaç/akışlar, işlenmiş örnekler — mermaid yok,
+  yeni bağımlılık yok; hasta veri katmanı/UI planlı işaretli (1.1–1.3).
+- `README.md` Türkçe yeniden yazıldı (genel bakış, yığın, önkoşullar, kurulum,
+  env, script'ler, mimari özet, test, deploy).
+**Dosyalar:** `src/styles/layout/*`, `src/components/layout/*`,
+`src/composables/useMenu*`, `src/modules/docs/**`, `docs/{en,tr}/**`,
+`README.md`, `src/locales/*`.
+**Kabul:** yalnız içerik kayarken topbar + sidebar yerinde kalır; Dokümanlar
+ebeveyni doc bağlantılarına açılır ve `/docs` açılış sayfası kalır; dokümanlar
+iki dilde referansın teknik çıtasını karşılar, hiçbir şey uydurulmamış; README
+Türkçe ve profesyonel; registry/menü/locale testleri yeşil.
+**Test:** `useMenu.lib` children spec'i; registry yol bütünlüğü (taşınmış
+SPRINT_PLAN yolları); locale eşliği.
+**DoD:** + global DoD.
+
 ---
 
 ## Sprint 1 — Patients özelliği (baştan sona)
@@ -408,20 +441,18 @@ round-trip; create/edit/delete storage + listeyi günceller (RTL + MSW).
 Sonuç: docs etlenir, öncelikli test paketi yerinde, a11y doğrulanır ve ilk
 etiketli sürüm çıkar.
 
-### 2.1 ⬜ Dokümantasyon içeriğini doldur (en + tr)
-**Hedef:** 0.9 iskeletlerini her doküman için iki dilde gerçek, sade-dil içerikle
-(§13.1) değiştir.
+### 2.1 ⬜ modules/PATIENTS.md'yi tamamla + içerik gözden geçirme turu
+**Hedef:** (Yeniden kapsamlandı — tam içerik yazımını 0.11 üstlendi.) Sprint 1
+indikten sonra `modules/PATIENTS.md`'deki "planlı" işaretlerini gönderilmiş veri
+katmanı + UI ile (gerçek kod) değiştir ve tüm dokümanlar üzerinde koda karşı bir
+içerik gözden geçirme turu yap (her drift'i işaretle/düzelt).
 **Bağımlılık:** Sprint 1 tamamlanmış
-**Alt-adımlar:** `ARCHITECTURE`, `COMPONENTS`, `CODING_STANDARDS`, `STYLING`,
-`STATE_MANAGEMENT`, `I18N`, `TESTING`, `WORKFLOW`, `VERSIONING`,
-`modules/PATIENTS`, `modules/DOCS`'u yaz — her biri §13.1 özeti + kısa örneklerle;
-kodu/tanımlayıcıları iki dilde de İngilizce tut (§13.5); koda karşı doğrula
-(her drift'i işaretle/düzelt).
-**Dosyalar:** `docs/en/*.md`, `docs/tr/*.md`, `docs/{en,tr}/modules/*.md`.
-**Kabul:** her doküman uygulama-içinde iki dilde render olur; doc↔kod drift yok;
-her §13.2 girdisi iskelet-olmayan; registry sağlam.
-**Test:** (0.9 registry-bütünlük testini yeniden kullan.)
-**DoD:** + global DoD. Commit `docs: write full bilingual documentation content`.
+**Dosyalar:** `docs/{en,tr}/modules/PATIENTS.md`, `docs/{en,tr}/` genelinde
+drift düzeltmeleri.
+**Kabul:** PATIENTS.md gönderilmiş modülü belgeler, hiçbir şey planlı işaretli
+değil; hiçbir yerde doc↔kod drift yok; registry sağlam.
+**Test:** (registry-bütünlük testini yeniden kullan.)
+**DoD:** + global DoD. Commit `docs: complete the patients module documentation`.
 
 ### 2.2 ⬜ Test paketini öncelik çıtasına getir
 **Hedef:** Öncelik hedeflerini (§11) ve MSW kurulumunu, özelliklerle birlikte zaten

@@ -296,6 +296,39 @@ the `lg` threshold; no raw hex outside token definitions; `validate` + tests gre
 **DoD:** + global DoD. Commits `feat(layout): atlantis-style app shell` +
 `docs: sync rule files and sprint plan for the shell design pass`.
 
+### 0.11 ⬜ Docs revision — technical depth, nested menu, scroll region
+**Goal:** Bring the 0.9 docs to the reference bar (plain prose kept, real
+technical demonstrations added — code from this repo only, planned work marked
+as planned), restructure the shell around them.
+**Depends on:** 0.9
+**Sub-steps:**
+- Viewport-locked shell: `.l-layout`/`.l-content` pinned to the viewport;
+  `<main>` is the only scroll region; scroll-to-top on route change (replaces
+  `ScrollRestoration`, which tracks window scroll only).
+- Nested Dokümanlar sub-menu: `useMenu` items gain `children` (docs children
+  from the registry); `AppSidebar` renders a disclosure (row navigates to
+  `/docs`, chevron toggles, auto-expanded under `/docs`); §13.4 step 5
+  re-amended.
+- Overview lead paragraph removed (`docs.lead` key dropped).
+- `SPRINT_PLAN` moved to `docs/{en,tr}/SPRINT_PLAN.md` (verified: no
+  release-please/CI dependency on the root path); glob + registry + rule-file
+  references updated; `CHANGELOG.md` stays at root (release-please owns it).
+- Technical-depth rewrite of all 11 docs (EN + TR): real code excerpts,
+  tables, ASCII trees/flows, worked examples — no mermaid, no new deps;
+  patient data layer/UI marked planned (1.1–1.3).
+- `README.md` rewritten in Turkish (overview, stack, prerequisites, setup,
+  env, scripts, architecture summary, testing, deploy).
+**Files:** `src/styles/layout/*`, `src/components/layout/*`,
+`src/composables/useMenu*`, `src/modules/docs/**`, `docs/{en,tr}/**`,
+`README.md`, `src/locales/*`.
+**Acceptance:** topbar + sidebar stay put while only the content scrolls; the
+Dokümanlar parent expands to the doc links and `/docs` stays the landing; docs
+match the reference's technical bar in both languages with nothing invented;
+README is Turkish and professional; registry/menu/locale tests green.
+**Tests:** `useMenu.lib` children spec; registry path integrity (moved
+SPRINT_PLAN paths); locale parity.
+**DoD:** + global DoD.
+
 ---
 
 ## Sprint 1 — Patients feature (end to end)
@@ -393,20 +426,17 @@ round-trip; create/edit/delete update storage + list (RTL + MSW).
 Outcome: docs fleshed out, the priority test suite in place, a11y verified, and
 the first tagged release.
 
-### 2.1 ⬜ Fill documentation content (en + tr)
-**Goal:** Replace the 0.9 skeletons with real, plain-language content (§13.1) for
-every doc, both languages.
+### 2.1 ⬜ Complete modules/PATIENTS.md + content review pass
+**Goal:** (Rescoped — 0.11 absorbed the full-content rewrite.) After Sprint 1
+lands, replace the "planned" markers in `modules/PATIENTS.md` with the shipped
+data layer + UI (real code), and run a content review pass over all docs
+against the code (flag/fix any drift).
 **Depends on:** Sprint 1 complete
-**Sub-steps:** write `ARCHITECTURE`, `COMPONENTS`, `CODING_STANDARDS`, `STYLING`,
-`STATE_MANAGEMENT`, `I18N`, `TESTING`, `WORKFLOW`, `VERSIONING`,
-`modules/PATIENTS`, `modules/DOCS` — each with the §13.1 summary + short examples;
-keep code/identifiers English in both languages (§13.5); verify against the code
-(flag/fix any drift).
-**Files:** `docs/en/*.md`, `docs/tr/*.md`, `docs/{en,tr}/modules/*.md`.
-**Acceptance:** each doc renders in-app in both languages; no doc↔code drift;
-every §13.2 entry is non-skeleton; registry intact.
-**Tests:** (reuse 0.9 registry-integrity test.)
-**DoD:** + global DoD. Commit `docs: write full bilingual documentation content`.
+**Files:** `docs/{en,tr}/modules/PATIENTS.md`, drift fixes across `docs/{en,tr}/`.
+**Acceptance:** PATIENTS.md documents the shipped module with nothing marked
+planned; no doc↔code drift anywhere; registry intact.
+**Tests:** (reuse the registry-integrity test.)
+**DoD:** + global DoD. Commit `docs: complete the patients module documentation`.
 
 ### 2.2 ⬜ Test suite to priority bar
 **Goal:** Solidify the priority targets (§11) and MSW setup beyond the unit tests

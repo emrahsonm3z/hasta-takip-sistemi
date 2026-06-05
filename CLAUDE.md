@@ -68,7 +68,10 @@ Sections: <CLAUDE.md §refs>   ·   Paths: <key paths touched>
 Next: <the current/next sub-item — specific enough to start without context>
 ```
 
-_(No active work in progress.)_
+### Active: 0.11 Docs revision — technical depth, nested menu, scroll region · branch: feat/docs-module · status: in-progress
+
+Sections: §2 §3 §3.1 §6 §8 §9 §13 · Paths: src/components/layout/\*\*, src/composables/useMenu\*, src/styles/layout/\*\*, src/modules/docs/\*\*, docs/{en,tr}/\*\*, README.md
+Next: nested Dokümanlar sub-menu (useMenu children + AppSidebar disclosure + SCSS)
 
 ## 1. Project Overview
 
