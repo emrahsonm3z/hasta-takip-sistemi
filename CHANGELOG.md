@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.3.0](https://github.com/emrahsonm3z/hasta-takip-sistemi/compare/v0.2.0...v0.3.0) (2026-06-05)
+
+
+### Features
+
+* **docs:** doc registry, content loader, and query keys ([1793474](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/1793474f1aae8a056dc544621b30c26d728d1ee5))
+* **docs:** drop the overview lead and move the sprint plan into docs ([8027971](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/8027971f6a495a3acfb362f8d05ad0e40e48aace))
+* **docs:** markdown viewer at /docs/:slug with token-mapped typography ([1ede424](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/1ede4240a3047c497d26b8c86c7a1436d139e0ef))
+* **docs:** overview page card-grid index of registered docs ([25a3949](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/25a39497421b1537e79e750e13d6dd47c696a85b))
+* **docs:** restyle the content area to the reference reading design ([8986ba6](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/8986ba68ef88253e62e1fe7a23a84af69bf8d403))
+* **layout:** group module docs under a section label in the sub-menu ([b6fe91f](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/b6fe91f10078ddb7e28a4481ac05571700e13ffa))
+* **layout:** nested documentation sub-menu in the sidebar ([fd5d00b](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/fd5d00bedcacc1a9497a92e20daaa4fd122e03e1))
+* **layout:** viewport-locked shell with a content scroll region ([8dfa742](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/8dfa7422bab26515a5ff5e2951b22fe9ba74d69e))
+
+
+### Bug Fixes
+
+* **docs:** apply uniform horizontal padding to all table body cells ([f44cd27](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/f44cd274b102857000ad16be44e4a8b1a32cd800))
+* **docs:** uniform table cell padding in rendered docs ([77f192a](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/77f192af81e05bc435cc318f468e3550f86a0288))
+
 ## [0.2.0](https://github.com/emrahsonm3z/hasta-takip-sistemi/compare/v0.1.0...v0.2.0) (2026-06-04)
 
 
