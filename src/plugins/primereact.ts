@@ -1,42 +1,213 @@
 import type { APIOptions } from 'primereact/api'
 import { addLocale, FilterService, locale } from 'primereact/api'
 
-import { turkishIncludes } from '@/lib/text'
+import {
+  arrayContainsAny,
+  turkishContains,
+  turkishEndsWith,
+  turkishEquals,
+  turkishNotContains,
+  turkishNotEquals,
+  turkishStartsWith,
+} from '@/lib/filters'
 
-export const NFC_CONTAINS = 'nfcContains'
+export const ARRAY_CONTAINS_ANY = 'arrayContainsAny'
 
 const TR_LOCALE = {
   accept: 'Evet',
-  reject: 'Hayır',
-  choose: 'Seç',
-  cancel: 'İptal',
-  clear: 'Temizle',
+  addRule: 'Kural ekle',
+  am: 'ÖÖ',
   apply: 'Uygula',
-  today: 'Bugün',
-  weekHeader: 'Hf',
-  emptyMessage: 'Sonuç bulunamadı',
+  cancel: 'İptal',
+  choose: 'Seç',
+  chooseDate: 'Tarih seç',
+  chooseMonth: 'Ay seç',
+  chooseYear: 'Yıl seç',
+  clear: 'Temizle',
+  completed: 'Tamamlandı',
+  contains: 'İçerir',
+  custom: 'Özel',
+  dateAfter: 'Tarihten sonra',
+  dateBefore: 'Tarihten önce',
+  dateFormat: 'dd.mm.yy',
+  dateIs: 'Tarih şudur',
+  dateIsNot: 'Tarih şu değildir',
+  dayNames: ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'],
+  dayNamesMin: ['Pz', 'Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct'],
+  dayNamesShort: ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'],
   emptyFilterMessage: 'Sonuç bulunamadı',
+  emptyMessage: 'Sonuç bulunamadı',
+  emptySearchMessage: 'Sonuç bulunamadı',
+  emptySelectionMessage: 'Seçili öğe yok',
+  endsWith: 'Şununla biter',
+  equals: 'Eşittir',
+  fileChosenMessage: '{0} dosya',
+  fileSizeTypes: ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
+  filter: 'Filtrele',
+  firstDayOfWeek: 1,
+  gt: 'Büyüktür',
+  gte: 'Büyük veya eşittir',
+  lt: 'Küçüktür',
+  lte: 'Küçük veya eşittir',
+  matchAll: 'Tümüyle eşleşsin',
+  matchAny: 'Herhangi biriyle eşleşsin',
+  medium: 'Orta',
+  monthNames: [
+    'Ocak',
+    'Şubat',
+    'Mart',
+    'Nisan',
+    'Mayıs',
+    'Haziran',
+    'Temmuz',
+    'Ağustos',
+    'Eylül',
+    'Ekim',
+    'Kasım',
+    'Aralık',
+  ],
+  monthNamesShort: [
+    'Oca',
+    'Şub',
+    'Mar',
+    'Nis',
+    'May',
+    'Haz',
+    'Tem',
+    'Ağu',
+    'Eyl',
+    'Eki',
+    'Kas',
+    'Ara',
+  ],
+  nextDecade: 'Sonraki on yıl',
+  nextHour: 'Sonraki saat',
+  nextMinute: 'Sonraki dakika',
+  nextMonth: 'Sonraki ay',
+  nextSecond: 'Sonraki saniye',
+  nextYear: 'Sonraki yıl',
+  noFileChosenMessage: 'Dosya seçilmedi',
+  noFilter: 'Filtre yok',
+  notContains: 'İçermez',
+  notEquals: 'Eşit değildir',
+  now: 'Şimdi',
+  passwordPrompt: 'Parola girin',
+  pending: 'Bekliyor',
+  pm: 'ÖS',
+  prevDecade: 'Önceki on yıl',
+  prevHour: 'Önceki saat',
+  prevMinute: 'Önceki dakika',
+  prevMonth: 'Önceki ay',
+  prevSecond: 'Önceki saniye',
+  prevYear: 'Önceki yıl',
+  reject: 'Hayır',
+  removeRule: 'Kuralı kaldır',
+  searchMessage: '{0} sonuç mevcut',
+  selectionMessage: '{0} öğe seçildi',
+  showMonthAfterYear: false,
+  startsWith: 'Şununla başlar',
+  strong: 'Güçlü',
+  today: 'Bugün',
+  upload: 'Yükle',
+  weak: 'Zayıf',
+  weekHeader: 'Hf',
+  aria: {
+    cancelEdit: 'Düzenlemeyi iptal et',
+    close: 'Kapat',
+    collapseLabel: 'Daralt',
+    collapseRow: 'Satırı daralt',
+    editRow: 'Satırı düzenle',
+    expandLabel: 'Genişlet',
+    expandRow: 'Satırı genişlet',
+    falseLabel: 'Hayır',
+    filterConstraint: 'Filtre kısıtı',
+    filterOperator: 'Filtre operatörü',
+    firstPageLabel: 'İlk sayfa',
+    gridView: 'Izgara görünümü',
+    hideFilterMenu: 'Filtre menüsünü gizle',
+    jumpToPageDropdownLabel: 'Sayfa açılır listesine git',
+    jumpToPageInputLabel: 'Sayfa girişine git',
+    lastPageLabel: 'Son sayfa',
+    listLabel: 'Eylem listesi',
+    listView: 'Liste görünümü',
+    moveAllToSource: 'Tümünü kaynağa taşı',
+    moveAllToTarget: 'Tümünü hedefe taşı',
+    moveBottom: 'En alta taşı',
+    moveDown: 'Aşağı taşı',
+    moveToSource: 'Kaynağa taşı',
+    moveToTarget: 'Hedefe taşı',
+    moveTop: 'En üste taşı',
+    moveUp: 'Yukarı taşı',
+    navigation: 'Gezinme',
+    next: 'Sonraki',
+    nextPageLabel: 'Sonraki sayfa',
+    nullLabel: 'Seçili değil',
+    otpLabel: 'Lütfen tek kullanımlık parolanın {0}. karakterini girin',
+    pageLabel: 'Sayfa {page}',
+    passwordHide: 'Parolayı gizle',
+    passwordShow: 'Parolayı göster',
+    previous: 'Önceki',
+    prevPageLabel: 'Önceki sayfa',
+    removeLabel: 'Kaldır',
+    rotateLeft: 'Sola döndür',
+    rotateRight: 'Sağa döndür',
+    rowsPerPageLabel: 'Sayfa başına satır',
+    saveEdit: 'Düzenlemeyi kaydet',
+    scrollTop: 'En üste kaydır',
+    selectAll: 'Tümünü seç',
+    selectLabel: 'Seç',
+    selectRow: 'Satırı seç',
+    showFilterMenu: 'Filtre menüsünü göster',
+    slide: 'Slayt',
+    slideNumber: '{slideNumber}. slayt',
+    star: '1 yıldız',
+    stars: '{star} yıldız',
+    trueLabel: 'Evet',
+    unselectAll: 'Tüm seçimleri kaldır',
+    unselectLabel: 'Seçimi kaldır',
+    unselectRow: 'Satır seçimini kaldır',
+    zoomImage: 'Görseli yakınlaştır',
+    zoomIn: 'Yakınlaştır',
+    zoomOut: 'Uzaklaştır',
+  },
 }
 
+const EN_LOCALE = {
+  startsWith: 'Starts with',
+  contains: 'Contains',
+  notContains: 'Not contains',
+  endsWith: 'Ends with',
+  equals: 'Equals',
+  notEquals: 'Not equals',
+  noFilter: 'No filter',
+  lt: 'Less than',
+  lte: 'Less than or equal to',
+  gt: 'Greater than',
+  gte: 'Greater than or equal to',
+  dateIs: 'Date is',
+  dateIsNot: 'Date is not',
+  dateBefore: 'Date is before',
+  dateAfter: 'Date is after',
+  apply: 'Apply',
+  clear: 'Clear',
+  matchAll: 'Match All',
+  matchAny: 'Match Any',
+  addRule: 'Add Rule',
+  removeRule: 'Remove Rule',
+  emptyMessage: 'No results found',
+  emptyFilterMessage: 'No results found',
+}
+
+addLocale('en', EN_LOCALE)
 addLocale('tr', TR_LOCALE)
 
-function cellText(input: unknown): string {
-  return typeof input === 'string' ||
-    typeof input === 'number' ||
-    typeof input === 'boolean'
-    ? String(input)
-    : ''
-}
-
-FilterService.register(NFC_CONTAINS, (value: unknown, filter: unknown): boolean => {
-  if (filter === undefined || filter === null || filter === '') {
-    return true
-  }
-  if (value === undefined || value === null) {
-    return false
-  }
-  return turkishIncludes(cellText(value), cellText(filter))
-})
+FilterService.register('startsWith', turkishStartsWith)
+FilterService.register('contains', turkishContains)
+FilterService.register('notContains', turkishNotContains)
+FilterService.register('endsWith', turkishEndsWith)
+FilterService.register('equals', turkishEquals)
+FilterService.register('notEquals', turkishNotEquals)
+FilterService.register(ARRAY_CONTAINS_ANY, arrayContainsAny)
 
 export function setPrimeReactLocale(language: string): void {
   locale(language === 'tr' ? 'tr' : 'en')

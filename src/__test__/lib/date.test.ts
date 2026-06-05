@@ -14,3 +14,7 @@ test('formatDate returns "" for empty, nullish, or invalid input', () => {
   assert.equal(formatDate(undefined), '')
   assert.equal(formatDate('not-a-date'), '')
 })
+
+test('formatDate accepts a Date instance', () => {
+  assert.equal(formatDate(new Date(2024, 1, 14), 'DD.MM.YYYY'), '14.02.2024')
+})
