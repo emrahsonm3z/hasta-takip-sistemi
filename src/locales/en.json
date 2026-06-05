@@ -88,7 +88,6 @@
   },
   "docs": {
     "title": "Documentation",
-    "lead": "Everything about how this application is built and how we work — written so everyone can read it, not just developers.",
     "backToList": "All documentation",
     "doc": {
       "architecture": {

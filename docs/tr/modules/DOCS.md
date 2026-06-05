@@ -13,9 +13,9 @@ değiştirir.
 ## Dokümanlar nerede yaşar
 
 Her doküman, projenin içinde saklanan düz bir metin dosyasıdır (Markdown);
-eşleşen adlarla bir İngilizce klasörde ve bir Türkçe klasörde durur. İki özel
-doküman — Sprint Planı ve Değişiklik Günlüğü — proje kökünde yaşar; Değişiklik
-Günlüğü yalnızca İngilizce vardır ve iki dilde de İngilizce gösterilir.
+eşleşen adlarla bir İngilizce klasörde ve bir Türkçe klasörde durur. Tek özel
+doküman — Değişiklik Günlüğü — proje kökünde yaşar, çünkü sürüm aracı onu
+orada üretir; yalnızca İngilizce vardır ve iki dilde de İngilizce gösterilir.
 
 ## Kayıt (registry) kuralı
 
