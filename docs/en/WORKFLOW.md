@@ -1,68 +1,109 @@
 # How We Work
 
 This document explains how a change makes its way into the application: from
-the first idea, through writing and checking the code, to going live. It is
-written for everyone on the team — you do not need to be a developer to follow
-it. If you only remember one thing, remember this: **nothing goes live without
-the project owner's review and approval.**
+the first idea, through writing and checking the code, to going live. If you
+only remember one thing, remember this: **nothing goes live without the
+project owner's review, and the owner — never the AI developer — opens and
+merges the pull request.**
+
+---
 
 ## The two roles
 
-- **The developer** (in this project, the AI assistant Claude Code working
-  under supervision) writes the code and prepares every change.
-- **The owner** (the project manager) reviews every change, opens the pull
-  request, and presses the final "merge" button. The owner is the only person
-  who can put something live.
+| Role | Who | Does |
+| --- | --- | --- |
+| Developer | Claude Code, working under supervision | Plans, writes code + tests, self-reviews, commits (only with approval), pushes — then STOPS |
+| Owner | The repository owner / team manager | Reviews plans and code, **opens the pull request**, merges, owns every release |
 
-## Where work comes from
+---
 
-Planned work lives in one place: the **Sprint Plan** (you can read it right
-here in the app, under Documentation). It is a simple list of tasks. Finished
-tasks are marked with a ✅ and are never deleted, so the plan is also the
-project's history.
+## The life of a change
 
-## The life of a change, step by step
+```
+idea (sprint plan)
+  → audit / plan (no code; owner approves)
+    → implement one sub-item at a time
+        → self-review → Conventional Commit (one per reviewed sub-item)
+    → docs:sync (both languages) in the topic's final commit
+  → push the branch — the developer's flow ENDS here
+    → the OWNER opens the PR on GitHub (using the title + body the
+      developer proposed in its final report; the description is the contract)
+      → the CI gate runs — must be green
+        → owner reviews against the contract
+          → Rebase and merge (sub-commits preserved, never squashed)
+            → Vercel deploys main automatically
+```
 
-1. **Plan first.** Before any code is written, the developer reads the
-   relevant documentation and proposes a plan: what will change, in what
-   order, and how it will be tested. The owner reviews and approves the plan.
-2. **Work in small, reviewed steps.** The change is built piece by piece. Each
-   piece is checked by the developer (a self-review), and only then recorded
-   as a **commit** — a small, named snapshot of the work. Commit messages
-   follow a strict naming convention so that machines can read them too (this
-   powers automatic version numbers — see "Versions & Releases").
-3. **Update the documentation.** If the change affects anything described in
-   the documentation, the relevant pages are updated in **both languages** in
-   the same batch of work.
-4. **Push and stop.** The developer uploads ("pushes") the finished branch and
-   **stops there**. The developer does **not** open the pull request. After
-   pushing, the developer hands the owner a proposed title and description for
-   it in its final report.
-5. **The owner opens the pull request.** A **pull request** (PR) is a request
-   to bring the change into the main version of the app. Its description is
-   the **contract**: what was planned, what was done, how it was tested, and
-   which documents were touched. The owner opens it on GitHub using the text
-   the developer proposed.
-6. **Automatic checks run.** Every pull request is checked by a machine (the
-   **CI gate**): code quality, types, formatting, tests, and a security scan.
-   A pull request **cannot** be merged while the gate is red.
-7. **The owner reviews and merges.** The owner compares the work against the
-   contract. If something is off, it goes back to the developer. When it is
-   right and the gate is green, the owner merges it — keeping each reviewed
-   step visible in the history (no squashing).
-8. **It goes live.** Merging to the main branch deploys the application
-   automatically.
+Small, low-risk changes (dependency bumps, typo fixes) may skip the formal
+audit ceremony — but never the pull request, the gate, or the owner's merge.
 
-## The safety rules that never bend
+---
 
-- The developer never records (commits) work without approval, never uploads
-  it without finishing the agreed steps, and **never opens the pull request**.
-- The automated gate runs on every pull request, with no exceptions.
-- Small, low-risk changes may skip the formal planning ceremony — but never
-  the pull request, the gate, or the owner's review.
+## Commits — readable by humans AND machines
+
+Every commit message follows **Conventional Commits**, enforced by commitlint
+on a git hook. A real example from this branch:
+
+```
+feat(layout): group module docs under a section label in the sub-menu
+```
+
+The type prefix is not cosmetic: release-please derives version numbers from
+it (see "Versions & Releases"). The common types here:
+
+| Type | Means | Version effect (0.x) |
+| --- | --- | --- |
+| `feat:` | something new | minor bump |
+| `fix:` | a repair | patch bump |
+| `docs:` / `chore:` / `ci:` / `refactor:` | no user-facing change | none |
+
+Branches are named by the same types: `feat/*`, `fix/*`, `docs/*`, `chore/*` —
+one topic per branch, many reviewed commits on it.
+
+---
+
+## The automated gate
+
+Every pull request runs the `gate` job (`.github/workflows/ci.yml`) — the
+exact steps, in order:
+
+```yaml
+- uses: actions/setup-node@v4
+  with:
+    node-version-file: .nvmrc      # Node 24
+    cache: npm
+- run: npm ci
+- run: npm run validate            # type-check + ESLint + Stylelint + Prettier
+- run: npm test                    # node --test (pure-logic specs)
+- run: npm run build               # production build must succeed
+- run: npm audit --audit-level=high
+```
+
+Branch protection on `main` requires a pull request and a green `gate` before
+merging, with linear history (only "Rebase and merge" is possible — sub-commits
+are preserved because release-please reads each one; squashing would destroy
+release signal). The check is required but not in "strict" mode (the branch
+does not have to be re-synced with `main` before merging). Administrators stay
+exempt — needed for the release flow below.
+
+---
+
+## Release PRs and the close + reopen trick
+
+After merges land on `main`, the release-please robot opens a **Release PR**
+(version bump + changelog — see "Versions & Releases"). That PR is created by
+the `GITHUB_TOKEN`, and GitHub's anti-recursion rule means a robot-opened PR
+does not trigger the CI gate by itself. The owner's preferred move: **close
+the Release PR and reopen it in the GitHub UI** — a human-initiated reopen IS
+allowed to trigger workflows, the gate runs, and the PR merges with a real
+green check. (Fallback: admin-exempt direct merge — acceptable because the
+Release PR only ever touches the version number and the changelog.)
+
+---
 
 ## When something goes wrong
 
-If a problem reaches the live application, there are two tools: the hosting
-service can instantly roll back to the previous version, and an urgent fix can
-travel the same path described above, just faster.
+A failed self-review loops back to implementation; a failed owner review goes
+back to the developer. If a problem reaches production: Vercel can instantly
+roll back to the previous deployment, and an urgent fix travels the same path
+above on a `fix/*` branch, just faster.
