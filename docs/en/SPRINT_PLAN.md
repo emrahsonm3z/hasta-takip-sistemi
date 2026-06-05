@@ -296,7 +296,7 @@ the `lg` threshold; no raw hex outside token definitions; `validate` + tests gre
 **DoD:** + global DoD. Commits `feat(layout): atlantis-style app shell` +
 `docs: sync rule files and sprint plan for the shell design pass`.
 
-### 0.11 ⬜ Docs revision — technical depth, nested menu, scroll region
+### 0.11 ✅ Docs revision — technical depth, nested menu, scroll region
 **Goal:** Bring the 0.9 docs to the reference bar (plain prose kept, real
 technical demonstrations added — code from this repo only, planned work marked
 as planned), restructure the shell around them.
@@ -318,9 +318,15 @@ as planned), restructure the shell around them.
   patient data layer/UI marked planned (1.1–1.3).
 - `README.md` rewritten in Turkish (overview, stack, prerequisites, setup,
   env, scripts, architecture summary, testing, deploy).
+- (Added in review) Reference reading design for the content area: no card,
+  left-aligned, 57.5rem cap; ruled h1/h2; full-grid tables with uniform
+  0.875rem cell padding; callout blockquotes; dark-always code blocks via
+  `rehype-highlight` + highlight.js `github-dark` (the sanctioned §9
+  exception); module docs grouped under a Modüller subsection label in the
+  sidebar disclosure.
 **Files:** `src/styles/layout/*`, `src/components/layout/*`,
 `src/composables/useMenu*`, `src/modules/docs/**`, `docs/{en,tr}/**`,
-`README.md`, `src/locales/*`.
+`README.md`, `src/locales/*`, `tailwind.config.ts`.
 **Acceptance:** topbar + sidebar stay put while only the content scrolls; the
 Dokümanlar parent expands to the doc links and `/docs` stays the landing; docs
 match the reference's technical bar in both languages with nothing invented;

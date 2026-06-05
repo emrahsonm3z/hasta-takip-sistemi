@@ -308,7 +308,7 @@ marka işareti, pattern arka planı, responsive drawer.
 **DoD:** + global DoD. Commit'ler `feat(layout): atlantis-style app shell` +
 `docs: sync rule files and sprint plan for the shell design pass`.
 
-### 0.11 ⬜ Docs revizyonu — teknik derinlik, iç içe menü, kaydırma bölgesi
+### 0.11 ✅ Docs revizyonu — teknik derinlik, iç içe menü, kaydırma bölgesi
 **Hedef:** 0.9 dokümanlarını referans çıtasına taşımak (sade anlatım korunur,
 gerçek teknik gösterimler eklenir — yalnız bu repodaki kod; planlı iş planlı
 olarak işaretlenir) ve kabuğu buna göre yeniden yapılandırmak.
@@ -330,9 +330,15 @@ olarak işaretlenir) ve kabuğu buna göre yeniden yapılandırmak.
   yeni bağımlılık yok; hasta veri katmanı/UI planlı işaretli (1.1–1.3).
 - `README.md` Türkçe yeniden yazıldı (genel bakış, yığın, önkoşullar, kurulum,
   env, script'ler, mimari özet, test, deploy).
+- (İncelemede eklendi) İçerik alanı için referans okuma tasarımı: kart yok,
+  sola hizalı, 57.5rem sınır; çizgili h1/h2; hücre dolgusu eşit (0.875rem)
+  tam-ızgaralı tablolar; callout blockquote'lar; `rehype-highlight` +
+  highlight.js `github-dark` ile her-zaman-koyu kod blokları (onaylı §9
+  istisnası); sidebar disclosure'ında modül dokümanları Modüller alt-bölüm
+  etiketi altında gruplu.
 **Dosyalar:** `src/styles/layout/*`, `src/components/layout/*`,
 `src/composables/useMenu*`, `src/modules/docs/**`, `docs/{en,tr}/**`,
-`README.md`, `src/locales/*`.
+`README.md`, `src/locales/*`, `tailwind.config.ts`.
 **Kabul:** yalnız içerik kayarken topbar + sidebar yerinde kalır; Dokümanlar
 ebeveyni doc bağlantılarına açılır ve `/docs` açılış sayfası kalır; dokümanlar
 iki dilde referansın teknik çıtasını karşılar, hiçbir şey uydurulmamış; README
