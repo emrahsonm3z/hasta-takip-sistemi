@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.5.0](https://github.com/emrahsonm3z/hasta-takip-sistemi/compare/v0.4.0...v0.5.0) (2026-06-05)
+
+
+### Features
+
+* **components:** standard menu filters with turkish match modes ([9ba4a59](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/9ba4a593d63c59f33f8acd8b825aafc9ce53c2bb))
+* **patients:** full-scope patient list with per-column sort and menu filters ([445b0d4](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/445b0d402cdf7cecef4ba5502f79e68575fc2167))
+
+
+### Bug Fixes
+
+* **styles:** unify primereact surfaces on the zinc scale ([d816752](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/d8167522cb89a31e703cd21eae25f37f13076191))
+
 ## [0.4.0](https://github.com/emrahsonm3z/hasta-takip-sistemi/compare/v0.3.0...v0.4.0) (2026-06-05)
 
 
