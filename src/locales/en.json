@@ -146,7 +146,8 @@
   },
   "menu": {
     "section": {
-      "general": "General"
+      "general": "General",
+      "modules": "Modules"
     },
     "toggleSubmenu": "Toggle submenu"
   }

@@ -146,7 +146,8 @@
   },
   "menu": {
     "section": {
-      "general": "Genel"
+      "general": "Genel",
+      "modules": "Modüller"
     },
     "toggleSubmenu": "Alt menüyü aç/kapat"
   }

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { NavLink, useLocation } from 'react-router-dom'
 import { Sidebar } from 'primereact/sidebar'
@@ -72,14 +72,21 @@ function SidebarDisclosure({ item, onNavigate }: SidebarDisclosureProps) {
       </div>
       {expanded ? (
         <div id={submenuId} className="l-sidebar-subnav">
-          {item.children?.map((child) => (
-            <SidebarLeafLink
-              key={child.key}
-              item={child}
-              nested
-              onNavigate={onNavigate}
-            />
-          ))}
+          {item.children?.map((child, index) => {
+            const previous = index > 0 ? item.children?.[index - 1] : undefined
+            const startsNewSection =
+              Boolean(child.sectionLabel) && child.sectionLabel !== previous?.sectionLabel
+            return (
+              <Fragment key={child.key}>
+                {startsNewSection ? (
+                  <p className="l-sidebar-section l-sidebar-subsection">
+                    {child.sectionLabel}
+                  </p>
+                ) : null}
+                <SidebarLeafLink item={child} nested onNavigate={onNavigate} />
+              </Fragment>
+            )
+          })}
         </div>
       ) : null}
     </div>

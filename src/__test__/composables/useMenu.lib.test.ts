@@ -10,6 +10,7 @@ const translate = (key: TranslationKey): string => {
     'patients.title': 'Hastalar',
     'docs.title': 'Dokümanlar',
     'menu.section.general': 'Genel',
+    'menu.section.modules': 'Modüller',
     'common.actions': 'İşlemler',
   }
   return labels[key] ?? key
@@ -67,6 +68,7 @@ test('buildMenu sorts children by menuOrder and resolves their labels', () => {
           path: '/docs/second',
           icon: 'pi pi-tag',
           menuOrder: 2,
+          subsectionKey: 'menu.section.modules',
         },
         {
           key: 'first',
@@ -88,6 +90,8 @@ test('buildMenu sorts children by menuOrder and resolves their labels', () => {
   )
   assert.equal(item.children?.[0].label, 'Hastalar')
   assert.equal(item.children?.[0].path, '/docs/first')
+  assert.equal(item.children?.[0].sectionLabel, undefined)
+  assert.equal(item.children?.[1].sectionLabel, 'Modüller')
 })
 
 test('buildMenu leaves items without children flat', () => {
