@@ -71,7 +71,7 @@ Next: <the current/next sub-item — specific enough to start without context>
 ### Active: 0.9 Docs module + registry + skeleton docs + README · branch: feat/docs-module · status: in-progress
 
 Sections: §2 §3 §3.1 §6 §8 §9 §10 §11 §13 · Paths: src/modules/docs/\*\*, src/composables/useMenu.ts, docs/{en,tr}/\*\*, README.md, tailwind.config.ts
-Next: project README (setup, scripts, env, deploy)
+Next: docs:sync final commit (rule files §1.1 §3 §6 §9 §13.4, SPRINT_PLAN ✅, Active Work deletion)
 
 ## 1. Project Overview
 

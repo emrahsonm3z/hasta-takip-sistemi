@@ -76,7 +76,7 @@ Next: <mevcut/sıradaki alt-madde — bağlam olmadan başlamaya yetecek kadar n
 ### Active: 0.9 Docs modülü + registry + iskelet docs + README · branch: feat/docs-module · status: in-progress
 
 Sections: §2 §3 §3.1 §6 §8 §9 §10 §11 §13 · Paths: src/modules/docs/\*\*, src/composables/useMenu.ts, docs/{en,tr}/\*\*, README.md, tailwind.config.ts
-Next: proje README'si (kurulum, script'ler, env, deploy)
+Next: docs:sync son commit (kural dosyaları §1.1 §3 §6 §9 §13.4, SPRINT_PLAN ✅, Active Work silme)
 
 ## 1. Proje Genel Bakış
 
