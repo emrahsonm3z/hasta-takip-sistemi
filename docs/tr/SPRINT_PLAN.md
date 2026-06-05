@@ -386,32 +386,69 @@ için MSW); `usePatientMutations` invalidate eder.
 **DoD:** + global DoD; `STATE_MANAGEMENT.md` + `modules/PATIENTS.md` güncellendi.
 Commit `feat(patients): add data layer with storage-backed crud`.
 
-### 1.2 ⬜ Hasta listesi (AppDataTable, Türkçe sıralama/filtre/arama)
-**Hedef:** Vaka çalışmasının bir sıralama + bir filtre + bir aramasıyla,
-`AppDataTable`'ı render eden liste sayfası; iki dilli alanlar ve etiketler.
+### 1.2 ✅ Hasta listesi (AppDataTable, Türkçe sıralama/filtre/arama)
+**Hedef:** `AppDataTable` üzerinde tam hasta listesi — her kolon sıralanabilir,
+tipe-uygun menü filtreleri + global arama, iki dilli alanlar ve etiketler.
+**Kapsam notu:** bu, vaka çalışmasının "1 sıralama, 1 filtre, 1 arama"
+asgarisini BİLEREK aşar — sahibin tercihi; burada ve modül dokümanında kayıtlı.
 **Bağımlılık:** 1.1
-**Alt-adımlar:**
-- `pages/PatientsPage.tsx` (ince): `usePatients` çağırır, `PatientList` render
-  eder, loading (`Loading`) ve okuma hatasını (`ErrorState` + retry) yönetir.
-- `components/PatientList.tsx`: `AppDataTable` kolonları — `fullName`,
-  `department` (filtre), `appointmentDate` (`formatDate 'LLL'`), `status`/`priority`
-  çevrilmiş tag olarak (``t(`patient.status.${value}`)``), yerelleştirilmiş not
-  `pickLocalized` ile; global arama kutusu; bir sıralanabilir kolon;
-  Türkçe-duyarlı eşleşme.
-- Satır eylemleri (edit/delete) `aria-label={t(...)}`'li ikon butonları olarak
-  (1.3'te bağlanır).
-- `routes.tsx`: `PATIENT_ROUTES.LIST` + lazy sayfa + `handle.titleKey`.
-**Dosyalar:** `src/modules/patients/pages/PatientsPage.tsx`,
-`src/modules/patients/components/PatientList.tsx`,
-`src/modules/patients/routes.tsx` (+ barrel export).
-**Kabul:** `/patients` seed'li veriyi listeler; Türkçe arama (ör. `şişli`/`sisli`)
-eşleşir; sıralama Türkçe collation'a uyar; department filtresi satırları daraltır;
-boş durum i18n `emptyMessage` gösterir; kolonlar yerelleştirilmiş değerleri ve
-formatlanmış tarihleri render eder; dil değişimi reload olmadan yeniden etiketler.
-**Test:** `PatientList` satır render eder, Türkçe filtre daraltır, sıralama sırası
-doğru (RTL, MSW seed).
-**DoD:** + global DoD; `modules/PATIENTS.md` güncellendi. Commit
-`feat(patients): add list page with turkish-aware table`.
+**Alt-adımlar (indiği hâliyle):**
+- `pages/PatientsPage.tsx` (ince): `usePatients` çağırır, `PatientList`'i bir
+  `.card` üzerinde render eder, loading'i (wrapper'ın iki modu) ve okuma
+  hatasını (`ErrorState` + retry) yönetir.
+- `components/PatientList.tsx`: 15 kolon (fullName, department, status,
+  priority, appointmentDate, birthDate, bloodType, score, diagnosis, note,
+  isInsured, isFollowUp, isVaccinated, tags, createdAt). status/priority
+  `Tag` olarak (severity haritası `patient-tag.constants.ts`); boolean'lar
+  çevrilmiş evet/hayır; tag'ler `Chip`; tarihler `formatDate 'L'` (canlı
+  veride saat yok); diagnosis/note yerel-dile-duyarlı TÜRETİLMİŞ satır
+  alanlarıdır (`buildPatientListRows` + enjekte `pickLocalized`); böylece
+  sıralama/filtre/gövde düz alanlar üzerinde çalışır.
+- Sıralama, her kolonda: metin kolonları (fullName, etiketiyle department,
+  diagnosis, note, bloodType, birleşik-etiketiyle tags) Türkçe collator ile
+  (`sortRowsByTurkishValue`); status/priority TANIMLI enum sırasıyla
+  (`sortRowsByValueOrder`); tarihler (ISO string)/score/boolean'lar doğal.
+- Filtreleme, her kolonda, wrapper'da sabit `filterDisplay="menu"` —
+  STANDART demo davranışı (incelemede revize edildi): her menüde varsayılan
+  Temizle + Uygula düğme çubuğu, filtreler YALNIZ Uygula'da uygulanır ve tipe
+  göre match-mode dropdown'u gösterilir (yalnız tags'te gizli, demo-stili;
+  boolean'lar `dataType="boolean"` ile otomatik gizler → yerleşik
+  TriStateCheckbox). Altı standart METİN modu Türkçe-duyarlı global override
+  edilir (`lib/filters.ts`); tarihler türetilmiş satırlardaki gerçek `Date`
+  değerleri üzerinde yerleşik tarih modlarını kullanır; score sayısal
+  InputNumber filtresi; enum'lar TEK yeniden kullanılabilir Dropdown öğesi
+  (status/priority severity-Tag seçenek şablonlu); tags TEK yeniden
+  kullanılabilir herhangi-biri MultiSelect (özel `arrayContainsAny`). Ortak
+  öğe fabrikaları `components/AppDataTableFilters.tsx`'te. Global arama
+  korunur (fullName + diagnosisTr/En üzerinde yerleşik Türkçe `contains`;
+  `nfcContains` kaldırıldı).
+- `AppDataTable`: `filterDisplay` ve `minTableWidth` prop'ları KALDIRILDI —
+  menü filtreleme wrapper'ın içinde sabit ve kolonlar içeriğe göre sığar (dar
+  ekranda yatay kaydırma beklenen davranıştır; gerçek bir mobil yerleşim ayrı,
+  sonraki bir karardır). TR + EN PrimeReact locale'leri filtre sözlüğüyle
+  (+ TR takvim adları) genişletildi; her filtre girdisinde yerelleştirilmiş
+  placeholder; tüm filtre overlay'leri tek tutarlı 16rem genişlikte, kompakt
+  0.75rem bölüm ritmiyle.
+- (İncelemede eklendi) Zinc yüzey birleştirmesi: Lara `--surface-*`/`--gray-*`
+  skalası iki modda da Tailwind zinc'e boyandı (`theme/_dark.scss`; katmansız,
+  `@layer primereact`'i yener); `--app-ground/card-bg/card-border`
+  `var(--surface-*)` alias'ı oldu; `modules/_prime-skin.scss` PrimeReact'in
+  pişmiş yüzeylerini — konteyner öğeleri dahil — değişkenlere yönlendirir
+  (DataTable, paginator, input'lar, dropdown/multiselect panelleri,
+  datepicker, chip'ler); striped satırlar kapalı (yerine ızgara çizgileri).
+**Dosyalar:** `src/modules/patients/{pages,components,lib,constants}/*`,
+`src/components/AppDataTable.tsx`, `src/lib/{text,filters}.ts`,
+`src/plugins/primereact.ts`, `src/styles/**`, `src/__test__/*`.
+**Kabul:** `/patients` seed'li veriyi listeler; her kolon sıralanır (metinde
+Türkçe collation, status/priority'de enum sırası) ve tipe-uygun menü
+kontrolüyle filtrelenir; global arama ile `ışık`, `Işık`'ı bulur; boş durum
+i18n `emptyMessage` gösterir; boolean'lar/enum'lar çevrilmiş render olur; dil
+değişimi etiketleri ve diagnosis/note'u canlı yeniden çözer.
+**Test:** saf node:test spec'leri — Türkçe satır sıralama, enum-sırası
+sıralama, türetilmiş yerelleştirilmiş satırlar, ayrık tag/score toplayıcılar,
+seçenek kurucular, `isoDateMatches` + `arrayContainsAny` yüklemleri,
+tag-severity haritaları; render/etkileşim manuel QA ile (§11).
+**DoD:** + global DoD; `modules/PATIENTS.md` güncellendi.
 
 ### 1.3 ⬜ Hasta ekle / düzenle / sil formu
 **Hedef:** Dialog içinde, Yup ile doğrulanmış, mutation'lara bağlı, silme

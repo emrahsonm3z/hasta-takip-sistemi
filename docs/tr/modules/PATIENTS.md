@@ -1,9 +1,9 @@
 # Hasta Modülü
 
 Bu doküman, hasta takibi özelliğini anlatır. Dürüst durum: **veri katmanı
-gönderildi** (Sprint 1.1) — modül hasta kayıtlarını baştan sona yükler,
-saklar ve değiştirir. Ekranlar henüz yolda: liste 1.2, ekleme / düzenleme /
-silme 1.3; en altta planlı olarak işaretlidir.
+(1.1) ve liste ekranı (1.2) gönderildi** — modül hasta kayıtlarını yükler,
+saklar, listeler, sıralar, filtreler ve arar. Ekleme / düzenleme / silme (1.3)
+hâlâ planlıdır ve en altta öyle işaretlidir.
 
 ---
 
@@ -17,14 +17,18 @@ src/modules/patients/
 ├── composables/
 │   ├── usePatients.ts         useQuery: depoyu oku, boşsa bir kez tohumla
 │   └── usePatientMutations.ts ekle / güncelle / sil + invalidate + toast'lar
+├── components/
+│   └── PatientList.tsx        AppDataTable üzerinde 7 kolonlu liste
 ├── constants/
+│   ├── patient-tag.constants.ts  status/priority → Tag severity haritaları
 │   └── query-keys.ts          patientKeys factory'si
 ├── lib/
+│   ├── patient-list.lib.ts    buildStatusFilterOptions (saf, birim-testli)
 │   ├── patient.mapper.ts      ham satır → tipli PatientRecord (saf, birim-testli)
 │   └── patient-storage.lib.ts createPatientStorage çekirdeği (saf, birim-testli)
 ├── models/
 │   └── patient.model.ts       PatientRecord + dört enum-benzeri union
-├── pages/PatientsPage.tsx     Yer-tutucu sayfa (1.2 listesi yerini alacak)
+├── pages/PatientsPage.tsx     İnce: usePatients → ErrorState | .card üzerinde PatientList
 ├── routes.tsx                 PATIENT_ROUTES sabitleri + rota dizisi
 └── index.ts                   barrel
 ```
@@ -170,12 +174,85 @@ zaman eşleşir).
 
 ---
 
-## Planlı — Sprint 1.2 / 1.3: ekranlar
+## Liste (gönderildi, Sprint 1.2)
 
-- **1.2 — liste:** `usePatients()` üzerinde `AppDataTable`; Türkçe bilen
-  genel arama, bir sütun sıralama, bir sütun filtre, çevrilmiş enum
-  etiketleri, tarihler `formatDate` üzerinden.
-- **1.3 — ekle / düzenle / sil:** ortak `Form*` alanlarından kurulan bir
-  PrimeReact Dialog formu, tipli iki dilli mesajlarla Yup doğrulaması,
-  not/tanının iki dil varyantı yan yana, onaylı silme — hepsi
-  `usePatientMutations`'a bağlı.
+`PatientsPage` ince bir kabuktur: `usePatients()` → okuma hatasında (retry'lı)
+`ErrorState`, aksi hâlde `.card` yüzeyinde `PatientList`.
+
+**Kapsam, dürüstçe:** liste, vaka çalışmasının "bir sıralama, bir filtre, bir
+arama" asgarisini BİLEREK AŞAR — sahip tam özellik setini seçti. Yapılan:
+**15 kolon, her kolon sıralanabilir, her kolonda tipe-uygun menü filtresi,
+artı global arama.**
+
+| Kolon | Çizer | Sıralama | Filtre |
+| --- | --- | --- | --- |
+| fullName | metin | Türkçe collator | metin, standart match modları (Türkçe-duyarlı) |
+| department | çevrilmiş etiket | Türkçe collator (görünen etiket) | dropdown |
+| status | `Tag` (severity haritası) | tanımlı enum sırası | dropdown |
+| priority | `Tag` (severity haritası) | tanımlı enum sırası | dropdown |
+| appointmentDate | `formatDate 'L'` | doğal | Takvim + tarih match modları (varsayılan dateIs) |
+| birthDate | `formatDate 'L'` | doğal | Takvim + tarih match modları |
+| bloodType | çevrilmiş gösterim | Türkçe collator | dropdown |
+| score | sayı | doğal | InputNumber + sayısal match modları |
+| diagnosis | dile-duyarlı türetilmiş alan | Türkçe collator | metin, standart match modları |
+| note | dile-duyarlı türetilmiş alan | Türkçe collator | metin, standart match modları |
+| isInsured / isFollowUp / isVaccinated | success/danger ikon (check / times) | doğal | etiketli TriStateCheckbox (evet / hayır / hepsi) |
+| tags | `Chip`'ler | — (sıralanmaz) | herhangi-biri multiselect, virgül görünümü (`arrayContainsAny`) |
+| createdAt | `formatDate 'L'` | doğal | Takvim + tarih match modları |
+
+Mekanik:
+
+- **Standart menü-filtre davranışı** (resmî custom_filter demosu): her filtre
+  menüsü varsayılan **Temizle + Uygula** düğme çubuğunu gösterir ve bir filtre
+  YALNIZ Uygula'ya basıldığında uygulanır — değişiklikte hiçbir şey
+  filtrelenmez. Varsayılan match-mode dropdown'u tipe göre gösterilir
+  (metin / sayı / tarih / enum kolonları); yalnız tipin modu olmadığı yerde
+  gizlidir — boolean'lar otomatik gizler (`dataType="boolean"`), tags
+  multiselect'i ise demonun representative kolonu gibi
+  `showFilterMatchModes={false}` verir.
+- **Türkçe-duyarlı standart metin modları.** Altı standart metin match modu
+  (şununla başlar / içerir / içermez / şununla biter / eşittir / eşit
+  değildir) Türkçe-normalize implementasyonlarla global override edilir
+  (`lib/filters.ts`; kayıt `plugins/primereact.ts`) — match-mode dropdown'u
+  standart seçenekleri sunar ve HEPSİ Türkçe-duyarsız eşleşir. Global arama
+  kutusu da aynı (artık Türkçe) yerleşik `contains`'a biner.
+- **Yeniden kullanılabilir filtre öğeleri, tek ortak modül**
+  (`components/AppDataTableFilters.tsx` — PrimeReact 10 yalnız InputText
+  varsayılan öğesi gönderir, kaynakta doğrulandı): TEK enum Dropdown
+  fabrikası (status/priority severity-Tag seçenek şablonu verir), TEK tags
+  MultiSelect, artı demo-standardı Calendar / InputNumber / TriStateCheckbox
+  öğeleri. Hepsi `filterCallback` ile → Uygula'da uygulanır.
+- **Türetilmiş satırlar.** `buildPatientListRows(patients, localize)`,
+  `diagnosis`/`note`'u etkin dil için çözer (enjekte `pickLocalized`) VE üç
+  tarih alanını gerçek `Date` nesnelerine çevirir — yerleşik tarih match
+  modları string değil tarih karşılaştırır. Kurucu saftır ve birim-testlidir;
+  satırlar dil değişiminde yeniden çözülür.
+- **Locale.** Kayıtlı TR locale, PrimeReact varsayılan locale'inin HER
+  anahtarını kapsar (filtre sözlüğü, takvim, yükleme/parola metinleri ve tüm
+  `aria.*` etiketleri — eksiksizlik `primereact/api` varsayılan nesnesine
+  karşı doğrulandı); EN aynı kümeyi yerleşik varsayılanların üzerine pinler.
+  Tüm bileşen sözlüğü etkin dili izler ve dil değişiminde canlı yeniden
+  çizilir. Her filtre
+  girdisi yerelleştirilmiş bir placeholder gösterir (`filters.*` anahtarları:
+  "Ara…", "gg.aa.yyyy", "Sayı girin", "Seçiniz", "Tümü" — ve İngilizce
+  karşılıkları). Her filtre overlay'i `_prime-skin.scss` üzerinden TEK
+  tutarlı `16rem` genişliğe ve kompakt bölüm ritmine sahiptir (0.75rem bölüm
+  dolgusu, match-mode dropdown'unun altında 0.5rem).
+  Boolean filtreleri etiketli TriStateCheckbox'tır (kutunun yanında alan
+  adı); boolean hücreleri success/danger ikonları çizer (Tag severity
+  tonları, `--app-success`/`--app-danger` olarak token'landı). fullName /
+  note / tags kolonları iki katına çıkarılmış min-genişlik taşır (16 / 24 /
+  16rem); kalanı içeriğe göre sığar.
+- **Yerleşim.** Kolonlar içeriğe göre sığar; dar ekranda tablo kendi bölgesi
+  içinde yatay kayar — beklenen davranış; gerçek bir mobil yerleşim
+  (istifli/öncelikli kolonlar) ayrı, sonraki bir karardır. Satırlar kartın
+  üzerinde transparan, ince ızgara çizgileriyle oturur (şerit yok).
+
+---
+
+## Planlı — Sprint 1.3: ekle / düzenle / sil
+
+Ortak `Form*` alanlarından kurulan bir PrimeReact Dialog formu, tipli iki
+dilli mesajlarla Yup doğrulaması, not/tanının iki dil varyantı yan yana,
+onaylı silme, listede satır eylem düğmeleri — hepsi `usePatientMutations`'a
+bağlı. Satıra-tıkla gezinme de bir 1.3 kararıdır.

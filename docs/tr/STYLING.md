@@ -16,11 +16,29 @@ tema stylesheet'idir. Tailwind ve bizim SCSS'imiz aynı değişkenleri tüketir.
 Token tanımları dışında ham hex renk her yerde yasaktır.
 
 ```
-Lara Green tema CSS'i (açık / koyu dosya, çalışma anında takaslanır)
-  → CSS değişkenleri (--primary-color, --surface-*, --text-color, …)
+Lara Green tema CSS'i (çalışma anında takas)  styles/theme/_dark.scss (bizim)
+  → YEŞİL vurgu + bileşen skin'leri             → NÖTR skala: --surface-*
+                                                  Tailwind ZINC'e boyandı,
+                                                  açık VE koyu
       ├→ tailwind.config.ts   renkler doğrudan değişkenlere eşlenir
-      └→ styles/utils/_tokens.scss   özel SCSS için alias'lar
+      ├→ styles/utils/_tokens.scss   özel SCSS için alias'lar
+      └→ styles/modules/_prime-skin.scss   PrimeReact'in pişmiş bileşen
+         yüzeylerini (tablolar, input'lar, dropdown panelleri) değişkenlere yönlendirir
 ```
+
+Bilinmeye değer bir incelik: PrimeReact teması bileşenlerini sabit renk
+değerleriyle boyar — çalışma anında `--surface-*` değişkenlerini okumaz. Bu
+yüzden `_dark.scss`'imiz nötr skalanın tamamını zinc'e (sayfanın kendi gri
+ailesine) yeniden tanımlar ve `_prime-skin.scss`, boyanmış bileşen
+yüzeylerini — hem HÜCRELERİ (başlık/gövde/altlık hücreleri, ızgara çizgileri,
+hover, paginator düğmeleri, input'lar, dropdown öğeleri) hem de temanın ayrı
+boyadığı KONTEYNER öğelerini (`.p-datatable-thead` / `-tfoot` / `-footer`,
+dropdown ve multiselect panelleri + başlıkları, datepicker, chip'ler,
+kolon-filtre overlay'i + operatör başlığı) — aynı değişkenlere yönlendirir. Her yerde tek
+gri ailesi; yeşil vurgu Lara'nın kalır. Tablo satırları transparandır ve
+doğrudan kartın üzerinde oturur, ince ızgara çizgileriyle ayrılır (striped
+satırlar kapalı). Gelecekte çatışan bir PrimeReact bileşeni
+`_prime-skin.scss`'e bir satır alır — asla yerel override değil.
 
 Tailwind tarafı (`tailwind.config.ts`'ten, olduğu gibi):
 
@@ -71,9 +89,9 @@ her mod için bir kez (`styles/theme/_dark.scss`, `:root` + `.dark`):
 
 | Token | Açık | Koyu |
 | --- | --- | --- |
-| `--app-ground` (sayfa zemini) | `rgb(248 250 252)` | `rgb(9 9 11)` |
-| `--app-card-bg` (yükseltilmiş yüzey) | `rgb(255 255 255)` | `rgb(24 24 27)` |
-| `--app-card-border` | `rgb(226 232 240)` | `rgb(63 63 70)` |
+| `--app-ground` (sayfa zemini) | `var(--surface-ground)` → zinc-50 | `var(--surface-ground)` → zinc-950 |
+| `--app-card-bg` (yükseltilmiş yüzey) | `var(--surface-card)` → beyaz | `var(--surface-card)` → zinc-900 |
+| `--app-card-border` | `var(--surface-border)` → zinc-200 | `var(--surface-border)` → zinc-700 |
 | `--app-card-shadow` | hafif iki katmanlı gölge | `none` (ayrımı kenarlık yapar) |
 | `--app-menu-item-hover-bg` | `rgb(100 116 139 / 10%)` | `rgb(255 255 255 / 5%)` |
 | `--app-radius-card/-item` | `8px` | aynı |

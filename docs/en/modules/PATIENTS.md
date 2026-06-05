@@ -1,9 +1,9 @@
 # Patients Module
 
 This document describes the patient tracking feature. Honest status: **the
-data layer is shipped** (Sprint 1.1) — the module loads, stores, and mutates
-patient records end to end. The screens are still to come: the list is 1.2,
-add/edit/delete is 1.3; they are marked planned at the bottom.
+data layer (1.1) and the list screen (1.2) are shipped** — the module loads,
+stores, lists, sorts, filters, and searches patient records. Add/edit/delete
+(1.3) is still planned and marked so at the bottom.
 
 ---
 
@@ -17,14 +17,18 @@ src/modules/patients/
 ├── composables/
 │   ├── usePatients.ts         useQuery: read storage, seed once if empty
 │   └── usePatientMutations.ts add / update / remove + invalidate + toasts
+├── components/
+│   └── PatientList.tsx        The 7-column list over AppDataTable
 ├── constants/
+│   ├── patient-tag.constants.ts  status/priority → Tag severity maps
 │   └── query-keys.ts          patientKeys factory
 ├── lib/
+│   ├── patient-list.lib.ts    buildStatusFilterOptions (pure, unit-tested)
 │   ├── patient.mapper.ts      raw row → typed PatientRecord (pure, unit-tested)
 │   └── patient-storage.lib.ts createPatientStorage core (pure, unit-tested)
 ├── models/
 │   └── patient.model.ts       PatientRecord + the four enum-like unions
-├── pages/PatientsPage.tsx     Placeholder page (the 1.2 list replaces it)
+├── pages/PatientsPage.tsx     Thin: usePatients → ErrorState | PatientList on a .card
 ├── routes.tsx                 PATIENT_ROUTES constants + the route array
 └── index.ts                   barrel
 ```
@@ -169,12 +173,85 @@ always matches).
 
 ---
 
-## Planned — Sprints 1.2 / 1.3: the screens
+## The list (shipped, Sprint 1.2)
 
-- **1.2 — the list:** `AppDataTable` over `usePatients()` with Turkish-aware
-  global search, one column sort, one column filter, translated enum labels,
-  dates through `formatDate`.
-- **1.3 — add / edit / delete:** a PrimeReact Dialog form built from the
-  shared `Form*` fields, Yup validation with typed bilingual messages, both
-  language variants of note/diagnosis side by side, delete with confirmation
-  — all wired to `usePatientMutations`.
+`PatientsPage` is a thin shell: `usePatients()` → `ErrorState` (with retry) on
+a read failure, otherwise `PatientList` on a `.card` surface.
+
+**Scope, honestly stated:** the list deliberately EXCEEDS the case study's
+"one sort, one filter, one search" minimum — the owner chose the full feature
+set. What is built: **15 columns, every column sortable, every column with a
+type-appropriate menu filter, plus the global search.**
+
+| Column | Renders | Sorts by | Filters with |
+| --- | --- | --- | --- |
+| fullName | text | Turkish collator | text, standard match modes (Turkish-aware) |
+| department | translated label | Turkish collator (displayed label) | dropdown |
+| status | `Tag` (severity map) | defined enum order | dropdown |
+| priority | `Tag` (severity map) | defined enum order | dropdown |
+| appointmentDate | `formatDate 'L'` | natural | Calendar + date match modes (dateIs default) |
+| birthDate | `formatDate 'L'` | natural | Calendar + date match modes |
+| bloodType | translated notation | Turkish collator | dropdown |
+| score | number | natural | InputNumber + numeric match modes |
+| diagnosis | locale-aware derived field | Turkish collator | text, standard match modes |
+| note | locale-aware derived field | Turkish collator | text, standard match modes |
+| isInsured / isFollowUp / isVaccinated | success/danger icon (check / times) | natural | labelled TriStateCheckbox (yes / no / any) |
+| tags | `Chip`s | — (not sortable) | any-of multiselect, comma display (`arrayContainsAny`) |
+| createdAt | `formatDate 'L'` | natural | Calendar + date match modes |
+
+The mechanics:
+
+- **Standard menu-filter behaviour** (the official custom_filter demo): every
+  filter menu shows the default **Clear + Apply** buttonbar, and a filter
+  applies ONLY when Apply is pressed — nothing filters on change. The default
+  match-mode dropdown is shown per type (text / numeric / date / enum
+  columns); it is hidden only where a type has none — booleans hide it
+  automatically (`dataType="boolean"`), and the tags multiselect sets
+  `showFilterMatchModes={false}`, exactly as the demo does for its
+  representative column.
+- **Turkish-aware standard text modes.** The six standard text match modes
+  (starts with / contains / not contains / ends with / equals / not equals)
+  are globally overridden with Turkish-normalized implementations
+  (`lib/filters.ts`, registered in `plugins/primereact.ts`) — so the
+  match-mode dropdown offers the standard choices and ALL of them match
+  Turkish-insensitively. The global search box rides the same (now Turkish)
+  built-in `contains`.
+- **Reusable filter elements, one shared module**
+  (`components/AppDataTableFilters.tsx` — PrimeReact 10 ships only an
+  InputText default element, verified in source): ONE enum Dropdown factory
+  (status/priority pass a severity-Tag option template), ONE tags
+  MultiSelect, plus the demo-standard Calendar / InputNumber /
+  TriStateCheckbox elements. All apply via `filterCallback` → Apply.
+- **Derived rows.** `buildPatientListRows(patients, localize)` resolves
+  `diagnosis`/`note` for the active language (injected `pickLocalized`) AND
+  converts the three date fields to real `Date` objects — required by the
+  built-in date match modes, which compare dates, not strings. The builder is
+  pure and unit-tested; rows re-resolve on language switch.
+- **Locale.** The registered TR locale covers EVERY key of PrimeReact's
+  default locale (filter vocabulary, calendar, upload/password texts, and all
+  `aria.*` labels — completeness verified against
+  `primereact/api`'s default object); EN pins the same set over the built-in
+  defaults. The whole component vocabulary follows the active language and
+  re-renders live on switch. Every filter
+  input shows a localized placeholder (`filters.*` keys: "Ara…",
+  "gg.aa.yyyy", "Sayı girin", "Seçiniz", "Tümü" — and their English
+  counterparts). Every filter overlay has ONE consistent
+  `16rem` width with a compact section rhythm (0.75rem section padding,
+  0.5rem below the match-mode dropdown) via `_prime-skin.scss`. Boolean
+  filters are a labelled TriStateCheckbox (field name beside the box);
+  boolean cells render success/danger icons (the Tag severity hues, exposed
+  as `--app-success`/`--app-danger`). The fullName / note / tags columns
+  carry doubled min-widths (16 / 24 / 16rem); the rest auto-fit.
+- **Layout.** Columns auto-fit their content; on narrow viewports the table
+  scrolls horizontally inside its region — expected behaviour; a true mobile
+  layout (stacked/priority columns) is a separate, later decision. Rows sit
+  transparent on the card with hairline gridlines (no stripes).
+
+---
+
+## Planned — Sprint 1.3: add / edit / delete
+
+A PrimeReact Dialog form built from the shared `Form*` fields, Yup validation
+with typed bilingual messages, both language variants of note/diagnosis side
+by side, delete with confirmation, row action buttons in the list — all wired
+to `usePatientMutations`. Row-click navigation is also a 1.3 decision.

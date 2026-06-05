@@ -25,7 +25,7 @@ src/
 ├── config/
 │   └── env.ts               Tipli dondurulmuş env + validateRequiredEnvVars()
 ├── plugins/                 Üçüncü parti kütüphane yapılandırması
-│   ├── primereact.ts        Provider config + TR locale + nfcContains filtresi
+│   ├── primereact.ts        Provider config + TR locale + Türkçe-override metin filtre modları
 │   ├── theme.ts             Lara Green açık/koyu ?url takası, <link id="app-theme">
 │   ├── theme.lib.ts         Saf tema-takas mantığı (birim-testli)
 │   ├── react-query.ts       QueryClient varsayılanları

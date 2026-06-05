@@ -374,30 +374,67 @@ corrupt storage value → empty list (no crash); model has no free `string` enum
 **DoD:** + global DoD; `STATE_MANAGEMENT.md` + `modules/PATIENTS.md` updated.
 Commit `feat(patients): add data layer with storage-backed crud`.
 
-### 1.2 ⬜ Patient list (AppDataTable, Turkish sort/filter/search)
-**Goal:** The list page rendering `AppDataTable` with the case-study's one sort +
-one filter + one search, bilingual fields and labels.
+### 1.2 ✅ Patient list (AppDataTable, Turkish sort/filter/search)
+**Goal:** The full patient list over `AppDataTable` — every column sortable with
+type-appropriate menu filters plus global search, bilingual fields and labels.
+**Scope note:** this DELIBERATELY exceeds the case study's "1 sort, 1 filter,
+1 search" minimum — the owner's choice, recorded here and in the module doc.
 **Depends on:** 1.1
-**Sub-steps:**
-- `pages/PatientsPage.tsx` (thin): calls `usePatients`, renders `PatientList`,
-  handles loading (`Loading`) and read error (`ErrorState` + retry).
-- `components/PatientList.tsx`: `AppDataTable` columns — `fullName`, `department`
-  (filter), `appointmentDate` (`formatDate 'LLL'`), `status`/`priority` as
-  translated tags (``t(`patient.status.${value}`)``), localized note via
-  `pickLocalized`; global search box; one sortable column; Turkish-aware match.
-- Row actions (edit/delete) as icon buttons with `aria-label={t(...)}` (wired in 1.3).
-- `routes.tsx`: `PATIENT_ROUTES.LIST` + lazy page + `handle.titleKey`.
-**Files:** `src/modules/patients/pages/PatientsPage.tsx`,
-`src/modules/patients/components/PatientList.tsx`,
-`src/modules/patients/routes.tsx` (+ barrel export).
-**Acceptance:** `/patients` lists seeded data; Turkish search (e.g. `şişli`/`sisli`)
-matches; sort respects Turkish collation; the department filter narrows rows;
-empty state shows the i18n `emptyMessage`; columns render localized values and
-formatted dates; language switch re-labels without reload.
-**Tests:** `PatientList` renders rows, Turkish filter narrows, sort order correct
-(RTL, MSW seed).
-**DoD:** + global DoD; `modules/PATIENTS.md` updated. Commit
-`feat(patients): add list page with turkish-aware table`.
+**Sub-steps (as landed):**
+- `pages/PatientsPage.tsx` (thin): calls `usePatients`, renders `PatientList` on a
+  `.card`, handles loading (wrapper two-mode) and read error (`ErrorState` + retry).
+- `components/PatientList.tsx`: 15 columns (fullName, department, status,
+  priority, appointmentDate, birthDate, bloodType, score, diagnosis, note,
+  isInsured, isFollowUp, isVaccinated, tags, createdAt). status/priority as
+  `Tag`s (severity map in `patient-tag.constants.ts`); booleans as translated
+  yes/no; tags as `Chip`s; dates via `formatDate 'L'` (live data has no time
+  component); diagnosis/note are locale-aware DERIVED row fields
+  (`buildPatientListRows` + injected `pickLocalized`), so sort/filter/body all
+  work on plain fields.
+- Sorting, every column: Turkish collator for the text columns (fullName,
+  department-by-label, diagnosis, note, bloodType, tags-by-joined-label) via
+  `sortRowsByTurkishValue`; status/priority by their DEFINED enum order
+  (`sortRowsByValueOrder`); dates (ISO strings)/score/booleans natural.
+- Filtering, every column, `filterDisplay="menu"` hardcoded in the wrapper —
+  STANDARD demo behaviour (revised in review): every menu has the default
+  Clear + Apply buttonbar, filters apply ONLY on Apply, and the per-type
+  match-mode dropdown is shown (hidden only for tags, demo-style; booleans
+  auto-hide via `dataType="boolean"` → built-in TriStateCheckbox). The six
+  standard TEXT modes are globally overridden Turkish-aware
+  (`lib/filters.ts`); dates use the built-in date modes over real `Date`
+  values in the derived rows; score uses the numeric InputNumber filter;
+  enums use ONE reusable Dropdown element (status/priority with severity-Tag
+  option templates); tags use ONE reusable any-of MultiSelect (custom
+  `arrayContainsAny`). Shared element factories live in
+  `components/AppDataTableFilters.tsx`. Global search kept (built-in
+  Turkish `contains` over fullName + diagnosisTr/En; `nfcContains` removed).
+- `AppDataTable`: `filterDisplay` and `minTableWidth` props REMOVED —
+  menu filtering is hardcoded inside the wrapper and columns auto-fit
+  (horizontal scroll on narrow viewports is the expected behaviour; a true
+  mobile layout is a separate later decision). TR + EN PrimeReact locales extended
+  with the filter vocabulary (+ TR calendar names); localized placeholders in
+  every filter input; all filter overlays at one consistent 16rem width with
+  a compact 0.75rem section rhythm.
+- (Added in review) Zinc surface unification: the Lara `--surface-*`/`--gray-*`
+  scale recolored to Tailwind zinc in both modes (`theme/_dark.scss`,
+  unlayered beats `@layer primereact`); `--app-ground/card-bg/card-border`
+  became `var(--surface-*)` aliases; `modules/_prime-skin.scss` re-points
+  PrimeReact's baked surfaces — incl. container elements — at the variables
+  (DataTable, paginator, inputs, dropdown/multiselect panels, datepicker,
+  chips); striped rows off (gridlines instead).
+**Files:** `src/modules/patients/{pages,components,lib,constants}/*`,
+`src/components/AppDataTable.tsx`, `src/lib/{text,filters}.ts`,
+`src/plugins/primereact.ts`, `src/styles/**`, `src/__test__/*`.
+**Acceptance:** `/patients` lists seeded data; every column sorts (Turkish
+collation on text, enum order on status/priority) and filters with its
+type-appropriate menu control; `ışık` finds `Işık` via global search; empty
+state shows the i18n `emptyMessage`; booleans/enums render translated; language
+switch re-labels and re-localizes diagnosis/note live.
+**Tests:** pure node:test specs — Turkish row sorting, enum-order sorting,
+derived localized rows, distinct tag/score collectors, option builders,
+`isoDateMatches` + `arrayContainsAny` predicates, tag-severity maps;
+render/interaction by manual QA (§11 — no DOM harness).
+**DoD:** + global DoD; `modules/PATIENTS.md` updated.
 
 ### 1.3 ⬜ Patient add / edit / delete form
 **Goal:** A bilingual form (all fields side by side) in a dialog, validated by

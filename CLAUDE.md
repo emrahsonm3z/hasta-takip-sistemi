@@ -172,7 +172,7 @@ src/
 │   ├── env.ts               Typed frozen env + validateRequiredEnvVars()
 │   └── vite-env.d.ts        ImportMetaEnv augmentation
 ├── plugins/                 Third-party library configuration
-│   ├── primereact.ts        PrimeReactProvider value + locale + FilterService.register('nfcContains') (§8)
+│   ├── primereact.ts        Provider value + COMPLETE TR locale (every key of PrimeReact's default locale incl. aria) + EN pins + Turkish overrides of the standard text filter modes + arrayContainsAny (§8; lib/filters.ts)
 │   ├── theme.ts             Lara Green light/dark theme.css?url + applyTheme/setThemeMode over <link id="app-theme"> (§9; core deprecated/empty, icons via main.scss)
 │   ├── theme.lib.ts         Pure theme-swap logic (resolveThemeMode/applyThemeMode); no ?url, unit-tested under node:test
 │   ├── react-query.ts       QueryClient defaults (§10)
@@ -184,6 +184,8 @@ src/
 ├── components/              Global UI (App* wrappers + shells) — §3.1
 │   ├── AppDataTable.tsx     DataTable wrapper (toolbar slot + search + clear-filters, Turkish sort/filter, two-mode loading, responsive paginator) (§3.1)
 │   ├── AppDataTable.lib.ts  pure buildInitialFilters(globalMatchMode, defaults, includeGlobal) (unit-tested)
+│   ├── AppDataTableFilters.tsx  shared menu-filter element factories (enum/multiselect/date/numeric/boolean) (§3.1)
+│   ├── AppPrimeReactProvider.tsx  PrimeReactProvider seeded from i18n + LocaleBridge (context.setLocale on language change) (§8)
 │   ├── AppToastProvider.tsx Mounts PrimeReact <Toast/>; backs useNotify (§3.1)
 │   ├── toast-context.ts     ToastContext (split out so AppToastProvider stays fast-refresh-clean)
 │   ├── Loading.tsx          Lazy-route fallback
@@ -228,8 +230,9 @@ src/
 │   ├── layout/_sidebar.scss   .l-sidebar shell — TRANSPARENT (no surface/shadow), fixed 21rem, brand, grouped nav, 8px primary border-left accent; .l-sidebar-drawer mobile-panel overrides (§9)
 │   ├── layout/_topbar.scss    .l-topbar shell — transparent (start cluster, action chips, :focus-visible-only focus) (§9)
 │   ├── modules/_card.scss     .card the RAISED surface (card-bg + 1px border + faint shadow, radius 8px, padding 14px) (§9)
+│   ├── modules/_prime-skin.scss  Re-points baked PrimeReact surfaces (DataTable/paginator/inputs/dropdown panel) at the --surface-* vars (§9)
 │   ├── utils/_tokens.scss   SCSS aliases of the v10 theme vars + the app-* custom tokens (for component SCSS)
-│   └── theme/_dark.scss     Custom app tokens (:root + .dark) — app-ground/card/radii/sidebar-width + the mode-invariant --glow-* pattern tokens; --app-background folded into the cool ground (FOUC) (§9)
+│   └── theme/_dark.scss     THE neutral source (:root + .dark): zinc override of the Lara --surface-*/--gray-* scale + app-* tokens (ground/card/border now ALIAS --surface-*) + radii/width/--glow-* (§9)
 ├── types/
 │   ├── route.types.ts       AppRouteHandle { titleKey; title?(args) } (§6)
 │   ├── i18n.types.ts        TranslationKey (DotPaths from en.json) — portable, no i18next ref (§8)
@@ -287,21 +290,40 @@ it never re-implements them.
 
 **Components** (`src/components`):
 
-- `AppDataTable` — the only table. Wraps PrimeReact DataTable; Turkish-aware
-  (global + column filters via the registered `nfcContains`; Turkish-collator
-  column sort via `compareTurkish`). Header = a `toolbar` action slot + global
-  search box + clear-filters button (resets search + column filters). Per-column
-  filters via `filterDisplay` + `defaultFilters` (filter state managed internally).
-  Two-mode loading (initial / empty → the `Loading` component; background refetch →
-  DataTable overlay). Responsive paginator (`useMediaQuery` mobile/desktop template)
-  with a `{first} - {last} / {total}` report. `emptyMessageKey` → `t()`. Props:
-  `data`, `children` (columns), `dataKey`, `loading`, `toolbar`, `showSearchBox`,
-  `globalFilterFields`, `filterDisplay`, `defaultFilters`, controlled sort
-  (`sortField` / `sortOrder` / `onSort`), `paginator`, `rows`, `rowsPerPageOptions`,
-  `rowClass` / `rowHover` / `stripedRows`, `emptyMessageKey`. Not its job: data
-  fetching, page errors. No selection / expansion / grouping; rowClick is a 1.2
-  decision. `buildInitialFilters` is the unit-tested pure core. (Final responsive
-  prop + patient columns land in 1.2.)
+- `AppDataTable` — the only table. Wraps PrimeReact DataTable;
+  `filterDisplay="menu"` is HARDCODED inside the wrapper, with the STANDARD
+  menu-filter behaviour (the official custom_filter demo): every filter menu
+  carries the default Clear + Apply buttonbar — filters apply ONLY on Apply —
+  and the default match-mode dropdown per `dataType` (hidden only where a type
+  has none: boolean auto-hides; the tags multiselect sets
+  `showFilterMatchModes={false}`). Turkish-aware everywhere: the six standard
+  TEXT match modes are globally overridden with Turkish-normalized
+  implementations (§8), so the global search box (built-in `contains`) and
+  text column filters match Turkish-insensitively; text column sort via
+  `sortRowsByTurkishValue`/`Field` (`lib/text.ts`). Call sites supply
+  `defaultFilters` (operator+constraints shape) and, where no usable built-in
+  element exists, a shared element from `AppDataTableFilters` (below). Header
+  = a `toolbar` action slot + global search box (`aria-label`ed) +
+  clear-filters button (resets search + column filters). Two-mode loading
+  (initial / empty → `Loading`; background refetch → DataTable overlay).
+  Columns AUTO-FIT content; `scrollable` horizontal scroll is the expected
+  narrow-viewport behaviour (a true mobile layout is a separate later
+  decision); responsive paginator (`useMediaQuery`) with a `{first} - {last} /
+  {total}` report. `emptyMessageKey` → `t()`. Props: `data`, `children`
+  (columns), `dataKey`, `loading`, `toolbar`, `showSearchBox`,
+  `globalFilterFields`, `defaultFilters`, controlled sort (`sortField` /
+  `sortOrder` / `onSort`), `paginator`, `rows`, `rowsPerPageOptions`,
+  `rowClass` / `rowHover` / `stripedRows` (striped default OFF),
+  `emptyMessageKey`. Not its job: data fetching, page errors. No selection /
+  expansion / grouping; rowClick is a 1.3 decision. `buildInitialFilters` is
+  the unit-tested pure core.
+- `AppDataTableFilters` — the shared menu-filter ELEMENT factories
+  (PrimeReact 10 ships only an InputText default element — verified, 0
+  built-ins for other types): `createEnumFilterElement` (Dropdown + optional
+  option template), `createMultiSelectFilterElement` (tags any-of),
+  `createDateFilterElement` (Calendar), `createNumericFilterElement`
+  (InputNumber), `createBooleanFilterElement` (TriStateCheckbox). All call
+  `filterCallback` (apply-on-Apply); never re-implemented per column.
 - `AppToastProvider` — mounts the single PrimeReact `<Toast/>`; backs `useNotify`.
 - `Loading` — lazy-route Suspense fallback (no skeletons).
 - `ErrorState` — in-page expected-data error with `onRetry` (distinct from the
@@ -539,21 +561,36 @@ add/edit form shows ALL fields (`noteTr` + `noteEn`, `diagnosisTr` +
 
 ### PrimeReact locale + dates (one language flow)
 
-PrimeReact's own component strings are driven by its Locale API (the `tr`/`en`
-entries from `primelocale`), not react-i18next. Switching language is a single
-flow in `AppLanguageSwitcher`: `i18n.changeLanguage` → PrimeReact `setLocale` →
+PrimeReact's own component strings are driven by its Locale API — the COMPLETE
+`tr` dictionary (every key of the default locale incl. `aria.*`) + `en` pins
+registered in `plugins/primereact.ts` — not react-i18next. CRITICAL: the
+ACTIVE locale lives in PrimeReactContext state (components resolve
+`context.locale || global`; the provider seeds its state ONCE, so neither a
+later `locale()` call nor a provider-prop change reaches mounted components).
+`AppPrimeReactProvider` therefore seeds the provider from the active i18n
+language and its inner LocaleBridge calls `context.setLocale` + the global
+`locale()` on every language change. Switching language is a single flow in
+`AppLanguageSwitcher`: `i18n.changeLanguage` → the bridge (context + global) →
 `setDayjsLocale` → update `<html lang>`. Dates use one helper,
 `formatDate(value, pattern = 'L')` (`lib/date.ts`, Day.js + active locale; `''`
 for invalid ISO), with `localizedFormat` tokens per field (`birthDate` → `'L'`,
-`appointmentDate` → `'LLL'`). Scattered `toLocaleString` is forbidden. Dates are
+`appointmentDate` → `'L'` — the live data carries no time component, so a
+time-of-day format would render midnight noise on every row). Scattered
+`toLocaleString` is forbidden. Dates are
 ISO strings in the model; the Calendar `Date` is converted to ISO on save.
 
 ### Turkish-aware text
 
 Search/filter normalise with `.normalize('NFC').toLocaleLowerCase('tr')`; sort
 uses `new Intl.Collator('tr', { numeric: true }).compare`. These live in
-`lib/text.ts`; the `nfcContains` filter is registered in `plugins/primereact.ts`
-and wired into `AppDataTable` (§3.1). Detail: `docs/en/I18N.md`.
+`lib/text.ts`. The six STANDARD text filter match modes (`startsWith`,
+`contains`, `notContains`, `endsWith`, `equals`, `notEquals`) are globally
+OVERRIDDEN with Turkish-normalized implementations, plus the custom
+`arrayContainsAny` for tag any-of (pure predicates in `lib/filters.ts`,
+registered in `plugins/primereact.ts`); date/numeric modes stay built-in
+(date columns carry real `Date` values in the derived list rows). The TR
+PrimeReact locale carries the filter + calendar vocabulary so match-mode
+dropdowns and Calendars render in Turkish. Detail: `docs/en/I18N.md`.
 
 ## 9. Styling — One Token Source, Many Consumers (PrimeReact v10)
 
@@ -621,12 +658,13 @@ literals live ONLY in these definitions (written as
 
 | Token | Light | Dark |
 | --- | --- | --- |
-| `--app-ground` (wrapper/body bg) | `rgb(248 250 252)` | `rgb(9 9 11)` |
+| `--app-ground` (wrapper/body bg) | `var(--surface-ground)` → zinc-50 | `var(--surface-ground)` → zinc-950 |
 | `--app-background` (FOUC, = ground) | `var(--app-ground)` | `var(--app-ground)` |
-| `--app-card-bg` (raised card surface) | `rgb(255 255 255)` | `rgb(24 24 27)` |
-| `--app-card-border` | `rgb(226 232 240)` | `rgb(63 63 70)` |
+| `--app-card-bg` (raised card surface) | `var(--surface-card)` → white | `var(--surface-card)` → zinc-900 |
+| `--app-card-border` | `var(--surface-border)` → zinc-200 | `var(--surface-border)` → zinc-700 |
 | `--app-card-shadow` | `0 1px 2px rgb(15 23 42 / 4%), 0 1px 3px rgb(15 23 42 / 6%)` | `none` |
 | `--app-menu-item-hover-bg` (sidebar hover/active overlay) | `rgb(100 116 139 / 10%)` | `rgb(255 255 255 / 5%)` |
+| `--app-success` / `--app-danger` (boolean icons; = the Tag severity hues) | `rgb(34 197 94)` / `rgb(239 68 68)` | `rgb(74 222 128)` / `rgb(248 113 113)` |
 | `--app-radius-card` / `-item` | `8px` / `8px` | same |
 | `--app-radius-sidebar` / `-drawer` (desktop panel / mobile drawer right corners) | `16px` / `16px` | same |
 | `--app-sidebar-width` | `21rem` (sidebar width; content offset is `+ 1rem` = 22rem) | same |
@@ -716,11 +754,33 @@ it), and `main.scss` sets the **14px** base size + antialiasing in `@layer tw-ba
 ### Token pipeline
 
 ```
-Lara Green theme CSS (lara-light-green / lara-dark-green, ?url-swapped by plugins/theme)
-  → v10 CSS variables (--primary-color, --surface-0..900, --text-color, …)
-      ├→ tailwind.config.ts  colours map straight to the v10 variables
-      └→ src/styles/utils/_tokens.scss  → SCSS aliases for custom SCSS
+Lara Green theme CSS (?url-swapped)        theme/_dark.scss (ours, unlayered)
+  → green accent + component skins          → THE neutral scale: --surface-*/--gray-*
+    (in @layer primereact)                    recolored to Tailwind ZINC, :root + .dark
+                                              (unlayered beats the layered theme)
+      ├→ tailwind.config.ts  colours map straight to the variables
+      ├→ src/styles/utils/_tokens.scss  → SCSS aliases for custom SCSS
+      └→ modules/_prime-skin.scss  → re-points baked PrimeReact surface skins
+         (the theme bakes literal hexes — 0 var() refs) at the same variables
 ```
+
+**One neutral source (settled in 1.2).** The Lara theme's blue-grey ("gray")
+neutral scale clashed with the app's zinc shell, and its component skins bake
+LITERAL hexes (they never read `--surface-*` at runtime). So: (a)
+`theme/_dark.scss` redefines the full `--surface-*` + `--gray-*` scale to
+Tailwind zinc for BOTH modes — unlayered, so it beats the `@layer primereact`
+theme deterministically; the green accent stays Lara's. (b) The app tokens
+`--app-ground` / `--app-card-bg` / `--app-card-border` are now ALIASES of
+`var(--surface-ground/card/border)` — one source, no drift. (c)
+`modules/_prime-skin.scss` (tw-components layer, beats the theme layer)
+re-points the baked component surfaces in use — CELLS and their CONTAINERS
+alike (DataTable thead/tfoot/footer containers + header/body/footer cells,
+borders, hover, paginator, InputText, Dropdown + panel + its header, the
+column-filter overlay + operator) — at the variables — table rows
+are transparent on the `.card`, separated by 1px `--surface-border` gridlines
+(striped rows are OFF by default). RULE: a new PrimeReact component whose
+baked surfaces clash gets a row in `_prime-skin.scss` — never a local
+override.
 
 ### Tailwind config (token-backed, v10 — no tailwindcss-primeui)
 
@@ -825,10 +885,11 @@ in-bundle `@layer` statement, and the theme loads at runtime (the swappable
 `<link>`), so the order must be pre-locked before any sheet loads. Do NOT remove or
 reorder it; its names must match the `tw-*` layers.
 
-**(c) `--app-background` is a custom token** (`theme/_dark.scss`, `:root` + `.dark`):
-the pre-paint FOUC script needs a correct background BEFORE the theme `<link>`
-loads, so it cannot depend on the not-yet-loaded Lara `--surface-*` vars. Keep
-both-mode values; it is applied to `html` in `tw-base`.
+**(c) `--app-background` is a custom token** (`theme/_dark.scss`): the
+pre-paint FOUC script needs a correct background BEFORE the theme `<link>`
+loads. It now resolves through OUR `--surface-ground` — safe, because the
+whole zinc scale ships in the app bundle (`theme/_dark.scss`), not in the
+theme link. It is applied to `html` in `tw-base`.
 
 **(d) No separate PrimeReact core import.** `primereact/resources/primereact.min.css`
 is deprecated and EMPTY in 10.9.8; all component CSS (structural + skin) ships in

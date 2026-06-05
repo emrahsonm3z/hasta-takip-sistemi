@@ -14,6 +14,7 @@ asla ham PrimeReact bileşenini kullanmaz; eksik bir yetenek yerel geçici
 | Bileşen | Dosya | İş |
 | --- | --- | --- |
 | `AppDataTable` | `components/AppDataTable.tsx` | Tek tablo — Türkçe bilen sıralama/filtre/arama |
+| `AppDataTableFilters` | `components/AppDataTableFilters.tsx` | Ortak menü-filtre öğe fabrikaları (enum/multiselect/tarih/sayı/boolean) |
 | `AppToastProvider` | `components/AppToastProvider.tsx` | Tek `<Toast/>`'u monte eder; `useNotify`'ı besler |
 | `Loading` | `components/Loading.tsx` | Lazy rotalar ve ilk yüklemeler için spinner |
 | `ErrorState` | `components/ErrorState.tsx` | Beklenen veri hataları için sayfa-içi "başarısız, yeniden dene" |
@@ -30,11 +31,25 @@ asla ham PrimeReact bileşenini kullanmaz; eksik bir yetenek yerel geçici
 ## Her şey için tek tablo
 
 Tüm listeler `AppDataTable` kullanır. PrimeReact DataTable'ını sarar ve her
-ekranın yoksa yeniden kuracağı şeyleri hazır getirir: Türkçe bilen genel arama
-(kayıtlı `nfcContains` filtresi), sütun filtreleri, bir toolbar yuvası,
-filtreleri temizleme düğmesi, iki yükleme modu (ilk → `Loading`; arka plan
-yenileme → tablonun overlay'i) ve küçük ekranlarda `useMediaQuery` ile şablon
-değiştiren duyarlı bir paginator.
+ekranın yoksa yeniden kuracağı şeyleri hazır getirir: Türkçe bilen genel
+arama, Türkçe-collator sütun sıralaması (`lib/text.ts`'teki
+`sortRowsByTurkishValue` / `sortRowsByTurkishField`), **wrapper'ın içinde
+sabit, STANDART menü-tipi sütun filtreleme** (`filterDisplay="menu"`,
+demo-varsayılanı davranış: her filtre menüsünde Temizle + Uygula düğme çubuğu
+— filtreler YALNIZ Uygula'da uygulanır — ve tipe göre match-mode dropdown'u;
+altı standart metin modu Türkçe-duyarlı olacak şekilde global override
+edilir, özel `arrayContainsAny` tag herhangi-birini karşılar), bir toolbar
+yuvası, filtreleri temizleme düğmesi, iki yükleme modu (ilk → `Loading`; arka
+plan yenileme → tablonun overlay'i) ve küçük ekranlarda `useMediaQuery`
+üzerinden kompakt şablona geçen paginator. Kolonlar içeriğe göre sığar; dar
+ekranda tablo kendi bölgesi içinde yatay kayar — gerçek bir mobil yerleşim
+ayrı, sonraki bir karardır.
+
+Bir kolonun varsayılan InputText öğesinden fazlasına ihtiyacı olduğunda,
+`components/AppDataTableFilters.tsx`'teki ortak fabrikalar demo-standardı
+öğeleri sağlar — enum Dropdown (opsiyonel seçenek şablonuyla), tags
+MultiSelect, Calendar, InputNumber, TriStateCheckbox — hepsi `filterCallback`
+ile (yani Uygula'da) uygulanır; asla kolon başına yeniden yazılmaz.
 
 Bugünkü bileşenden, props'ları:
 
@@ -47,7 +62,6 @@ interface AppDataTableProps<T extends object> {
   toolbar?: ReactNode
   showSearchBox?: boolean        // varsayılan true
   globalFilterFields?: string[]
-  filterDisplay?: 'row' | 'menu'
   defaultFilters?: DataTableFilterMeta
   sortField?: string
   sortOrder?: 1 | 0 | -1 | null
@@ -154,7 +168,8 @@ dokümanlarına bakın).
 | `useMenu` | `composables/useMenu.ts` | Tek menü kaynağı — grupları (ve docs çocuklarını) rota sabitlerinden kurar |
 | `useNotify` | `composables/useNotify.ts` | Yalnız-anahtar toast API'si |
 | `useMediaQuery` | `composables/useMediaQuery.ts` | `matchMedia` hook'u (paginator, sidebar eşikleri) |
-| `normalizeTurkish` / `compareTurkish` / `turkishIncludes` | `lib/text.ts` | Türkçe bilen normalizasyon / collator sıralama / içerme |
+| `normalizeTurkish` / `compareTurkish` / `turkishIncludes` / `sortRowsByTurkishValue` | `lib/text.ts` | Türkçe bilen normalizasyon / collator sıralama / içerme / satır sıralama |
+| `turkishStartsWith` … `turkishNotEquals` / `arrayContainsAny` | `lib/filters.ts` | Türkçe-override edilen standart metin modları + tag herhangi-biri yüklemleri |
 | `formatDate` | `lib/date.ts` | Tek tarih biçimleyici (Day.js, etkin locale) |
 | `pickLocalized` | `lib/pickLocalized.ts` | Türkçe geri-düşüşlü iki dilli alan seçici |
 | `getRouteHandle` | `lib/route.ts` | Router eşleşmeleri üzerinde tipli koruma |
