@@ -213,7 +213,7 @@ src/
 │       ├── AppLanguageSwitcher.tsx  aktif-dil metin chip'i (TR/EN) → i18n.changeLanguage diğerine geçirir (tek dil akışı §8)
 │       └── AppThemeToggle.tsx       → plugins/theme setThemeMode + 'theme-mode' (§9)
 ├── composables/
-│   ├── useMenu.ts           tek menü kaynağı: barrel üzerinden modül route constant'ları (docs = tek OVERVIEW maddesi), section atar (§6)
+│   ├── useMenu.ts           tek menü kaynağı: barrel üzerinden modül route constant'ları (docs = OVERVIEW maddesi + registry çocukları; module-* slug'ları Modüller alt-bölümünde), section atar (§6)
 │   ├── useMenu.lib.ts       saf buildMenu(sources, translate) — gruplu section'lar, sırala + etiketle (unit-test'li)
 │   ├── useNotify.ts         success / error / info toast; yalnız-anahtar TranslationKey API (§3.1)
 │   ├── useNotify.lib.ts     saf normalizeErrorKey(error) → TranslationKey (unit-test'li)
@@ -335,9 +335,12 @@ referans verir; asla yeniden uygulamaz.
   içerik yüzeyi `.card` modülüdür (`styles/modules/_card.scss`, §9).
 
 **Composables** (`src/composables`): `useMenu` (tek menü kaynağı — her modülün
-route constant'larını barrel üzerinden toplar (docs = tek OVERVIEW maddesi, §13.4),
-`menuOrder`'a göre sıralar, etiketleri `t(titleKey)` ile çözer; `AppSidebar` yalnız
-onu render eder); `useNotify` (success/error/info; YALNIZ bir `TranslationKey` kabul eder —
+route constant'larını barrel üzerinden toplar; Dokümanlar maddesi registry
+dokümanlarını `children` olarak taşır (`module-*` slug'ları
+`menu.section.modules` alt-bölüm etiketini alır, §13.4), `menuOrder`'a göre
+sıralar, etiketleri `t(titleKey)` ile çözer; `AppSidebar` yalnız onu render
+eder — disclosure satırı `/docs`'a gider, chevron açar/kapar, `/docs` altında
+otomatik açık); `useNotify` (success/error/info; YALNIZ bir `TranslationKey` kabul eder —
 literal derleme hatasıdır, §8; `useNotify.lib`'deki saf `normalizeErrorKey`
 bilinmeyen hatayı `errors.unexpected`'e eşler); `useMediaQuery` (responsive UI için
 matchMedia hook'u, ör. AppDataTable paginator'ı).
@@ -412,10 +415,12 @@ route'ları ve bir 404'tür. Varsayılan index route'u `patients`'e yönlendirir
   Yalnızca başlık — menü handle'da DEĞİL.
 - **Menü route constant'larından türetilir (drift yok).** `useMenu` composable'ı
   (`src/composables`) tek menü kaynağıdır: her modülün route constant'larını
-  barrel üzerinden toplar (tek `DOCS_ROUTES.OVERVIEW` maddesi dahil — tekil
-  dokümanlar menüde değil, `/docs` genel bakış sayfasında indekslenir, §13.4),
-  `menuOrder`'a göre sıralar ve etiketi `t(titleKey)`'den çözer. `AppSidebar`
-  yalnız `useMenu`'nun döndürdüğünü render eder — asla elle-yazılmış dizi.
+  barrel üzerinden toplar, `menuOrder`'a göre sıralar ve etiketi
+  `t(titleKey)`'den çözer. Dokümanlar maddesi bir disclosure'dır: `children`'ı
+  docs registry'den gelir (`module-*` slug'ları Modüller alt-bölüm etiketi
+  altında gruplanır); satır `/docs`'a gider, chevron açar/kapar ve `/docs`
+  altında otomatik açılır (§13.4). `AppSidebar` yalnız `useMenu`'nun
+  döndürdüğünü render eder — asla elle-yazılmış dizi.
 - **Dinamik parametreler.** Path'te bildirilir (`/patients/:patientId`), tipli bir
   `build(patientId)` yardımcısıyla; parametreler string okunur, tüketildiği yerde
   parse edilir.
@@ -1031,9 +1036,9 @@ birden fazla yerden referans verilen bağımsız bir mesele olduğunda oluşturu
      ona yönlensin.
   4. Bir CLAUDE.md bölümü ona işaret etmeliyse, §0 tablosuna pointer ekle.
   5. Uygulama-içi `docsRegistry`'ye (`modules/docs/constants`) bir girdi ekle ki
-     `/docs` genel bakış indeksinde görünsün (kart-grid; sidebar doküman başına
-     bir madde değil, tek bir Dokümanlar maddesi taşır) ve `/docs/:slug`'tan
-     erişilebilsin.
+     `/docs` genel bakış indeksinde (kart-grid) VE Dokümanlar sidebar
+     alt-menüsünün çocuğu olarak görünsün (`module-*` slug'ları Modüller
+     alt-bölüm etiketi altına düşer), `/docs/:slug`'tan erişilebilsin.
 - **Kural**: indekste (§13.2), eşleştirme tablosunda (§13.3) VE `docsRegistry`'de
   olmayan bir referans noktası yoktur. Kayıtsız doküman olmaz.
 

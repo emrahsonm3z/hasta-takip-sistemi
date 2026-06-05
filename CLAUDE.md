@@ -209,7 +209,7 @@ src/
 │       ├── AppLanguageSwitcher.tsx  active-language text chip (TR/EN) → i18n.changeLanguage toggles the other (single language flow §8)
 │       └── AppThemeToggle.tsx       → plugins/theme setThemeMode + 'theme-mode' (§9)
 ├── composables/
-│   ├── useMenu.ts           single menu source: module route constants via barrels (docs = the single OVERVIEW item), assigns sections (§6)
+│   ├── useMenu.ts           single menu source: module route constants via barrels (docs = OVERVIEW item + registry children; module-* slugs under a Modüller subsection), assigns sections (§6)
 │   ├── useMenu.lib.ts       pure buildMenu(sources, translate) — grouped sections, sort + label (unit-tested)
 │   ├── useNotify.ts         success / error / info toasts; key-only TranslationKey API (§3.1)
 │   ├── useNotify.lib.ts     pure normalizeErrorKey(error) → TranslationKey (unit-tested)
@@ -333,8 +333,11 @@ it never re-implements them.
   reusable content surface is the `.card` module (`styles/modules/_card.scss`, §9).
 
 **Composables** (`src/composables`): `useMenu` (the single menu source — collects
-each module's route constants via barrels (docs = the single OVERVIEW item, §13.4),
-sorts by `menuOrder`, resolves labels via `t(titleKey)`; `AppSidebar` only renders it);
+each module's route constants via barrels; the Dokümanlar item carries the
+registry docs as `children` (`module-*` slugs get the `menu.section.modules`
+subsection label, §13.4), sorts by `menuOrder`, resolves labels via
+`t(titleKey)`; `AppSidebar` only renders it — the disclosure row navigates to
+`/docs`, the chevron toggles, auto-open under `/docs`);
 `useNotify` (success/error/info; accepts ONLY a `TranslationKey` — a literal is a
 compile error, §8; the pure `normalizeErrorKey` in `useNotify.lib` maps unknown
 errors to `errors.unexpected`); `useMediaQuery` (matchMedia hook for responsive UI,
@@ -410,10 +413,12 @@ and a 404. The default index route redirects to `patients`.
   Title only — the menu is NOT in the handle.
 - **Menu is derived from route constants (no drift).** The `useMenu` composable
   (`src/composables`) is the single menu source: it collects each module's route
-  constants via their barrels (incl. the single `DOCS_ROUTES.OVERVIEW` item —
-  individual docs are indexed on the `/docs` overview page, not in the menu,
-  §13.4), sorts by `menuOrder`, and resolves the label from `t(titleKey)`.
-  `AppSidebar` only renders what `useMenu` returns — never a hand-coded array.
+  constants via their barrels, sorts by `menuOrder`, and resolves the label from
+  `t(titleKey)`. The Dokümanlar item is a disclosure: its `children` come from
+  the docs registry (`module-*` slugs grouped under a Modüller subsection
+  label); the row navigates to `/docs`, the chevron toggles, and it auto-opens
+  under `/docs` (§13.4). `AppSidebar` only renders what `useMenu` returns —
+  never a hand-coded array.
 - **Dynamic params.** Declared in the path (`/patients/:patientId`) with a typed
   `build(patientId)` helper; params read as strings, parsed where consumed.
 
@@ -1025,9 +1030,9 @@ AND is a standalone concern referenced from more than one place.
   3. Add a row to the change-type table (§13.3) so future changes route to it.
   4. If a CLAUDE.md section should point to it, add the pointer in the §0 table.
   5. Add an entry to the in-app `docsRegistry` (`modules/docs/constants`) so it
-     appears on the `/docs` overview index (the card-grid; the sidebar holds a
-     single Documentation item, not one item per doc) and is reachable at
-     `/docs/:slug`.
+     appears on the `/docs` overview index (the card-grid) AND as a child of
+     the Dokümanlar sidebar sub-menu (`module-*` slugs land under the Modüller
+     subsection label), reachable at `/docs/:slug`.
 - **Rule**: a reference point not in the index (§13.2), the mapping table
   (§13.3), AND the `docsRegistry` does not exist. No unregistered docs.
 
