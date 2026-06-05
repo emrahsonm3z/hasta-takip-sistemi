@@ -42,6 +42,7 @@ jobs:
     steps:
       - uses: googleapis/release-please-action@v4
         with:
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 ```
@@ -73,11 +74,13 @@ never squash): each commit's type is release signal.
 3. The owner merges that Release PR — the release now exists: the version is
    bumped and the commit is tagged (e.g. `v0.2.0`).
 
-One quirk worth knowing: the Release PR is opened by a robot token, so the CI
-gate does not run on it by itself. The owner **closes and reopens it in the
-GitHub UI** — a human reopen triggers the gate, and the PR merges with a real
-green check. (Fallback: admin-exempt direct merge; safe, since the Release PR
-touches only the version and the changelog.)
+One detail worth knowing: the robot opens the Release PR with a dedicated
+token (`RELEASE_PLEASE_TOKEN`, a repository secret) rather than the default
+workflow token. That matters because GitHub blocks workflows from running on
+pull requests opened by the default token (an anti-recursion safety rule) —
+the required gate would never start. With the dedicated token, **the CI gate
+runs on the Release PR automatically**, and the owner merges it like any
+other pull request, on a real green check.
 
 ---
 

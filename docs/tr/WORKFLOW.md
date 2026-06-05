@@ -89,17 +89,16 @@ muaf kalır — aşağıdaki release akışı için gereklidir.
 
 ---
 
-## Release PR'ları ve kapat + yeniden aç numarası
+## Release PR'ları
 
 Merge'ler `main`'e indikten sonra release-please robotu bir **Release PR**
-açar (sürüm artışı + değişiklik günlüğü — bkz. "Sürümler ve Yayınlar"). O PR
-`GITHUB_TOKEN` ile açılır ve GitHub'ın anti-recursion kuralı gereği robotun
-açtığı bir PR, CI kapısını kendiliğinden tetiklemez. Sahibin tercih ettiği
-hamle: **Release PR'ını GitHub arayüzünde kapatıp yeniden açmak** — insan
-eliyle yapılan yeniden açmanın workflow tetiklemesine izin VARDIR, kapı
-çalışır ve PR gerçek bir yeşil kontrolle merge olur. (Yedek yol: yönetici
-muafiyetiyle doğrudan merge — kabul edilebilir, çünkü Release PR yalnız sürüm
-numarasına ve değişiklik günlüğüne dokunur.)
+açar (sürüm artışı + değişiklik günlüğü — bkz. "Sürümler ve Yayınlar"). Robot
+onu varsayılan workflow token'ı yerine özel bir token'la
+(`RELEASE_PLEASE_TOKEN`, bir repo secret'ı) açar — bilerek: GitHub'ın
+anti-recursion kuralı, varsayılan token'ın açtığı pull request'lerde
+workflow'ların çalışmasını engeller; zorunlu kapı "waiting for status"ta
+takılı kalırdı. Özel token'la **kapı Release PR'da otomatik çalışır** ve
+sahip onu diğer her pull request gibi, gerçek bir yeşil kontrolle merge eder.
 
 ---
 
