@@ -28,7 +28,8 @@
     },
     "unexpected": "Beklenmeyen bir hata oluştu.",
     "notFound": "Kayıt bulunamadı.",
-    "loadFailed": "Veriler yüklenemedi."
+    "loadFailed": "Veriler yüklenemedi.",
+    "saveFailed": "Değişiklikler kaydedilemedi."
   },
   "validation": {
     "required": "Bu alan zorunludur.",
@@ -41,6 +42,11 @@
   },
   "patients": {
     "title": "Hastalar",
+    "notifications": {
+      "added": "Hasta eklendi.",
+      "updated": "Hasta güncellendi.",
+      "removed": "Hasta silindi."
+    },
     "fields": {
       "fullName": "Ad Soyad",
       "birthDate": "Doğum tarihi",
