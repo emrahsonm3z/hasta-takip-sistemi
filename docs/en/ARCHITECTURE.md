@@ -26,7 +26,7 @@ src/
 ├── config/
 │   └── env.ts               Typed frozen env + validateRequiredEnvVars()
 ├── plugins/                 Third-party library configuration
-│   ├── primereact.ts        Provider config + TR locale + the nfcContains filter
+│   ├── primereact.ts        Provider config + TR locale + Turkish-overridden text filter modes
 │   ├── theme.ts             Lara Green light/dark ?url swap over <link id="app-theme">
 │   ├── theme.lib.ts         Pure theme-swap logic (unit-tested)
 │   ├── react-query.ts       QueryClient defaults

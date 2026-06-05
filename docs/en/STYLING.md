@@ -17,11 +17,30 @@ those same variables. Raw hex colours are forbidden everywhere outside token
 definitions.
 
 ```
-Lara Green theme CSS (light / dark file, swapped at runtime)
-  → CSS variables (--primary-color, --surface-*, --text-color, …)
+Lara Green theme CSS (swapped at runtime)   styles/theme/_dark.scss (ours)
+  → the GREEN accent + component skins        → the NEUTRAL scale: --surface-*
+                                                recolored to Tailwind ZINC,
+                                                light AND dark
       ├→ tailwind.config.ts   colours map straight to the variables
-      └→ styles/utils/_tokens.scss   SCSS aliases for custom SCSS
+      ├→ styles/utils/_tokens.scss   SCSS aliases for custom SCSS
+      └→ styles/modules/_prime-skin.scss   re-points PrimeReact's baked
+         component surfaces (tables, inputs, dropdown panels) at the variables
 ```
+
+A subtlety worth knowing: PrimeReact's theme paints its components with
+hard-coded colour values — it does not read the `--surface-*` variables at
+runtime. So our `_dark.scss` redefines the whole neutral scale to zinc (the
+page's own grey family), and `_prime-skin.scss` re-points the painted
+component surfaces — both the CELLS (header/body/footer cells, gridlines,
+hover, paginator buttons, inputs, dropdown items) and their CONTAINER
+elements, which the theme paints separately (`.p-datatable-thead` /
+`-tfoot` / `-footer`, the dropdown and multiselect panels + their headers,
+the datepicker, chips, the column-filter overlay + its operator header) — at
+those same variables. One grey family
+everywhere; the green accent stays Lara's. Table rows are transparent and sit
+directly on the card, separated by hairline gridlines (striped rows are off).
+If a future PrimeReact component clashes, it gets a row in
+`_prime-skin.scss` — never a local override.
 
 The Tailwind side (excerpt from `tailwind.config.ts` as it exists):
 
@@ -72,9 +91,9 @@ tokens — once for each mode (`styles/theme/_dark.scss`, `:root` + `.dark`):
 
 | Token | Light | Dark |
 | --- | --- | --- |
-| `--app-ground` (page background) | `rgb(248 250 252)` | `rgb(9 9 11)` |
-| `--app-card-bg` (raised surface) | `rgb(255 255 255)` | `rgb(24 24 27)` |
-| `--app-card-border` | `rgb(226 232 240)` | `rgb(63 63 70)` |
+| `--app-ground` (page background) | `var(--surface-ground)` → zinc-50 | `var(--surface-ground)` → zinc-950 |
+| `--app-card-bg` (raised surface) | `var(--surface-card)` → white | `var(--surface-card)` → zinc-900 |
+| `--app-card-border` | `var(--surface-border)` → zinc-200 | `var(--surface-border)` → zinc-700 |
 | `--app-card-shadow` | faint two-layer shadow | `none` (border separates) |
 | `--app-menu-item-hover-bg` | `rgb(100 116 139 / 10%)` | `rgb(255 255 255 / 5%)` |
 | `--app-radius-card/-item` | `8px` | same |

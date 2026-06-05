@@ -14,6 +14,7 @@ wrapper, not worked around locally.
 | Component | File | Job |
 | --- | --- | --- |
 | `AppDataTable` | `components/AppDataTable.tsx` | The only table — Turkish-aware sort/filter/search |
+| `AppDataTableFilters` | `components/AppDataTableFilters.tsx` | Shared menu-filter element factories (enum/multiselect/date/numeric/boolean) |
 | `AppToastProvider` | `components/AppToastProvider.tsx` | Mounts the single `<Toast/>`; backs `useNotify` |
 | `Loading` | `components/Loading.tsx` | Spinner for lazy routes and initial loads |
 | `ErrorState` | `components/ErrorState.tsx` | In-page "failed, retry" for expected data errors |
@@ -30,11 +31,25 @@ wrapper, not worked around locally.
 ## One table for everything
 
 All lists use `AppDataTable`. It wraps PrimeReact's DataTable and bakes in
-what every screen would otherwise rebuild: Turkish-aware global search (the
-registered `nfcContains` filter), per-column filters, a toolbar slot, a
-clear-filters button, two loading modes (initial → `Loading`; background
-refetch → the table's overlay), and a responsive paginator that switches
-template on small screens via `useMediaQuery`.
+what every screen would otherwise rebuild: Turkish-aware global search,
+Turkish-collator column sorting (`sortRowsByTurkishValue` /
+`sortRowsByTurkishField` from `lib/text.ts`), **standard menu-style
+per-column filtering hardcoded inside the wrapper** (`filterDisplay="menu"`,
+demo-default behaviour: every filter menu has the Clear + Apply buttonbar —
+filters apply ONLY on Apply — and the per-type match-mode dropdown; the six
+standard text modes are globally overridden to be Turkish-aware, and the
+custom `arrayContainsAny` covers tag any-of), a toolbar slot, a clear-filters
+button, two loading modes (initial → `Loading`; background refetch → the
+table's overlay), and a paginator that switches to a compact template on
+small screens via `useMediaQuery`. Columns auto-fit their content; on narrow
+viewports the table scrolls horizontally inside its region — a true mobile
+layout is a separate, later decision.
+
+Where a column needs more than the default InputText element, the shared
+factories in `components/AppDataTableFilters.tsx` supply the demo-standard
+elements — enum Dropdown (with optional option template), tags MultiSelect,
+Calendar, InputNumber, TriStateCheckbox — all applying via `filterCallback`
+(i.e. on Apply), never re-implemented per column.
 
 Its props, from the component as it exists today:
 
@@ -47,7 +62,6 @@ interface AppDataTableProps<T extends object> {
   toolbar?: ReactNode
   showSearchBox?: boolean        // default true
   globalFilterFields?: string[]
-  filterDisplay?: 'row' | 'menu'
   defaultFilters?: DataTableFilterMeta
   sortField?: string
   sortOrder?: 1 | 0 | -1 | null
@@ -154,7 +168,8 @@ chips (see the Languages and Styling docs for what they drive).
 | `useMenu` | `composables/useMenu.ts` | Single menu source — builds groups (and the docs children) from route constants |
 | `useNotify` | `composables/useNotify.ts` | Key-only toast API |
 | `useMediaQuery` | `composables/useMediaQuery.ts` | `matchMedia` hook (paginator, sidebar breakpoints) |
-| `normalizeTurkish` / `compareTurkish` / `turkishIncludes` | `lib/text.ts` | Turkish-aware normalise / collator sort / contains |
+| `normalizeTurkish` / `compareTurkish` / `turkishIncludes` / `sortRowsByTurkishValue` | `lib/text.ts` | Turkish-aware normalise / collator sort / contains / row sorting |
+| `turkishStartsWith` … `turkishNotEquals` / `arrayContainsAny` | `lib/filters.ts` | Pure predicates behind the Turkish-overridden standard text modes + tag any-of |
 | `formatDate` | `lib/date.ts` | The only date formatter (Day.js, active locale) |
 | `pickLocalized` | `lib/pickLocalized.ts` | Bilingual field picker with Turkish fallback |
 | `getRouteHandle` | `lib/route.ts` | Typed guard over router matches |

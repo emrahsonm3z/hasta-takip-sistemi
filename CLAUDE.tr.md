@@ -177,7 +177,7 @@ src/
 │   ├── env.ts               Tipli donmuş env + validateRequiredEnvVars()
 │   └── vite-env.d.ts        ImportMetaEnv augmentation
 ├── plugins/                 Üçüncü-parti kütüphane konfigürasyonu
-│   ├── primereact.ts        PrimeReactProvider value + locale + FilterService.register('nfcContains') (§8)
+│   ├── primereact.ts        Provider value + TAM TR locale (PrimeReact varsayılan locale'inin her anahtarı, aria dahil) + EN pinleri + standart metin filtre modlarının Türkçe override'ları + arrayContainsAny (§8; lib/filters.ts)
 │   ├── theme.ts             Lara Green light/dark theme.css?url + applyTheme/setThemeMode, <link id="app-theme"> üzerinden (§9)
 │   ├── react-query.ts       QueryClient varsayılanları (§10)
 │   ├── dayjs.ts             Day.js eklentileri + tr/en locale + setDayjsLocale (§8)
@@ -188,6 +188,8 @@ src/
 ├── components/              Global UI (App* wrapper'lar + kabuklar) — §3.1
 │   ├── AppDataTable.tsx     DataTable wrapper (toolbar slot + arama + filtre-temizle, Türkçe sort/filter, iki-mod loading, responsive paginator) (§3.1)
 │   ├── AppDataTable.lib.ts  saf buildInitialFilters(globalMatchMode, defaults, includeGlobal) (unit-test'li)
+│   ├── AppDataTableFilters.tsx  ortak menü-filtre öğe fabrikaları (enum/multiselect/tarih/sayı/boolean) (§3.1)
+│   ├── AppPrimeReactProvider.tsx  i18n'den beslenen PrimeReactProvider + LocaleBridge (dil değişiminde context.setLocale) (§8)
 │   ├── AppToastProvider.tsx Tek PrimeReact <Toast/>'u mount eder; useNotify'ı besler (§3.1)
 │   ├── toast-context.ts     ToastContext (AppToastProvider fast-refresh-temiz kalsın diye ayrıldı)
 │   ├── Loading.tsx          Lazy-route fallback
@@ -232,8 +234,9 @@ src/
 │   ├── layout/_sidebar.scss   .l-sidebar kabuğu — TRANSPARAN (yüzey/gölge yok), sabit 21rem, brand, gruplu nav, 8px primary border-left aksanı; .l-sidebar-drawer mobil panel override'ları (§9)
 │   ├── layout/_topbar.scss    .l-topbar kabuğu — transparan (start cluster, aksiyon chip'leri, yalnız-:focus-visible odak) (§9)
 │   ├── modules/_card.scss     .card RAISED yüzey (card-bg + 1px border + hafif gölge, radius 8px, padding 14px) (§9)
+│   ├── modules/_prime-skin.scss  Pişmiş PrimeReact yüzeylerini (DataTable/paginator/input/dropdown paneli) --surface-* değişkenlerine yönlendirir (§9)
 │   ├── utils/_tokens.scss   v10 tema değişkenlerinin + app-* özel token'larının SCSS alias'ları (bileşen SCSS'i için)
-│   └── theme/_dark.scss     Özel app token'ları (:root + .dark) — app-ground/card/radii/sidebar-width + mod-bağımsız --glow-* pattern token'ları; --app-background serin ground'a katlandı (FOUC) (§9)
+│   └── theme/_dark.scss     NÖTR kaynak (:root + .dark): Lara --surface-*/--gray-* skalasının zinc override'ı + app-* token'ları (ground/card/border artık --surface-* ALIAS'ı) + radii/genişlik/--glow-* (§9)
 ├── types/
 │   ├── route.types.ts       AppRouteHandle { titleKey; title?(args) } (§6)
 │   ├── i18n.types.ts        TranslationKey (en.json'dan DotPaths) — taşınabilir, i18next referansı yok (§8)
@@ -291,20 +294,41 @@ referans verir; asla yeniden uygulamaz.
 
 **Components** (`src/components`):
 
-- `AppDataTable` — tek tablo. PrimeReact DataTable'ı sarar; Türkçe-duyarlı (global
-  + kolon filtreleri kayıtlı `nfcContains` ile; Türkçe-collator kolon sıralaması
-  `compareTurkish` ile). Header = bir `toolbar` aksiyon slotu + global arama kutusu
-  + filtre-temizle butonu (arama + kolon filtrelerini sıfırlar). Kolon filtreleri
-  `filterDisplay` + `defaultFilters` ile (filtre state'i içeride yönetilir). İki-mod
-  loading (ilk/boş → `Loading` bileşeni; arka plan refetch → DataTable overlay).
-  Responsive paginator (`useMediaQuery` mobil/masaüstü template) + `{first} - {last}
-  / {total}` raporu. `emptyMessageKey` → `t()`. Prop'lar: `data`, `children`
-  (kolonlar), `dataKey`, `loading`, `toolbar`, `showSearchBox`, `globalFilterFields`,
-  `filterDisplay`, `defaultFilters`, controlled sort (`sortField` / `sortOrder` /
-  `onSort`), `paginator`, `rows`, `rowsPerPageOptions`, `rowClass` / `rowHover` /
-  `stripedRows`, `emptyMessageKey`. Görevi DEĞİL: veri çekme, sayfa hataları.
-  Selection / expansion / grouping yok; rowClick 1.2 kararı. `buildInitialFilters`
-  unit-test'li saf çekirdektir. (Kesin responsive prop + hasta kolonları 1.2'de.)
+- `AppDataTable` — tek tablo. PrimeReact DataTable'ı sarar;
+  `filterDisplay="menu"` wrapper'ın içinde SABİTTİR ve STANDART menü-filtre
+  davranışıyla çalışır (resmî custom_filter demosu): her filtre menüsü
+  varsayılan Temizle + Uygula düğme çubuğunu taşır — filtreler YALNIZ
+  Uygula'da uygulanır — ve `dataType` başına varsayılan match-mode
+  dropdown'unu gösterir (yalnız tipin modu olmadığı yerde gizli: boolean
+  otomatik gizler; tags multiselect'i `showFilterMatchModes={false}` verir).
+  Her yerde Türkçe-duyarlı: altı standart METİN match modu Türkçe-normalize
+  implementasyonlarla global override edilir (§8); böylece global arama
+  kutusu (yerleşik `contains`) ve metin kolon filtreleri Türkçe-duyarsız
+  eşleşir; metin kolon sıralaması `sortRowsByTurkishValue`/`Field`
+  (`lib/text.ts`). Çağrı yerleri `defaultFilters` (operatör+kısıt şekli) ve
+  kullanılabilir yerleşik öğe olmayan yerlerde `AppDataTableFilters`'tan
+  (aşağıda) ortak öğe verir. Header = bir `toolbar` aksiyon slotu + global
+  arama kutusu (`aria-label`'lı) + filtre-temizle butonu (arama + kolon
+  filtrelerini sıfırlar). İki-mod loading (ilk/boş → `Loading`; arka plan
+  refetch → DataTable overlay). Kolonlar içeriğe göre SIĞAR; dar ekranda
+  `scrollable` yatay kaydırma beklenen davranıştır (gerçek mobil yerleşim
+  ayrı, sonraki karar); responsive paginator (`useMediaQuery`) + `{first} -
+  {last} / {total}` raporu. `emptyMessageKey` → `t()`. Prop'lar: `data`,
+  `children` (kolonlar), `dataKey`, `loading`, `toolbar`, `showSearchBox`,
+  `globalFilterFields`, `defaultFilters`, controlled sort (`sortField` /
+  `sortOrder` / `onSort`), `paginator`, `rows`, `rowsPerPageOptions`,
+  `rowClass` / `rowHover` / `stripedRows` (striped varsayılan KAPALI),
+  `emptyMessageKey`. Görevi DEĞİL: veri çekme, sayfa hataları. Selection /
+  expansion / grouping yok; rowClick 1.3 kararı. `buildInitialFilters`
+  unit-test'li saf çekirdektir.
+- `AppDataTableFilters` — ortak menü-filtre ÖĞE fabrikaları (PrimeReact 10
+  yalnız InputText varsayılan öğesi gönderir — doğrulandı, diğer tipler için
+  yerleşik öğe 0): `createEnumFilterElement` (Dropdown + opsiyonel seçenek
+  şablonu), `createMultiSelectFilterElement` (tag herhangi-biri),
+  `createDateFilterElement` (Calendar), `createNumericFilterElement`
+  (InputNumber), `createBooleanFilterElement` (TriStateCheckbox). Hepsi
+  `filterCallback` çağırır (Uygula'da uygulanır); asla kolon başına yeniden
+  yazılmaz.
 - `AppToastProvider` — tek PrimeReact `<Toast/>`'u mount eder; `useNotify`'ı besler.
 - `Loading` — lazy-route Suspense fallback (skeleton yok).
 - `ErrorState` — sayfa-içi beklenen-veri hatası + `onRetry` (beklenmeyen
@@ -541,13 +565,22 @@ Ekle/düzenle formu TÜM alanları gösterir (`noteTr` + `noteEn`, `diagnosisTr`
 
 ### PrimeReact locale + tarihler (tek dil akışı)
 
-PrimeReact'in kendi bileşen string'leri react-i18next ile değil, kendi Locale
-API'siyle yönetilir (`primelocale`'den `tr`/`en` girdileri). Dil değiştirme
-`AppLanguageSwitcher`'da tek akıştır: `i18n.changeLanguage` → PrimeReact
-`setLocale` → `setDayjsLocale` → `<html lang>` güncelle. Tarihler tek bir
+PrimeReact'in kendi bileşen string'leri Locale API'siyle yönetilir —
+`plugins/primereact.ts`'te kayıtlı TAM `tr` sözlüğü (varsayılan locale'in
+`aria.*` dahil her anahtarı) + `en` pinleri — react-i18next ile değil.
+KRİTİK: AKTİF locale, PrimeReactContext state'inde yaşar (bileşenler
+`context.locale || global` çözer; provider state'ini BİR KEZ tohumlar; ne
+sonradan `locale()` çağrısı ne de provider prop değişikliği monte edilmiş
+bileşenlere ulaşır). Bu yüzden `AppPrimeReactProvider` provider'ı etkin i18n
+dilinden tohumlar ve içindeki LocaleBridge her dil değişiminde
+`context.setLocale` + global `locale()` çağırır. Dil değiştirme
+`AppLanguageSwitcher`'da tek akıştır: `i18n.changeLanguage` → köprü (context
++ global) → `setDayjsLocale` → `<html lang>` güncelle. Tarihler tek bir
 yardımcı kullanır, `formatDate(value, pattern = 'L')` (`lib/date.ts`, Day.js +
 aktif locale; geçersiz ISO'da `''`); `localizedFormat` token'ları alana göre
-(`birthDate` → `'L'`, `appointmentDate` → `'LLL'`). Dağınık `toLocaleString`
+(`birthDate` → `'L'`, `appointmentDate` → `'L'` — canlı veri saat bileşeni
+taşımaz; saatli format her satırda gece yarısı gürültüsü çizerdi). Dağınık
+`toLocaleString`
 yasaktır. Tarihler model'de ISO string'tir; Calendar `Date` kaydetmede ISO'ya
 çevrilir.
 
@@ -555,8 +588,15 @@ yasaktır. Tarihler model'de ISO string'tir; Calendar `Date` kaydetmede ISO'ya
 
 Arama/filtre `.normalize('NFC').toLocaleLowerCase('tr')` ile normalize eder;
 sıralama `new Intl.Collator('tr', { numeric: true }).compare` kullanır. Bunlar
-`lib/text.ts`'te yaşar; `nfcContains` filtresi `plugins/primereact.ts`'te kayıt
-edilir ve `AppDataTable`'a bağlanır (§3.1). Detay: `docs/tr/I18N.md`.
+`lib/text.ts`'te yaşar. Altı STANDART metin filtre match modu (`startsWith`,
+`contains`, `notContains`, `endsWith`, `equals`, `notEquals`)
+Türkçe-normalize implementasyonlarla global OVERRIDE edilir; tag
+herhangi-biri için özel `arrayContainsAny` eklenir (saf yüklemler
+`lib/filters.ts`'te, kayıt `plugins/primereact.ts`'te); tarih/sayı modları
+yerleşik kalır (tarih kolonları türetilmiş liste satırlarında gerçek `Date`
+değerleri taşır). TR PrimeReact locale'i filtre + takvim sözlüğünü taşır;
+match-mode dropdown'ları ve takvimler Türkçe çizilir. Detay:
+`docs/tr/I18N.md`.
 
 ## 9. Stil — Tek Token Kaynağı, Çok Tüketici (PrimeReact v10)
 
@@ -625,12 +665,13 @@ konvansiyonuna uymak için hex değil `rgb()` yazılır); her tüketici token'ı
 
 | Token | Açık | Koyu |
 | --- | --- | --- |
-| `--app-ground` (wrapper/body bg) | `rgb(248 250 252)` | `rgb(9 9 11)` |
+| `--app-ground` (wrapper/body bg) | `var(--surface-ground)` → zinc-50 | `var(--surface-ground)` → zinc-950 |
 | `--app-background` (FOUC, = ground) | `var(--app-ground)` | `var(--app-ground)` |
-| `--app-card-bg` (raised kart yüzeyi) | `rgb(255 255 255)` | `rgb(24 24 27)` |
-| `--app-card-border` | `rgb(226 232 240)` | `rgb(63 63 70)` |
+| `--app-card-bg` (raised kart yüzeyi) | `var(--surface-card)` → beyaz | `var(--surface-card)` → zinc-900 |
+| `--app-card-border` | `var(--surface-border)` → zinc-200 | `var(--surface-border)` → zinc-700 |
 | `--app-card-shadow` | `0 1px 2px rgb(15 23 42 / 4%), 0 1px 3px rgb(15 23 42 / 6%)` | `none` |
 | `--app-menu-item-hover-bg` (sidebar hover/active overlay) | `rgb(100 116 139 / 10%)` | `rgb(255 255 255 / 5%)` |
+| `--app-success` / `--app-danger` (boolean ikonları; = Tag severity tonları) | `rgb(34 197 94)` / `rgb(239 68 68)` | `rgb(74 222 128)` / `rgb(248 113 113)` |
 | `--app-radius-card` / `-item` | `8px` / `8px` | aynı |
 | `--app-radius-sidebar` / `-drawer` (masaüstü panel / mobil drawer sağ köşeleri) | `16px` / `16px` | aynı |
 | `--app-sidebar-width` | `21rem` (sidebar genişliği; içerik offset'i `+ 1rem` = 22rem) | aynı |
@@ -720,11 +761,33 @@ diye) ve `main.scss` **14px** base boyutu + antialiasing'i `@layer tw-base`'te s
 ### Token boru hattı
 
 ```
-Lara Green tema CSS (lara-light-green / lara-dark-green, plugins/theme ile ?url-swap)
-  → v10 CSS değişkenleri (--primary-color, --surface-0..900, --text-color, …)
-      ├→ tailwind.config.ts  renkler doğrudan v10 değişkenlerine map'lenir
-      └→ src/styles/utils/_tokens.scss  → custom SCSS için SCSS alias'ları
+Lara Green tema CSS'i (?url-takaslı)       theme/_dark.scss (bizim, katmansız)
+  → yeşil vurgu + bileşen skin'leri          → NÖTR skala: --surface-*/--gray-*
+    (@layer primereact içinde)                Tailwind ZINC'e boyandı, :root + .dark
+                                              (katmansız, katmanlı temayı yener)
+      ├→ tailwind.config.ts  renkler doğrudan değişkenlere eşlenir
+      ├→ src/styles/utils/_tokens.scss  → özel SCSS için alias'lar
+      └→ modules/_prime-skin.scss  → pişmiş PrimeReact yüzey skin'lerini
+         (tema literal hex pişirir — 0 var() referansı) aynı değişkenlere yönlendirir
 ```
+
+**Tek nötr kaynak (1.2'de kesinleşti).** Lara temasının mavi-gri ("gray") nötr
+skalası uygulamanın zinc kabuğuyla çatışıyordu ve bileşen skin'leri LİTERAL hex
+pişirir (çalışma anında `--surface-*`'ı asla okumazlar). Bu yüzden: (a)
+`theme/_dark.scss`, `--surface-*` + `--gray-*` skalasının tamamını İKİ mod için
+Tailwind zinc'e yeniden tanımlar — katmansız olduğundan `@layer primereact`
+temasını deterministik yener; yeşil vurgu Lara'nın kalır. (b) `--app-ground` /
+`--app-card-bg` / `--app-card-border` artık `var(--surface-ground/card/border)`
+ALIAS'larıdır — tek kaynak, drift imkânsız. (c) `modules/_prime-skin.scss`
+(tw-components katmanı, tema katmanını yener) kullanılan pişmiş bileşen yüzeylerini —
+HÜCRELERİ ve KONTEYNERLERİNİ birlikte (DataTable thead/tfoot/footer
+konteynerleri + başlık/gövde/altlık hücreleri, kenarlıklar, hover, paginator,
+InputText, Dropdown + paneli + başlığı, kolon-filtre overlay'i + operatör) —
+değişkenlere yönlendirir — tablo satırları `.card` üzerinde
+transparandır, 1px `--surface-border` ızgara çizgileriyle ayrılır (striped
+satırlar varsayılan KAPALI). KURAL: pişmiş yüzeyleri çatışan yeni bir
+PrimeReact bileşeni `_prime-skin.scss`'e bir satır alır — asla yerel override
+değil.
 
 ### Tailwind config (token-destekli, v10 — tailwindcss-primeui yok)
 
@@ -829,10 +892,11 @@ yazmasına karşı bağışıktır ve tema çalışma-zamanında yüklenir (taka
 `<link>`), bu yüzden sıra herhangi bir sayfa yüklenmeden önce kilitlenmelidir.
 Kaldırmayın/yeniden sıralamayın; isimleri `tw-*` katmanlarıyla eşleşmeli.
 
-**(c) `--app-background` özel bir token'dır** (`theme/_dark.scss`, `:root` + `.dark`):
-pre-paint FOUC betiği, tema `<link>`'i yüklenmeden ÖNCE doğru bir arka plana ihtiyaç
-duyar, dolayısıyla henüz yüklenmemiş Lara `--surface-*` değişkenlerine bağlı olamaz.
-Her iki mod için değer tutun; `html`'e `tw-base` içinde uygulanır.
+**(c) `--app-background` özel bir token'dır** (`theme/_dark.scss`): pre-paint
+FOUC betiği, tema `<link>`'i yüklenmeden ÖNCE doğru bir arka plana ihtiyaç
+duyar. Artık BİZİM `--surface-ground`'umuz üzerinden çözülür — güvenli, çünkü
+zinc skalasının tamamı tema link'inde değil, uygulama bundle'ında
+(`theme/_dark.scss`) gelir. `html`'e `tw-base` içinde uygulanır.
 
 **(d) Ayrı PrimeReact core import'u yok.** `primereact/resources/primereact.min.css`
 10.9.8'de kullanımdan kaldırılmış ve BOŞtur; tüm bileşen CSS'i (yapısal + skin) temada
