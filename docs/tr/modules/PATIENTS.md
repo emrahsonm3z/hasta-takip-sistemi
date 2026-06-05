@@ -250,9 +250,41 @@ Mekanik:
 
 ---
 
-## Planlı — Sprint 1.3: ekle / düzenle / sil
+## Form (gönderildi, Sprint 1.3): ekle / düzenle / sil
 
-Ortak `Form*` alanlarından kurulan bir PrimeReact Dialog formu, tipli iki
-dilli mesajlarla Yup doğrulaması, not/tanının iki dil varyantı yan yana,
-onaylı silme, listede satır eylem düğmeleri — hepsi `usePatientMutations`'a
-bağlı. Satıra-tıkla gezinme de bir 1.3 kararıdır.
+TEK yeniden kullanılabilir dialog hem oluşturma hem düzenlemeye hizmet eder —
+`PatientDialog`, global `AppDialog` kabuğu içinde `PatientForm`'u barındırır
+(800px masaüstü taban genişlik, `min(750px, 70vh)` max-yükseklik, sabit
+başlık + altlık ve yalnız içeriğin kaydığı yapı, 75vw/95vw responsive
+kırılımları). Moda göre yalnız üç şey değişir: başlık ("Yeni Hasta" / "Hasta
+Düzenle"), başlangıç değerleri (`createEmptyFormValues()` /
+`toFormValues(record)`) ve gönderim hedefi (ekleme / güncelleme mutation'ı).
+
+- **Form.** YALNIZ ortak `Form*` sarmalayıcılarından kurulur. Bölümler (büyük
+  harfli soluk başlık + ince çizgi, i18n `patients.form.sections.*`): hasta
+  bilgileri (fullName tam genişlik; birthDate + bloodType), randevu
+  (department + status; priority + appointmentDate; score), tanı TR/EN yan
+  yana, not TR/EN yan yana, üç boolean onay kutusu HER genişlikte tek satırda
+  (kutu + etiket yan yana), etiketler Chips girdisi. Diğer her şey dar
+  ekranda tek sütuna iner. Status/priority dropdown'ları severity Tag'lerini
+  (seçenekler + seçili değer) ortak `PatientTags` kaynağından çizer. Her
+  girdinin yerelleştirilmiş placeholder'ı vardır
+  (`patients.form.placeholders.*`).
+- **Doğrulama** (`buildPatientFormSchema(mode)`, Yup, tüm mesajlar tipli
+  `message()` yardımıyla): fullName zorunlu 2–120; dört enum zorunlu +
+  `oneOf` üyeliği; birthDate zorunlu, gelecekte olamaz; randevu zorunlu, HER
+  İKİ modda ≥ birthDate ve OLUŞTURMA modunda ek olarak ≥ bugün (gün bazlı;
+  Calendar da `minDate` alır) — DÜZENLEME geçmiş randevuları düzenlenebilir
+  bırakır; score zorunlu tamsayı 1–5; tanı HER İKİ dilde zorunlu (min 2);
+  notlar opsiyonel; etiketler opsiyonel, kırpılır.
+- **Sistem alanları.** `id` (`pat-` + UUID) ve `createdAt` oluşturmada
+  üretilir; düzenlemede korunur, düzenlenemeyen `notes` alanı gibi. Saf
+  `toPatientRecord(values, system)` bunları birleştirir ve birim-testlidir.
+- **Satır eylemleri.** Sağda dondurulmuş eylem kolonu (yatay kaydırma altında
+  hep görünür; dondurulmuş hücreler `_prime-skin.scss`'te opak kart zemini +
+  katmanlı hover tonu alır), aria-etiketli düzenle + sil ikon düğmeleriyle.
+  Düzenle, dialog'u önceden doldurulmuş açar; sil, hastayı adıyla anan
+  `confirmDialog()` çalıştırır ("{{name}} silinsin mi?"), onay → silme
+  mutation'ı. Satıra-tıkla gezinme YOKTUR (1.3'te kararlaştırıldı).
+- **Veri.** Her şey `usePatientMutations` üzerinden akar (depolama →
+  invalidate → toast'lar); veri katmanına dokunulmadı.

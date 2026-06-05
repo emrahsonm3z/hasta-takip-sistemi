@@ -189,6 +189,7 @@ src/
 │   ├── AppDataTable.tsx     DataTable wrapper (toolbar slot + arama + filtre-temizle, Türkçe sort/filter, iki-mod loading, responsive paginator) (§3.1)
 │   ├── AppDataTable.lib.ts  saf buildInitialFilters(globalMatchMode, defaults, includeGlobal) (unit-test'li)
 │   ├── AppDataTableFilters.tsx  ortak menü-filtre öğe fabrikaları (enum/multiselect/tarih/sayı/boolean) (§3.1)
+│   ├── AppDialog.tsx        Dialog kabuğu: 800px taban, min(750px,70vh) sınır, sabit başlık/altlık yuvaları, kayan içerik (§3.1)
 │   ├── AppPrimeReactProvider.tsx  i18n'den beslenen PrimeReactProvider + LocaleBridge (dil değişiminde context.setLocale) (§8)
 │   ├── AppToastProvider.tsx Tek PrimeReact <Toast/>'u mount eder; useNotify'ı besler (§3.1)
 │   ├── toast-context.ts     ToastContext (AppToastProvider fast-refresh-temiz kalsın diye ayrıldı)
@@ -252,7 +253,7 @@ src/
     │   │   ├── patient.form.ts      form değerleri ↔ model (§3.1)
     │   │   └── patient-form.schema.ts  Yup schema (§3.1)
     │   ├── composables/     usePatients.ts (query+seed), usePatientMutations.ts (CRUD)
-    │   ├── components/       PatientList, PatientForm, PatientDialog, …
+    │   ├── components/       PatientList, PatientForm, PatientDialog, PatientTags (ortak severity Tag'leri + seçenek şablonları)
     │   ├── constants/
     │   │   ├── patient-options.constants.ts
     │   │   └── query-keys.ts            patientKeys factory (§10)
@@ -319,8 +320,10 @@ referans verir; asla yeniden uygulamaz.
   `sortOrder` / `onSort`), `paginator`, `rows`, `rowsPerPageOptions`,
   `rowClass` / `rowHover` / `stripedRows` (striped varsayılan KAPALI),
   `emptyMessageKey`. Görevi DEĞİL: veri çekme, sayfa hataları. Selection /
-  expansion / grouping yok; rowClick 1.3 kararı. `buildInitialFilters`
-  unit-test'li saf çekirdektir.
+  expansion / grouping yok; satıra-tıkla YOK (1.3'te kararlaştırıldı —
+  bunun yerine sağda dondurulmuş eylem kolonunda açık satır eylem düğmeleri;
+  opak dondurulmuş-hücre kaplaması `_prime-skin.scss`'te).
+  `buildInitialFilters` unit-test'li saf çekirdektir.
 - `AppDataTableFilters` — ortak menü-filtre ÖĞE fabrikaları (PrimeReact 10
   yalnız InputText varsayılan öğesi gönderir — doğrulandı, diğer tipler için
   yerleşik öğe 0): `createEnumFilterElement` (Dropdown + opsiyonel seçenek
@@ -345,7 +348,20 @@ referans verir; asla yeniden uygulamaz.
   değişken adları; prod: i18n mesajı).
 - `form/Form*` — Formik↔PrimeReact alan wrapper'ları (`FormInputText`,
   `FormDropdown`, `FormCalendar`, `FormInputNumber`, `FormCheckbox`,
-  `FormChips`); i18n label + hata gösterimi gömülü.
+  `FormChips`); i18n label + hata gösterimi gömülü, SABİT tek satırlık hata
+  yuvasıyla (yerleşim kayması yok) ve her alanda tipli `placeholderKey` ile.
+  Ekstralar: `FormDropdown` generic'tir ve `optionTemplate` alır (seçeneği VE
+  seçili değeri çizer — ör. severity Tag'leri); `FormCalendar` `minDate`
+  alır; `FormCheckbox` satır içi çizer (kutu + etiket tek satır, hata yuvası
+  yok).
+- `AppDialog` — her uygulama dialog'unun geçtiği dialog kabuğu
+  (boyutlandırma BURADA yaşar: 800px masaüstü taban, `min(750px, 70vh)`
+  max-yükseklik, 12px yarıçap token'ı, 960→75vw / 640→95vw kırılımları):
+  sabit başlık + `footer` yuvası (eylem düğmeleri footer'a; form DOM'u
+  dışındaki kaydet düğmesi Formik `innerRef` ile gönderir), içerik tek
+  kaydırma alanıdır. Zinc yüzeyler `_prime-skin.scss`'te (`.p-dialog` genel;
+  dolgu/kaydırma `.app-dialog` altında). `ConfirmDialog` bunun üzerinden
+  GEÇMEZ — genel `.p-dialog` kaplamasını miras alır.
 - `layout/App*` — `AppLayout`, `AppSidebar`, `AppTopbar`, `AppLogo`,
   `AppLanguageSwitcher`, `AppThemeToggle`. `AppLogo` marka işaretidir (token-renkli
   inline SVG + `BRAND_NAME` constant wordmark — özel ad, i18n değil);

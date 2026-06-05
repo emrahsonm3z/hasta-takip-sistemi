@@ -450,32 +450,50 @@ seçenek kurucular, `isoDateMatches` + `arrayContainsAny` yüklemleri,
 tag-severity haritaları; render/etkileşim manuel QA ile (§11).
 **DoD:** + global DoD; `modules/PATIENTS.md` güncellendi.
 
-### 1.3 ⬜ Hasta ekle / düzenle / sil formu
-**Hedef:** Dialog içinde, Yup ile doğrulanmış, mutation'lara bağlı, silme
-onaylı, iki dilli bir form (tüm alanlar yan yana).
+### 1.3 ✅ Hasta ekle / düzenle / sil formu
+**Hedef:** Bir dialog içinde, Yup ile doğrulanan, mutation'lara bağlı, onaylı
+silmeli iki dilli bir form (tüm alanlar yan yana).
 **Bağımlılık:** 1.1, 1.2
-**Alt-adımlar:**
-- `lib/patient.form.ts`: form değerleri ↔ model (calendar için ISO↔`Date`;
-  create için varsayılanlar).
-- `lib/patient-form.schema.ts`: `yup.setLocale` anahtarlarını kullanan Yup schema
-  (literal mesaj yok); alanlar için required/format kuralları.
-- `components/PatientForm.tsx`: Formik + her alan için `Form*` alanları; hem
-  `noteTr`/`noteEn` hem `diagnosisTr`/`diagnosisEn` birlikte gösterilir (sekme yok).
-- `components/PatientDialog.tsx`: create + edit için formu barındıran PrimeReact
-  Dialog (focus-trap, `aria-labelledby`, focus return).
-- Liste eylemlerini bağla: add (toolbar), edit (satır), delete (satır → onay) →
-  `usePatientMutations`; success/error toast'ları; `dataKey` stabil id.
-**Dosyalar:** `src/modules/patients/lib/{patient.form,patient-form.schema}.ts`,
-`src/modules/patients/components/{PatientForm,PatientDialog}.tsx` (+ `PatientList`/
-`PatientsPage`'te bağlama).
-**Kabul:** create bir satır ekler (kalıcı); edit onu günceller; delete (onay
-sonrası) onu kaldırır; doğrulama hataları yerelleştirilmiş mesaj gösterir;
-iki-dilli alanlar kaydedilir; dialog klavye-erişilebilir; success/error'da
-toast'lar tetiklenir.
-**Test:** schema doğrulaması (eksik required, hatalı tarih); form↔model eşleme
-round-trip; create/edit/delete storage + listeyi günceller (RTL + MSW).
-**DoD:** + global DoD; `modules/PATIENTS.md` güncellendi. Commit
-`feat(patients): add create, edit, and delete form`.
+**Yapılan:**
+- `lib/patient.form.ts`: `PatientFormValues` + `createEmptyFormValues` /
+  `toFormValues` / `toPatientRecord(values, system)` (ISO↔`Date`; kırpma;
+  sistem alanları `id`/`createdAt`/`notes` enjekte edilir — `notes` kullanıcı
+  tarafından düzenlenmez, düzenlemede korunur, oluşturmada `null`).
+- `lib/patient-form.schema.ts`: MODA-DUYARLI `buildPatientFormSchema(mode)` —
+  zorunlu/enum-üyeliği kuralları, doğum tarihi gelecekte olamaz, randevu her
+  iki modda ≥ doğum tarihi ARTI yalnız OLUŞTURMADA ≥ bugün (gün bazlı;
+  Calendar bunu `minDate` ile yansıtır — düzenleme geçmiş randevuları
+  düzenlenebilir bırakır); skor tamsayı 1–5; tanı iki dilde de zorunlu;
+  notlar opsiyonel. Tüm mesajlar tipli `message()` anahtarlarıyla.
+- `components/AppDialog.tsx` (GLOBAL): yeniden kullanılabilir dialog kabuğu —
+  800px masaüstü taban, `min(750px, 70vh)` max-yükseklik, sabit başlık +
+  altlık yuvaları, tek kaydırma alanı olarak içerik, `_prime-skin.scss`'te
+  zinc kaplama satırları.
+- `components/PatientForm.tsx` + `PatientDialog.tsx`: oluşturma + düzenleme
+  için TEK dialog (moda göre başlık / başlangıç değerleri / mutation
+  değişir); bölüm gruplu iki sütunlu yerleşim mobilde tek sütuna iner (üç
+  boolean onay kutusu HER genişlikte tek satırda kalır); her yerde
+  yerelleştirilmiş placeholder; status/priority dropdown'ları ortak severity
+  Tag'lerini çizer (seçenekler + seçili değer, `PatientTags.tsx` — 1.2
+  kolonları/filtreleri de kullanır); altlıktaki Kaydet, Formik `innerRef` ile
+  gönderir. `FormField` sabit tek satırlık hata yuvası ayırır (yerleşim
+  kayması yok); `FormCheckbox` satır içi; wrapper'lara `placeholderKey` /
+  `minDate` / generic `optionTemplate` eklendi.
+- Satır eylemleri: sağda dondurulmuş kolon, aria-etiketli düzenle/sil ikon
+  düğmeleri (opak dondurulmuş-hücre kaplaması + katmanlı hover); düzenle
+  dialog'u önceden doldurur; sil, hastayı adıyla anan `confirmDialog()` →
+  silme mutation'ı + toast'lar. Satıra-tıkla gezinme YOK (burada
+  kararlaştırıldı).
+**Testler:** yalnız saf `node:test` — alan başına geçerli/geçersiz şema
+(oluştur/düzenle mod ayrımı dahil), eşleme gidiş-dönüşü, boş-değer
+varsayılanları, kırpma/eleme, eksik-değer fırlatması (eski RTL + MSW satırı
+§11 kararından önceydi ve yanlıştı).
+**DoD:** karşılandı — `validate` + 88/88 test + build yeşil; dokümanlar
+eşitlendi (PATIENTS/COMPONENTS + kural dosyaları, iki dil).
+Commit'ler: `feat(patients): patient form schema and value mapping`,
+`feat(patients): patient dialog with create and edit`, `feat(patients): row
+actions with delete confirmation`, `fix(styles): zinc surfaces for dialog and
+frozen cells`, `docs: …`.
 
 ---
 

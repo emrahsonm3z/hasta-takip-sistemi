@@ -185,6 +185,7 @@ src/
 │   ├── AppDataTable.tsx     DataTable wrapper (toolbar slot + search + clear-filters, Turkish sort/filter, two-mode loading, responsive paginator) (§3.1)
 │   ├── AppDataTable.lib.ts  pure buildInitialFilters(globalMatchMode, defaults, includeGlobal) (unit-tested)
 │   ├── AppDataTableFilters.tsx  shared menu-filter element factories (enum/multiselect/date/numeric/boolean) (§3.1)
+│   ├── AppDialog.tsx        Dialog shell: 800px base, min(750px,70vh) cap, pinned header/footer slots, scrolling content (§3.1)
 │   ├── AppPrimeReactProvider.tsx  PrimeReactProvider seeded from i18n + LocaleBridge (context.setLocale on language change) (§8)
 │   ├── AppToastProvider.tsx Mounts PrimeReact <Toast/>; backs useNotify (§3.1)
 │   ├── toast-context.ts     ToastContext (split out so AppToastProvider stays fast-refresh-clean)
@@ -248,7 +249,7 @@ src/
     │   │   ├── patient.form.ts      form values ↔ model (§3.1)
     │   │   └── patient-form.schema.ts  Yup schema (§3.1)
     │   ├── composables/     usePatients.ts (query+seed), usePatientMutations.ts (CRUD)
-    │   ├── components/       PatientList, PatientForm, PatientDialog, …
+    │   ├── components/       PatientList, PatientForm, PatientDialog, PatientTags (shared severity Tags + option templates)
     │   ├── constants/
     │   │   ├── patient-options.constants.ts
     │   │   └── query-keys.ts            patientKeys factory (§10)
@@ -315,8 +316,10 @@ it never re-implements them.
   `sortOrder` / `onSort`), `paginator`, `rows`, `rowsPerPageOptions`,
   `rowClass` / `rowHover` / `stripedRows` (striped default OFF),
   `emptyMessageKey`. Not its job: data fetching, page errors. No selection /
-  expansion / grouping; rowClick is a 1.3 decision. `buildInitialFilters` is
-  the unit-tested pure core.
+  expansion / grouping; NO row-click (decided in 1.3 — explicit row action
+  buttons instead, in a frozen-right actions column whose opaque cell skin
+  lives in `_prime-skin.scss`). `buildInitialFilters` is the unit-tested pure
+  core.
 - `AppDataTableFilters` — the shared menu-filter ELEMENT factories
   (PrimeReact 10 ships only an InputText default element — verified, 0
   built-ins for other types): `createEnumFilterElement` (Dropdown + optional
@@ -341,7 +344,20 @@ it never re-implements them.
   var names; prod: i18n message).
 - `form/Form*` — Formik↔PrimeReact field wrappers (`FormInputText`,
   `FormDropdown`, `FormCalendar`, `FormInputNumber`, `FormCheckbox`,
-  `FormChips`); i18n label + error display built in.
+  `FormChips`); i18n label + error display built in, with a FIXED one-line
+  error slot (no layout shift) and a typed `placeholderKey` on every field.
+  Extras: `FormDropdown` is generic with `optionTemplate` (renders the option
+  AND the selected value — e.g. severity Tags); `FormCalendar` takes
+  `minDate`; `FormCheckbox` renders inline (box + label one row, no error
+  slot).
+- `AppDialog` — the dialog shell every app dialog routes through (sizing
+  lives HERE: 800px desktop base, max-height `min(750px, 70vh)`, 12px radius
+  token, breakpoints 960→75vw / 640→95vw): pinned header + `footer` slot
+  (action buttons go in the footer; a submit button outside the form DOM
+  submits via Formik `innerRef`), content is the single scroll area. Zinc
+  surfaces in `_prime-skin.scss` (`.p-dialog` generic; padding/scroll under
+  `.app-dialog`). `ConfirmDialog` does NOT route through it — it inherits the
+  generic `.p-dialog` skin.
 - `layout/App*` — `AppLayout`, `AppSidebar`, `AppTopbar`, `AppLogo`,
   `AppLanguageSwitcher`, `AppThemeToggle`. `AppLogo` is the brand mark (token-colored
   inline SVG + the `BRAND_NAME` constant wordmark — a proper noun, not i18n);
