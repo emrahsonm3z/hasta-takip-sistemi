@@ -28,7 +28,8 @@
     },
     "unexpected": "An unexpected error occurred.",
     "notFound": "Not found.",
-    "loadFailed": "Failed to load data."
+    "loadFailed": "Failed to load data.",
+    "saveFailed": "Changes could not be saved."
   },
   "validation": {
     "required": "This field is required.",
@@ -41,6 +42,11 @@
   },
   "patients": {
     "title": "Patients",
+    "notifications": {
+      "added": "Patient added.",
+      "updated": "Patient updated.",
+      "removed": "Patient deleted."
+    },
     "fields": {
       "fullName": "Full name",
       "birthDate": "Birth date",
