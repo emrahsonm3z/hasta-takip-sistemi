@@ -76,7 +76,7 @@ Next: <mevcut/sıradaki alt-madde — bağlam olmadan başlamaya yetecek kadar n
 ### Active: 0.9 Docs modülü + registry + iskelet docs + README · branch: feat/docs-module · status: in-progress
 
 Sections: §2 §3 §3.1 §6 §8 §9 §10 §11 §13 · Paths: src/modules/docs/\*\*, src/composables/useMenu.ts, docs/{en,tr}/\*\*, README.md, tailwind.config.ts
-Next: /docs/:slug markdown görüntüleyici (MarkdownRenderer + prose token eşlemesi + route)
+Next: genel bakış sayfası — kayıtlı dokümanların kart-grid indeksi
 
 ## 1. Proje Genel Bakış
 

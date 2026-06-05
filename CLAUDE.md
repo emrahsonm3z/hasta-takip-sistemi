@@ -71,7 +71,7 @@ Next: <the current/next sub-item — specific enough to start without context>
 ### Active: 0.9 Docs module + registry + skeleton docs + README · branch: feat/docs-module · status: in-progress
 
 Sections: §2 §3 §3.1 §6 §8 §9 §10 §11 §13 · Paths: src/modules/docs/\*\*, src/composables/useMenu.ts, docs/{en,tr}/\*\*, README.md, tailwind.config.ts
-Next: markdown viewer at /docs/:slug (MarkdownRenderer + prose token mapping + route)
+Next: overview page card-grid index of registered docs
 
 ## 1. Project Overview
 
