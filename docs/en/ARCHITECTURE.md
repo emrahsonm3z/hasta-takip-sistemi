@@ -1,38 +1,189 @@
 # Architecture
 
 This document explains how the application is organised: which building blocks
-exist, what each one is responsible for, and how they fit together. It is for
-anyone who wants to understand the project's structure — you do not need to be
-a developer to follow the big picture.
+exist, what each one is responsible for, and how they fit together. The plain
+sections give everyone the big picture; the code and tables give developers
+the exact contracts.
 
-> This is an early skeleton. Each section will be filled with full
-> explanations and short examples in an upcoming documentation pass.
+---
 
 ## The big picture
 
 A single-page web application for tracking patients. It loads the patient list
-once from a data service, keeps all later changes on your own device, and
-speaks two languages (Turkish and English).
+once from a read-only data service, keeps all later changes on your own device,
+and speaks two languages (Turkish and English). There is no login — the app is
+a case study reviewed as-is.
 
-## Modules
+---
 
-Each feature lives in its own self-contained folder, called a module — for
-example `patients` (the patient screens) and `docs` (the documentation viewer
-you are reading right now). A module keeps everything it needs in one place
-and only talks to other modules through its public doorway.
+## Directory structure
 
-## Layers
+What is in the repository today. The patients data layer (api, models, lib,
+composables) is **planned for Sprint 1.1** and not yet on disk.
 
-Inside a module, code is arranged in layers, each with one job: talking to the
-outside world, describing data shapes, transforming data, coordinating, and
-drawing the screen. Each layer may only lean on the layers below it.
+```
+src/
+├── main.tsx                 Bootstrap: i18n → env check → theme → providers → router
+├── config/
+│   └── env.ts               Typed frozen env + validateRequiredEnvVars()
+├── plugins/                 Third-party library configuration
+│   ├── primereact.ts        Provider config + TR locale + the nfcContains filter
+│   ├── theme.ts             Lara Green light/dark ?url swap over <link id="app-theme">
+│   ├── theme.lib.ts         Pure theme-swap logic (unit-tested)
+│   ├── react-query.ts       QueryClient defaults
+│   ├── dayjs.ts             Day.js plugins + tr/en locales
+│   ├── i18n.ts              react-i18next init + PrimeReact + Day.js bridge
+│   └── yup.ts               yup.setLocale() → i18n message keys
+├── router/
+│   └── index.tsx            createBrowserRouter: layout + module routes + 404
+├── components/              Global UI (App* wrappers, form fields, error screens)
+│   ├── form/                Formik↔PrimeReact field wrappers
+│   └── layout/              AppLayout, AppSidebar, AppTopbar, AppLogo, …
+├── composables/             useMenu, useNotify, useMediaQuery (+ pure .lib cores)
+├── lib/                     Global pure helpers: text, date, pickLocalized, route
+├── locales/                 tr.json + en.json (same key set, test-enforced)
+├── styles/                  SCSS (SMACSS) + token aliases
+├── types/                   Route handle + TranslationKey typing
+├── __test__/                node:test specs mirroring the source tree
+└── modules/
+    ├── patients/            Routes + page shell today; data layer lands in 1.1
+    │   ├── pages/PatientsPage.tsx
+    │   ├── routes.tsx
+    │   └── index.ts
+    └── docs/                This documentation viewer (see its own doc)
+        ├── components/  composables/  constants/  lib/  pages/
+        ├── routes.tsx
+        └── index.ts
+```
 
-## Routing and the menu
+---
 
-Which page opens at which address, and how the sidebar menu is generated from
-the same single list of routes — so the menu can never drift out of sync.
+## Layer responsibilities
+
+Inside a module, code flows through layers — each with one job, each allowed
+to lean only on the layers above it in this table:
+
+| Layer | Responsibility |
+| --- | --- |
+| `api/` | I/O only — network calls and storage reads/writes; no parsing, no logic |
+| `models/` | Interfaces, types, enum-like unions |
+| `lib/` | Mappers and pure helper functions (unit-testable) |
+| `composables/` | `useQuery`/`useMutation` wrappers + orchestration |
+| `pages/` | Thin shells — call composables, compose components |
+| `components/` | Receive data via props, render |
+| `constants/` | Query-key factories, route constants |
+
+Global layers mirror the same idea: `src/lib` (pure), `src/composables`
+(hooks), `src/components` (UI), `src/plugins` (third-party config).
+
+---
+
+## Modules and the barrel rule
+
+Each feature lives in a self-contained folder under `src/modules/` and exposes
+a single public doorway: its `index.ts` (the "barrel"). Everything else is
+private.
+
+```ts
+// Correct — the barrel is the public API
+import { PATIENT_ROUTES } from '@/modules/patients'
+import { docsRegistry, DOCS_ROUTES } from '@/modules/docs'
+
+// Wrong — deep imports into another module are forbidden
+import { docsRegistry } from '@/modules/docs/constants/docs-registry'
+```
+
+Global layers (the router, `useMenu`) may import module barrels. Anything
+reusable across modules moves to a global layer — never copy-pasted, never
+reached into.
+
+---
+
+## Routing
+
+Routes are declared as **constants** in each module's `routes.tsx`, never as
+hardcoded strings. The real patients declaration:
+
+```tsx
+const PatientsPage = lazy(() => import('./pages/PatientsPage'))
+
+export const PATIENT_ROUTES = {
+  LIST: {
+    name: 'patients',
+    path: '/patients',
+    titleKey: 'patients.title',
+    icon: 'pi pi-users',
+    menuOrder: 1,
+  },
+} as const
+
+export const patientRoutes: RouteObject[] = [
+  {
+    path: PATIENT_ROUTES.LIST.path,
+    element: <PatientsPage />,
+    handle: { titleKey: PATIENT_ROUTES.LIST.titleKey } satisfies AppRouteHandle,
+  },
+]
+```
+
+The flow from a module to the address bar:
+
+```
+modules/{m}/routes.tsx  →  modules/{m}/index.ts  →  router/index.tsx  →  useMenu
+(route constants)          (barrel re-export)       (createBrowserRouter)  (sidebar)
+```
+
+The full route tree today:
+
+```
+/                  → redirect to /patients
+/patients          → PatientsPage
+/docs              → DocsOverviewPage (documentation index)
+/docs/:slug        → DocViewerPage (one document)
+*                  → NotFound (404)
+```
+
+Every route carries a typed `handle` (`AppRouteHandle`): a `titleKey` resolved
+through i18n, or a `title(match)` function for dynamic titles (the docs viewer
+uses this to put the document's name in the browser tab). `AppLayout` reads the
+deepest match and sets `document.title`; pages stay thin. Paths are
+language-neutral English; labels always come from i18n.
+
+The sidebar menu is **derived** from the same route constants by `useMenu` —
+there is no hand-written menu array, so the menu can never drift out of sync.
+The Dokümanlar entry additionally nests the registered documents as children.
+
+---
+
+## Bootstrap
+
+`src/main.tsx`, in order — each step exists in the file today:
+
+1. Side-effect imports: i18n init, Yup locale, the SCSS bundle.
+2. `validateRequiredEnvVars()` — if a required variable is missing, the app
+   renders `ConfigErrorScreen` and stops (no broken half-app).
+3. `applyTheme()` — sets the Lara theme `<link>` href from the stored mode.
+4. Providers, outermost first: `StrictMode` → `AppErrorBoundary` →
+   `QueryClientProvider` → `PrimeReactProvider` → `AppToastProvider` → `App`.
+
+---
 
 ## Configuration
 
-What the application needs from its environment to start (for example, the
-address of the data service), and how a missing setting is reported.
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `VITE_API_URL` | yes | Read-only patient data source (one-time seed) |
+
+The typed accessor lives in `src/config/env.ts`:
+
+```ts
+const REQUIRED_ENV_VARS = ['VITE_API_URL'] as const
+
+export const env = Object.freeze({
+  apiUrl: typeof apiUrlValue === 'string' ? apiUrlValue : '',
+})
+```
+
+`.env` is never committed; `.env.example` documents every variable. A missing
+variable produces a clear configuration-error screen (variable names shown in
+development, a translated message in production) instead of a broken app.
