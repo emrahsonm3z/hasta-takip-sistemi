@@ -14,9 +14,10 @@ to its translation instantly.
 ## Where the documents live
 
 Every document is a plain text file (Markdown) stored inside the project, in
-an English folder and a Turkish folder with matching names. Two special
-documents — the Sprint Plan and the Changelog — live at the project root; the
-Changelog exists in English only and is shown in English in both languages.
+an English folder and a Turkish folder with matching names. One special
+document — the Changelog — lives at the project root because the release
+tooling generates it there; it exists in English only and is shown in English
+in both languages.
 
 ## The registry rule
 

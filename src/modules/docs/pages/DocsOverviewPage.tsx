@@ -10,9 +10,6 @@ export default function DocsOverviewPage() {
 
   return (
     <div className="mx-auto w-full max-w-6xl">
-      <p className="mb-8 max-w-2xl text-base leading-relaxed text-text-secondary">
-        {t('docs.lead')}
-      </p>
       <ul className="grid list-none gap-4 p-0 sm:grid-cols-2 xl:grid-cols-3">
         {entries.map((entry) => (
           <li key={entry.slug}>

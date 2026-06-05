@@ -88,7 +88,6 @@
   },
   "docs": {
     "title": "Dokümanlar",
-    "lead": "Bu uygulamanın nasıl yapıldığı ve nasıl çalıştığımız hakkında her şey — yalnızca geliştiriciler için değil, herkesin okuyabileceği şekilde yazıldı.",
     "backToList": "Tüm dokümanlar",
     "doc": {
       "architecture": {

@@ -76,7 +76,7 @@ Next: <mevcut/sıradaki alt-madde — bağlam olmadan başlamaya yetecek kadar n
 ### Active: 0.11 Docs revizyonu — teknik derinlik, iç içe menü, kaydırma bölgesi · branch: feat/docs-module · status: in-progress
 
 Sections: §2 §3 §3.1 §6 §8 §9 §13 · Paths: src/components/layout/\*\*, src/composables/useMenu\*, src/styles/layout/\*\*, src/modules/docs/\*\*, docs/{en,tr}/\*\*, README.md
-Next: lead kaldırma + SPRINT_PLAN'ı docs/{en,tr}'ye taşıma (glob, registry, referanslar)
+Next: altı çekirdek dokümanın teknik-derinlik yeniden yazımı (EN + TR)
 
 ## 1. Proje Genel Bakış
 
@@ -262,7 +262,7 @@ src/
         ├── composables/      useDocContent.ts (lazy glob yükleyici üzerinde useQuery)
         ├── lib/
         │   ├── doc-path.ts      saf resolveDocPath(entry, language) + findDocEntry (birim-testli)
-        │   └── docs-loader.ts   import.meta.glob(['/docs/**/*.md', '/CHANGELOG.md', '/SPRINT_PLAN.md', '/SPRINT_PLAN.tr.md'], ?raw) + loadDocContent
+        │   └── docs-loader.ts   import.meta.glob(['/docs/**/*.md', '/CHANGELOG.md'], ?raw) + loadDocContent
         ├── constants/
         │   ├── docs-registry.ts  DocEntry { slug, titleKey, descriptionKey, icon, order, paths.{en,tr} } (tek kaynak, §13.4)
         │   └── query-keys.ts     docsKeys factory (§10)
@@ -948,11 +948,11 @@ Tek script her şeyi çalıştırır: `validate` = `type-check` + `lint` + `lint
 Referans haritası. Herhangi bir değişiklik için güncellenecek dokümanlar burada
 aranır, tahmin edilmez. Tüm dokümanlar `docs` modülü (§3 dizin) tarafından
 uygulama-içinde de render edilir; Vite
-`import.meta.glob(['/docs/**/*.md', '/CHANGELOG.md', '/SPRINT_PLAN.md', '/SPRINT_PLAN.tr.md'], { query: '?raw', import: 'default' })`
-ile yüklenir — kök-seviye `CHANGELOG.md` ve `SPRINT_PLAN(.tr).md` repo kökünde
-kalır (release-please ve workflow o yollara bağlıdır) ve registry'nin
-girdi-başına `paths.{en,tr}` alanı bu düzensizliği soğurur — aktif dile göre
-seçilir.
+`import.meta.glob(['/docs/**/*.md', '/CHANGELOG.md'], { query: '?raw', import: 'default' })`
+ile yüklenir — `CHANGELOG.md` kök seviyedeki tek istisnadır (release-please onu
+orada üretir; §13.5) ve registry'nin girdi-başına `paths.{en,tr}` alanı bunu
+soğurur. Sprint planı, diğer her doküman gibi `docs/{en,tr}/SPRINT_PLAN.md`'de
+yaşar. Dokümanlar aktif dile göre seçilir.
 
 ### 13.1 Hedef kitle ve açıklık
 

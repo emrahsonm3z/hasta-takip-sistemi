@@ -1,10 +1,10 @@
 import type { DocEntry } from '../constants/docs-registry'
 import { resolveDocPath } from './doc-path'
 
-const docFiles = import.meta.glob<string>(
-  ['/docs/**/*.md', '/CHANGELOG.md', '/SPRINT_PLAN.md', '/SPRINT_PLAN.tr.md'],
-  { query: '?raw', import: 'default' },
-)
+const docFiles = import.meta.glob<string>(['/docs/**/*.md', '/CHANGELOG.md'], {
+  query: '?raw',
+  import: 'default',
+})
 
 export const loadDocContent = (entry: DocEntry, language: string): Promise<string> => {
   const path = resolveDocPath(entry, language)

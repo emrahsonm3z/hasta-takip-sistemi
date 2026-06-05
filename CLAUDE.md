@@ -71,7 +71,7 @@ Next: <the current/next sub-item — specific enough to start without context>
 ### Active: 0.11 Docs revision — technical depth, nested menu, scroll region · branch: feat/docs-module · status: in-progress
 
 Sections: §2 §3 §3.1 §6 §8 §9 §13 · Paths: src/components/layout/\*\*, src/composables/useMenu\*, src/styles/layout/\*\*, src/modules/docs/\*\*, docs/{en,tr}/\*\*, README.md
-Next: lead removal + SPRINT_PLAN move to docs/{en,tr} (glob, registry, references)
+Next: technical-depth rewrite of the six core docs (EN + TR)
 
 ## 1. Project Overview
 
@@ -259,7 +259,7 @@ src/
         ├── composables/      useDocContent.ts (useQuery over the lazy glob loader)
         ├── lib/
         │   ├── doc-path.ts      pure resolveDocPath(entry, language) + findDocEntry (unit-tested)
-        │   └── docs-loader.ts   import.meta.glob(['/docs/**/*.md', '/CHANGELOG.md', '/SPRINT_PLAN.md', '/SPRINT_PLAN.tr.md'], ?raw) + loadDocContent
+        │   └── docs-loader.ts   import.meta.glob(['/docs/**/*.md', '/CHANGELOG.md'], ?raw) + loadDocContent
         ├── constants/
         │   ├── docs-registry.ts  DocEntry { slug, titleKey, descriptionKey, icon, order, paths.{en,tr} } (single source, §13.4)
         │   └── query-keys.ts     docsKeys factory (§10)
@@ -942,11 +942,11 @@ One script runs everything: `validate` = `type-check` + `lint` + `lint:style` +
 The reference map. For any change, the docs to update are looked up here, not
 guessed. All docs are also rendered in-app by the `docs` module (§3 directory),
 loaded via Vite
-`import.meta.glob(['/docs/**/*.md', '/CHANGELOG.md', '/SPRINT_PLAN.md', '/SPRINT_PLAN.tr.md'], { query: '?raw', import: 'default' })`
-— the root-level `CHANGELOG.md` and `SPRINT_PLAN(.tr).md` stay at the repo root
-(release-please and the workflow depend on those paths) and the registry's
-per-entry `paths.{en,tr}` absorb the irregularity — picked by the active
-language.
+`import.meta.glob(['/docs/**/*.md', '/CHANGELOG.md'], { query: '?raw', import: 'default' })`
+— `CHANGELOG.md` is the single root-level exception (release-please owns it
+there; §13.5) and the registry's per-entry `paths.{en,tr}` absorb it. The
+sprint plan lives at `docs/{en,tr}/SPRINT_PLAN.md` like every other doc. Docs
+are picked by the active language.
 
 ### 13.1 Audience and clarity
 

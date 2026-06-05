@@ -94,7 +94,7 @@ export const docsRegistry: DocEntry[] = [
     descriptionKey: 'docs.doc.sprintPlan.description',
     icon: 'pi pi-flag',
     order: 10,
-    paths: { en: '/SPRINT_PLAN.md', tr: '/SPRINT_PLAN.tr.md' },
+    paths: { en: '/docs/en/SPRINT_PLAN.md', tr: '/docs/tr/SPRINT_PLAN.md' },
   },
   {
     slug: 'changelog',
