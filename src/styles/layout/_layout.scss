@@ -7,17 +7,23 @@
     background-position: top;
     background-repeat: no-repeat;
     background-size: auto 20rem;
-    min-block-size: 100vh;
+    block-size: 100vh;
+    overflow: hidden;
     position: relative;
   }
 
   .l-content {
+    block-size: 100%;
     display: flex;
     flex-direction: column;
-    min-block-size: 100vh;
-    overflow-x: hidden;
+    overflow: hidden;
     position: relative;
     z-index: 1;
+  }
+
+  .l-content-scroll {
+    min-block-size: 0;
+    overflow-y: auto;
   }
 
   @media (width >= 1024px) {

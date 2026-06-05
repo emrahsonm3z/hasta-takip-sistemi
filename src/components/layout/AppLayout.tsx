@@ -1,6 +1,6 @@
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Outlet, ScrollRestoration, useLocation, useMatches } from 'react-router-dom'
+import { Outlet, useLocation, useMatches } from 'react-router-dom'
 
 import { Loading } from '@/components/Loading'
 import { useMediaQuery } from '@/composables/useMediaQuery'
@@ -16,6 +16,7 @@ export function AppLayout() {
   const isDesktop = useMediaQuery('(min-width: 1024px)')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const contentScrollRef = useRef<HTMLElement>(null)
 
   const active = [...matches].reverse().find((match) => getRouteHandle(match))
   const handle = active ? getRouteHandle(active) : undefined
@@ -29,6 +30,7 @@ export function AppLayout() {
 
   useEffect(() => {
     setMobileMenuOpen(false)
+    contentScrollRef.current?.scrollTo({ top: 0 })
   }, [location.pathname])
 
   const handleMenuToggle = () => {
@@ -49,13 +51,12 @@ export function AppLayout() {
       />
       <div className="l-content p-8">
         <AppTopbar title={title} onMenuToggle={handleMenuToggle} />
-        <main className="min-w-0 flex-1">
+        <main ref={contentScrollRef} className="l-content-scroll min-w-0 flex-1">
           <Suspense fallback={<Loading />}>
             <Outlet />
           </Suspense>
         </main>
       </div>
-      <ScrollRestoration />
     </div>
   )
 }
