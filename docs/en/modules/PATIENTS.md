@@ -136,7 +136,9 @@ export function usePatients() {
 First visit: one GET to `VITE_API_URL`, mapped, persisted. Every visit after:
 storage only. The double-invoke under React StrictMode is harmless — the
 second seed writes identical data. A failed GET renders the standard
-`ErrorState` with retry (`throwOnError: false`, `retry: 1`).
+`ErrorState` with retry — the `throwOnError: false` and `retry: 1` behaviour
+comes from the global QueryClient defaults (`plugins/react-query.ts`); the
+hook itself sets only the key and the query function.
 
 ---
 
