@@ -1,57 +1,93 @@
 # Versions & Releases
 
 This document explains how the application gets its version numbers (like
-0.2.0) and how a new release is published. It is written for everyone — no
-developer background needed. The short version: **version numbers are not
-chosen by hand; a robot derives them from the history of changes, and the
-owner approves each release with one click.**
+0.2.0) and how a release is cut. The short version for everyone: **nobody
+types a version number — a robot derives it from the commit history, and the
+owner approves each release with one click.** The exact mechanics follow.
+
+---
 
 ## What a version number means
 
-A version looks like `0.2.0` — three numbers: **major.minor.patch**.
+`major.minor.patch` — e.g. `0.2.0`:
 
-- A **patch** bump (0.2.0 → 0.2.1) means "small fixes only".
-- A **minor** bump (0.2.0 → 0.3.0) means "something new was added".
-- The **major** number says "things changed in a breaking way". While the
-  project is still being built, the major stays at **0**; moving to 1.0.0 will
-  be a deliberate decision when the app is feature-complete — it never happens
-  by accident.
+| Part | Bumps when | Example |
+| --- | --- | --- |
+| patch | only fixes landed (`fix:`) | 0.2.0 → 0.2.1 |
+| minor | something new landed (`feat:`) | 0.2.0 → 0.3.0 |
+| major | stays **0** during initial development | — |
+
+While pre-1.0, even breaking changes bump only the minor
+(`bump-minor-pre-major: true` in the config below). Moving to 1.0.0 will be a
+deliberate decision when the app is feature-complete — it cannot happen by
+accident.
+
+---
 
 ## Where the numbers come from
 
-Every recorded change (every **commit**) carries a typed message, like
-`fix: …` ("I repaired something") or `feat: …` ("I added something new"). A
-robot called **release-please** reads these messages on the main branch and
-works out the next version on its own: fixes bump the patch, features bump the
-minor. This is why the message convention from "How We Work" is enforced so
-strictly — the history is also the release calculator.
+Every commit message carries a machine-readable type (`feat:`, `fix:`, … —
+see "How We Work"). The **release-please** GitHub Action reads the commits on
+`main` and computes the next version on its own. The complete setup is two
+small files:
 
-## How a release happens, step by step
+```yaml
+# .github/workflows/release.yml
+on:
+  push:
+    branches: [main]
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v4
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+```
 
-1. Changes are merged into the main branch as usual (see "How We Work"). Each
-   merge already puts the new code live — but the version number does not move
-   yet.
-2. The robot notices the new changes and opens (or updates) a special
-   **Release PR**: a single pull request that raises the version number and
-   rewrites the **Changelog** (the version-by-version list of what changed —
-   also readable here in the app).
-3. The owner merges that Release PR. That is the moment the new version
-   officially exists: the number is bumped and the release is tagged.
+```json
+// release-please-config.json
+{
+  "include-component-in-tag": false,
+  "bump-minor-pre-major": true,
+  "packages": {
+    ".": { "release-type": "node", "package-name": "hasta-takip-sistemi" }
+  }
+}
+```
 
-There is no app store or package to publish — the application is private, and
-going live happens through the normal merge, so a "release" here is really
-about bookkeeping: the number and the changelog.
+This is why every reviewed sub-commit is preserved on `main` (rebase-merge,
+never squash): each commit's type is release signal.
 
-## The one quirk worth knowing
+---
 
-The Release PR is opened by a robot account, and for safety GitHub does not
-let one robot's pull request trigger another robot's checks. So the automated
-**gate** does not run on the Release PR by itself. The owner has two ways to
-merge it:
+## How a release is cut, step by step
 
-- **Close and reopen it in the GitHub interface.** A reopen done by a human
-  *does* trigger the checks, the gate runs, and the PR merges with a real
-  green check. **This is the preferred path.**
-- Merge it directly using the owner's administrator rights, without the check.
-  This is acceptable because the Release PR only ever touches the version
-  number and the changelog — it contains no code.
+1. Topic branches merge into `main` as usual. **Each merge already deploys
+   the code** (Vercel watches `main`) — but the version number does not move.
+2. The robot notices the new commits and opens (or updates) a single
+   **Release PR**: it bumps `package.json`'s version, updates the manifest,
+   and regenerates `CHANGELOG.md` from the commit messages since the last
+   release.
+3. The owner merges that Release PR — the release now exists: the version is
+   bumped and the commit is tagged (e.g. `v0.2.0`).
+
+One quirk worth knowing: the Release PR is opened by a robot token, so the CI
+gate does not run on it by itself. The owner **closes and reopens it in the
+GitHub UI** — a human reopen triggers the gate, and the PR merges with a real
+green check. (Fallback: admin-exempt direct merge; safe, since the Release PR
+touches only the version and the changelog.)
+
+---
+
+## The changelog
+
+`CHANGELOG.md` lives at the repository root because release-please generates
+it there. It is English-only (exempt from the bilingual docs rule) and is
+rendered read-only inside the app — Documentation → Changelog shows the same
+file in both languages.
+
+There is no npm publish and no app store — the application is private, and
+deployment happens at merge time. A "release" here is bookkeeping done well:
+an accurate number and an honest changelog.

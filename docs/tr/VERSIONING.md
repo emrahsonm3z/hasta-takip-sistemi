@@ -1,57 +1,92 @@
 # Sürümler ve Yayınlar
 
-Bu doküman, uygulamanın sürüm numaralarını (0.2.0 gibi) nasıl aldığını ve yeni
-bir sürümün nasıl yayınlandığını anlatır. Herkes için yazılmıştır —
-geliştirici geçmişi gerekmez. Kısa özet: **sürüm numaraları elle seçilmez; bir
-robot onları değişiklik tarihçesinden türetir ve sahip her sürümü tek tıkla
-onaylar.**
+Bu doküman, uygulamanın sürüm numaralarını (0.2.0 gibi) nasıl aldığını ve bir
+sürümün nasıl kesildiğini anlatır. Herkes için kısa özet: **sürüm numarasını
+kimse elle yazmaz — bir robot onu commit tarihçesinden türetir ve sahip her
+sürümü tek tıkla onaylar.** Kesin mekanik aşağıda.
+
+---
 
 ## Bir sürüm numarası ne anlatır
 
-Bir sürüm `0.2.0` gibi görünür — üç sayı: **major.minor.patch**.
+`major.minor.patch` — örn. `0.2.0`:
 
-- **Patch** artışı (0.2.0 → 0.2.1) "yalnızca küçük düzeltmeler" demektir.
-- **Minor** artışı (0.2.0 → 0.3.0) "yeni bir şey eklendi" demektir.
-- **Major** sayısı "işler geriye dönük uyumu bozacak şekilde değişti" der.
-  Proje hâlâ yapım aşamasındayken major **0**'da kalır; 1.0.0'a geçiş,
-  uygulama özellik açısından tamamlandığında bilinçli olarak verilecek bir
-  karardır — asla kazara olmaz.
+| Parça | Ne zaman artar | Örnek |
+| --- | --- | --- |
+| patch | yalnız düzeltmeler indi (`fix:`) | 0.2.0 → 0.2.1 |
+| minor | yeni bir şey indi (`feat:`) | 0.2.0 → 0.3.0 |
+| major | ilk geliştirme boyunca **0**'da kalır | — |
+
+1.0 öncesinde, kıran değişiklikler bile yalnız minor'ı artırır (aşağıdaki
+config'te `bump-minor-pre-major: true`). 1.0.0'a geçiş, uygulama özellik
+açısından tamamlandığında bilinçli bir karar olacak — kazara olamaz.
+
+---
 
 ## Sayılar nereden gelir
 
-Kaydedilen her değişiklik (her **commit**) tipli bir mesaj taşır: `fix: …`
-("bir şeyi onardım") ya da `feat: …` ("yeni bir şey ekledim") gibi.
-**release-please** adlı bir robot ana branch'teki bu mesajları okur ve sıradaki
-sürümü kendi başına hesaplar: düzeltmeler patch'i, yeni özellikler minor'ı
-artırır. "Nasıl Çalışıyoruz"daki mesaj kuralının bu kadar sıkı uygulanmasının
-nedeni budur — tarihçe aynı zamanda sürüm hesaplayıcısıdır.
+Her commit mesajı makine-okur bir tip taşır (`feat:`, `fix:`, … — bkz. "Nasıl
+Çalışıyoruz"). **release-please** GitHub Action'ı `main`'deki commit'leri
+okur ve sıradaki sürümü kendi başına hesaplar. Kurulumun tamamı iki küçük
+dosyadır:
 
-## Bir yayın adım adım nasıl olur
+```yaml
+# .github/workflows/release.yml
+on:
+  push:
+    branches: [main]
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v4
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+```
 
-1. Değişiklikler her zamanki gibi ana branch'e merge edilir (bkz. "Nasıl
-   Çalışıyoruz"). Her merge yeni kodu zaten yayına alır — ama sürüm numarası
-   henüz kıpırdamaz.
-2. Robot yeni değişiklikleri fark eder ve özel bir **Release PR** açar (ya da
-   günceller): sürüm numarasını yükselten ve **Değişiklik Günlüğü**'nü (neyin
-   değiştiğinin sürüm sürüm listesi — uygulamanın içinden de okunabilir)
-   yeniden yazan tek bir pull request.
-3. Sahip o Release PR'ı merge eder. Yeni sürümün resmî olarak var olduğu an
-   budur: numara yükselir ve sürüm etiketlenir.
+```json
+// release-please-config.json
+{
+  "include-component-in-tag": false,
+  "bump-minor-pre-major": true,
+  "packages": {
+    ".": { "release-type": "node", "package-name": "hasta-takip-sistemi" }
+  }
+}
+```
 
-Yayınlanacak bir uygulama mağazası ya da paket yoktur — uygulama özeldir ve
-yayına çıkış normal merge ile olur; burada "yayın" aslında kayıt düzenidir:
-numara ve değişiklik günlüğü.
+İncelenmiş her alt-commit'in `main`'de korunmasının (rebase-merge, asla
+squash) nedeni budur: her commit'in tipi sürüm sinyalidir.
 
-## Bilinmeye değer tek tuhaflık
+---
 
-Release PR'ı bir robot hesabı açar ve güvenlik gereği GitHub, bir robotun pull
-request'inin başka bir robotun kontrollerini tetiklemesine izin vermez. Bu
-yüzden otomatik **kapı**, Release PR'da kendiliğinden çalışmaz. Sahibin onu
-merge etmek için iki yolu vardır:
+## Bir sürüm adım adım nasıl kesilir
 
-- **GitHub arayüzünde kapatıp yeniden açmak.** İnsan eliyle yapılan yeniden
-  açma kontrolleri tetikler, kapı çalışır ve PR gerçek bir yeşil kontrolle
-  merge olur. **Tercih edilen yol budur.**
-- Sahibin yönetici yetkisiyle, kontrol olmadan doğrudan merge etmek. Bu kabul
-  edilebilir, çünkü Release PR yalnızca sürüm numarasına ve değişiklik
-  günlüğüne dokunur — içinde kod yoktur.
+1. Topic branch'leri her zamanki gibi `main`'e merge olur. **Her merge kodu
+   zaten yayınlar** (Vercel `main`'i izler) — ama sürüm numarası kıpırdamaz.
+2. Robot yeni commit'leri fark eder ve tek bir **Release PR** açar (ya da
+   günceller): `package.json` sürümünü yükseltir, manifest'i günceller ve son
+   sürümden bu yana gelen commit mesajlarından `CHANGELOG.md`'yi yeniden
+   üretir.
+3. Sahip o Release PR'ı merge eder — sürüm artık vardır: numara yükselir ve
+   commit etiketlenir (örn. `v0.2.0`).
+
+Bilinmeye değer tek tuhaflık: Release PR'ı bir robot token'ı açar; CI kapısı
+onda kendiliğinden çalışmaz. Sahip onu **GitHub arayüzünde kapatıp yeniden
+açar** — insan eliyle yeniden açma kapıyı tetikler ve PR gerçek bir yeşil
+kontrolle merge olur. (Yedek: yönetici muafiyetiyle doğrudan merge; güvenli,
+çünkü Release PR yalnız sürüme ve değişiklik günlüğüne dokunur.)
+
+---
+
+## Değişiklik günlüğü
+
+`CHANGELOG.md` repo kökünde yaşar, çünkü release-please onu orada üretir.
+Yalnız İngilizcedir (iki-dil kuralından muaf) ve uygulamanın içinde
+salt-okunur render edilir — Dokümanlar → Değişiklik Günlüğü, iki dilde de
+aynı dosyayı gösterir.
+
+npm publish yok, uygulama mağazası yok — uygulama özeldir ve yayın merge
+anında olur. Buradaki "release", iyi yapılmış kayıt düzenidir: doğru bir
+numara ve dürüst bir değişiklik günlüğü.
