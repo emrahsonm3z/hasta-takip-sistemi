@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.7.1](https://github.com/emrahsonm3z/hasta-takip-sistemi/compare/v0.7.0...v0.7.1) (2026-06-06)
+
+
+### Bug Fixes
+
+* **a11y:** actions header, reduced motion, and aria phrasing polish ([c4745f7](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/c4745f750f8e277e7b1fdaa7bf6f151c54bbe8f3))
+* **form:** wire aria-invalid and error announcement into the field shell ([dc7f060](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/dc7f060d53030a7b84924df25c16e8a264e2aa52))
+* **styles:** aa-compliant tag and icon tokens in light theme ([d529593](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/d5295933bfbbaa577e6fa09e273bf3cd745324e2))
+* **table:** localize the filter-popup aria labels ([1d2f7c5](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/1d2f7c5147746258b5d26cf3b209693581bfe5fd))
+
 ## [0.7.0](https://github.com/emrahsonm3z/hasta-takip-sistemi/compare/v0.6.0...v0.7.0) (2026-06-06)
 
 
