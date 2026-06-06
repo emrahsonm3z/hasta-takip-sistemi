@@ -33,8 +33,14 @@
   --gray-800: rgb(39 39 42);
   --gray-900: rgb(24 24 27);
   --app-background: var(--app-ground);
-  --app-success: rgb(34 197 94);
-  --app-danger: rgb(239 68 68);
+  --app-success: rgb(22 163 74);
+  --app-danger: rgb(220 38 38);
+  --app-tag-success: rgb(21 128 61);
+  --app-tag-info: rgb(3 105 161);
+  --app-tag-warning: rgb(194 65 12);
+  --app-tag-danger: rgb(185 28 28);
+  --app-tag-secondary-bg: rgb(82 82 91);
+  --app-tag-secondary-text: rgb(255 255 255);
   --app-card-bg: var(--surface-card);
   --app-card-border: var(--surface-border);
   --app-card-shadow: 0 1px 2px rgb(15 23 42 / 4%), 0 1px 3px rgb(15 23 42 / 6%);
@@ -71,6 +77,12 @@
   --surface-hover: rgb(255 255 255 / 3%);
   --app-success: rgb(74 222 128);
   --app-danger: rgb(248 113 113);
+  --app-tag-success: rgb(74 222 128);
+  --app-tag-info: rgb(56 189 248);
+  --app-tag-warning: rgb(251 146 60);
+  --app-tag-danger: rgb(248 113 113);
+  --app-tag-secondary-bg: rgb(212 212 216);
+  --app-tag-secondary-text: rgb(24 24 27);
   --app-card-shadow: none;
   --app-menu-item-hover-bg: rgb(255 255 255 / 5%);
 }
