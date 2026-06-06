@@ -17,8 +17,9 @@
     "menu": "Menü",
     "noResults": "Sonuç bulunamadı.",
     "clearFilters": "Filtreleri temizle",
-    "language": "Dil",
-    "theme": "Tema",
+    "languageSwitch": "İngilizce diline geç",
+    "themeToggleToLight": "Açık temaya geç",
+    "themeToggleToDark": "Koyu temaya geç",
     "actions": "İşlemler"
   },
   "errors": {
@@ -27,7 +28,8 @@
       "message": "Uygulama gerekli yapılandırmadan yoksun. Lütfen sistem yöneticinizle iletişime geçin."
     },
     "unexpected": "Beklenmeyen bir hata oluştu.",
-    "notFound": "Kayıt bulunamadı.",
+    "notFound": "Sayfa bulunamadı.",
+    "notFoundDetail": "Adres hatalı olabilir veya sayfa taşınmış olabilir. Aşağıdan hasta listesine dönebilirsiniz.",
     "loadFailed": "Veriler yüklenemedi.",
     "saveFailed": "Değişiklikler kaydedilemedi."
   },
@@ -69,7 +71,8 @@
     "actions": {
       "add": "Yeni Hasta",
       "edit": "Düzenle",
-      "delete": "Sil"
+      "delete": "Sil",
+      "header": "İşlemler"
     },
     "confirmDelete": {
       "header": "Hastayı Sil",
@@ -130,6 +133,11 @@
     }
   },
   "filters": {
+    "aria": {
+      "menu": "Filtre menüsü",
+      "operator": "Filtre operatörü",
+      "constraint": "Filtre kısıtı"
+    },
     "textPlaceholder": "Ara…",
     "datePlaceholder": "gg.aa.yyyy",
     "numberPlaceholder": "Sayı girin",

@@ -25,11 +25,25 @@ function PrimeReactLocaleBridge({ language }: { language: string }) {
 }
 
 export function AppPrimeReactProvider({ children }: { children: ReactNode }) {
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
+
+  const passThrough = {
+    column: {
+      filterMenuButton: { 'aria-label': t('filters.aria.menu') },
+      filterOperatorDropdown: { input: { 'aria-label': t('filters.aria.operator') } },
+      filterMatchModeDropdown: {
+        input: { 'aria-label': t('filters.aria.constraint') },
+      },
+    },
+  }
 
   return (
     <PrimeReactProvider
-      value={{ ...primeReactConfig, locale: toPrimeReactLocale(i18n.language) }}
+      value={{
+        ...primeReactConfig,
+        locale: toPrimeReactLocale(i18n.language),
+        pt: passThrough,
+      }}
     >
       <PrimeReactLocaleBridge language={i18n.language} />
       {children}

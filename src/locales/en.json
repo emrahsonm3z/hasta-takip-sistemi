@@ -17,8 +17,9 @@
     "menu": "Menu",
     "noResults": "No results found.",
     "clearFilters": "Clear filters",
-    "language": "Language",
-    "theme": "Theme",
+    "languageSwitch": "Switch language to Turkish",
+    "themeToggleToLight": "Switch to the light theme",
+    "themeToggleToDark": "Switch to the dark theme",
     "actions": "Actions"
   },
   "errors": {
@@ -27,7 +28,8 @@
       "message": "The application is missing required configuration. Please contact your administrator."
     },
     "unexpected": "An unexpected error occurred.",
-    "notFound": "Not found.",
+    "notFound": "Page not found.",
+    "notFoundDetail": "The address may be wrong or the page may have moved. You can return to the patient list below.",
     "loadFailed": "Failed to load data.",
     "saveFailed": "Changes could not be saved."
   },
@@ -69,7 +71,8 @@
     "actions": {
       "add": "New Patient",
       "edit": "Edit",
-      "delete": "Delete"
+      "delete": "Delete",
+      "header": "Actions"
     },
     "confirmDelete": {
       "header": "Delete Patient",
@@ -130,6 +133,11 @@
     }
   },
   "filters": {
+    "aria": {
+      "menu": "Filter menu",
+      "operator": "Filter operator",
+      "constraint": "Filter constraint"
+    },
     "textPlaceholder": "Search…",
     "datePlaceholder": "mm/dd/yyyy",
     "numberPlaceholder": "Enter a number",
