@@ -1,9 +1,9 @@
 # Hasta Modülü
 
-Bu doküman, hasta takibi özelliğini anlatır. Dürüst durum: **veri katmanı
-(1.1) ve liste ekranı (1.2) gönderildi** — modül hasta kayıtlarını yükler,
-saklar, listeler, sıralar, filtreler ve arar. Ekleme / düzenleme / silme (1.3)
-hâlâ planlıdır ve en altta öyle işaretlidir.
+Bu doküman, hasta takibi özelliğini anlatır. Modül **bütünüyle gönderildi**:
+veri katmanı (1.1), liste ekranı (1.2) ve ekleme / düzenleme / silme formu
+(1.3) — hasta kayıtlarını yükler, saklar, listeler, sıralar, filtreler, arar
+ve düzenler.
 
 ---
 
@@ -18,14 +18,19 @@ src/modules/patients/
 │   ├── usePatients.ts         useQuery: depoyu oku, boşsa bir kez tohumla
 │   └── usePatientMutations.ts ekle / güncelle / sil + invalidate + toast'lar
 ├── components/
-│   └── PatientList.tsx        AppDataTable üzerinde 7 kolonlu liste
+│   ├── PatientList.tsx        AppDataTable üzerinde 15 kolonlu liste
+│   ├── PatientDialog.tsx      Oluştur/düzenle dialog'u (AppDialog + PatientForm)
+│   ├── PatientForm.tsx        Form* sarmalayıcılarından kurulu Formik formu
+│   └── PatientTags.tsx        Ortak severity Tag'leri + dropdown seçenek şablonları
 ├── constants/
 │   ├── patient-tag.constants.ts  status/priority → Tag severity haritaları
 │   └── query-keys.ts          patientKeys factory'si
 ├── lib/
+│   ├── patient-form.schema.ts moda-duyarlı Yup şeması
 │   ├── patient-list.lib.ts    buildStatusFilterOptions (saf, birim-testli)
-│   ├── patient.mapper.ts      ham satır → tipli PatientRecord (saf, birim-testli)
-│   └── patient-storage.lib.ts createPatientStorage çekirdeği (saf, birim-testli)
+│   ├── patient-storage.lib.ts createPatientStorage çekirdeği (saf, birim-testli)
+│   ├── patient.form.ts        form değerleri ↔ model (saf, birim-testli)
+│   └── patient.mapper.ts      ham satır → tipli PatientRecord (saf, birim-testli)
 ├── models/
 │   └── patient.model.ts       PatientRecord + dört enum-benzeri union
 ├── pages/PatientsPage.tsx     İnce: usePatients → ErrorState | .card üzerinde PatientList
@@ -241,13 +246,20 @@ Mekanik:
   Boolean filtreleri etiketli TriStateCheckbox'tır (kutunun yanında alan
   adı); boolean hücreleri success/danger ikonları çizer (Tag severity
   tonları, `--app-success`/`--app-danger` olarak token'landı). fullName /
-  note / tags kolonları iki katına çıkarılmış min-genişlik taşır (16 / 24 /
+  note / tags kolonları genişletilmiş min-genişlik taşır (11.2 / 24 /
   16rem); kalanı içeriğe göre sığar.
-- **Yerleşim.** Kolonlar, wrapper'ın sabit `72rem` tablo tabanının üzerinde
-  içeriğe göre sığar; dar ekranda tablo kendi bölgesi içinde yatay kayar
-  (kaydırmayı ezilmiş kolonlar yerine gerçek kılan bu tabandır) — gerçek bir
-  mobil yerleşim (istifli/öncelikli kolonlar) ayrı, sonraki bir karardır. Satırlar kartın
-  üzerinde transparan, ince ızgara çizgileriyle oturur (şerit yok).
+- **Yerleşim.** `md` (768px) ve üzerinde kolonlar, wrapper'ın sabit `72rem`
+  tablo tabanının üzerinde içeriğe göre sığar; dar pencerede tablo kendi
+  bölgesi içinde yatay kayar (kaydırmayı ezilmiş kolonlar yerine gerçek kılan
+  bu tabandır). `md` altında mobil yoğunluk modu devrededir: kök yazı boyutu
+  12px'e iner (rem-tabanlı her şey yoğunlaşır) ve tüm düğmeler küçük metriği
+  alır (Stil dokümanına bakın); wrapper tablo tabanını bırakır; eylem kolonu
+  çizilmez; **fullName hücresi — solda dondurulmuş, yatay kaydırmada hep
+  görünür — düzenleme kontrolü olur**: AA-güvenli bağlantı renginde
+  (`--app-link`) gerçek bir düğme, etiketi `patients.actions.editNamed`
+  ("Düzenle: {{name}}"). Silme, düzenleme dialog'unun altlığına taşınır.
+  Satırlar kartın üzerinde transparan, ince ızgara çizgileriyle oturur
+  (şerit yok).
 
 ---
 
@@ -284,11 +296,16 @@ değerlerine geri almak yeniden devre dışı bırakır.
 - **Sistem alanları.** `id` (`pat-` + UUID) ve `createdAt` oluşturmada
   üretilir; düzenlemede korunur, düzenlenemeyen `notes` alanı gibi. Saf
   `toPatientRecord(values, system)` bunları birleştirir ve birim-testlidir.
-- **Satır eylemleri.** Sağda dondurulmuş eylem kolonu (yatay kaydırma altında
-  hep görünür; dondurulmuş hücreler `_prime-skin.scss`'te opak kart zemini +
-  katmanlı hover tonu alır), aria-etiketli düzenle + sil ikon düğmeleriyle.
-  Düzenle, dialog'u önceden doldurulmuş açar; sil, hastayı adıyla anan
-  `confirmDialog()` çalıştırır ("{{name}} silinsin mi?"), onay → silme
-  mutation'ı. Satıra-tıkla gezinme YOKTUR (1.3'te kararlaştırıldı).
+- **Satır eylemleri.** `md` ve üzerinde: sağda dondurulmuş eylem kolonu
+  (yatay kaydırma altında hep görünür; dondurulmuş hücreler
+  `_prime-skin.scss`'te opak kart zemini + katmanlı hover tonu alır),
+  aria-etiketli düzenle + sil ikon düğmeleriyle. Düzenle, dialog'u önceden
+  doldurulmuş açar; sil, hastayı adıyla anan `confirmDialog()` çalıştırır
+  ("{{name}} silinsin mi?"), onay → silme mutation'ı. `md` altında eylem
+  kolonu çizilmez: solda dondurulmuş hasta-adı düğmesi aynı düzenleme
+  dialog'unu açar; dialog altlığı (yalnız düzenleme modunda) danger-outlined
+  bir Sil düğmesi kazanır — aynı `confirmDialog()` akışını çalıştırır ve
+  onaylı silmede dialog'u kapatır. Satıra-tıkla gezinme YOKTUR (1.3'te
+  kararlaştırıldı).
 - **Veri.** Her şey `usePatientMutations` üzerinden akar (depolama →
   invalidate → toast'lar); veri katmanına dokunulmadı.

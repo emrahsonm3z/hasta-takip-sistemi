@@ -97,6 +97,7 @@ tokens — once for each mode (`styles/theme/_dark.scss`, `:root` + `.dark`):
 | `--app-card-shadow` | faint two-layer shadow | `none` (border separates) |
 | `--app-menu-item-hover-bg` | `rgb(100 116 139 / 10%)` | `rgb(255 255 255 / 5%)` |
 | `--app-success` / `--app-danger` (boolean/tristate icons; AA 3:1 on the light card) | `rgb(22 163 74)` / `rgb(220 38 38)` | `rgb(74 222 128)` / `rgb(248 113 113)` |
+| `--app-link` (clickable text on the card — the below-`md` patient-name edit control; AA 4.5:1 in both modes, where raw `--primary-color` sits at 2.5:1 on the light card) | `rgb(21 128 61)` | `var(--primary-color)` |
 | `--app-tag-{success,info,warning,danger}` (Tag backgrounds; light = the AA −700 set, dark = Lara's passing hues) | `rgb(21 128 61)` / `rgb(3 105 161)` / `rgb(194 65 12)` / `rgb(185 28 28)` | `rgb(74 222 128)` / `rgb(56 189 248)` / `rgb(251 146 60)` / `rgb(248 113 113)` |
 | `--app-tag-secondary-bg` / `-text` (Lara ships no secondary Tag rule) | `rgb(82 82 91)` / `rgb(255 255 255)` | `rgb(212 212 216)` / `rgb(24 24 27)` |
 | `--app-checkmark` (checked checkbox icon — Lara dark bakes a dark check) | `rgb(255 255 255)` | same |
@@ -162,7 +163,24 @@ rules in `@layer tw-components { … }`; same-named layers merge.
 
 The typeface is **Inter** (variable woff2, self-hosted in `styles/fonts/` —
 no CDN), with `latin-ext` covering the Turkish glyphs ğ ş ı İ. The base size
-is 14px, set in `main.scss`. Rendered documentation uses the
+is 14px, set in `main.scss` — and drops to **12px below the `md` breakpoint**
+(`(width <= 767px)`) in the same block, so on phones everything rem-based
+(text, PrimeReact paddings and widths, Tailwind spacing) densifies from one
+rule. Alongside it, `_prime-skin.scss` renders every PrimeReact button at
+Lara's small metrics below the same breakpoint (one `@media` block —
+PrimeReact 10 has no preset/`definePreset` API; that is v11). Breakpoint
+values have one canonical style-side source:
+`styles/utils/_breakpoints.scss` (`$bp-sm: 640px`, `$bp-md: 768px`,
+`$bp-lg: 1024px`, no output) — every SCSS media query derives from these
+(e.g. `(width <= #{$bp-md - 1px})` → 767px), never a hardcoded pixel value;
+the TypeScript side mirrors the breakpoints it consumes (md, lg) in
+`src/config/breakpoints.ts`
+(`BREAKPOINTS` + the derived `MEDIA` matchMedia strings). A tap-target audit
+at the 12px root found nothing under the WCAG 2.2 minimum of 24px CSS; the
+below-`md` patient-name edit control is itself sized to that floor — it
+fills its table cell with a `min-h-8` minimum (2rem = 24px at the 12px
+root; WCAG 2.5.8).
+Rendered documentation uses the
 `@tailwindcss/typography` plugin with every `--tw-prose-*` colour mapped onto
 the theme variables in `tailwind.config.ts` — left-aligned on the content
 surface, capped at ~920px — and one more place where dark mode costs nothing

@@ -95,6 +95,7 @@ her mod için bir kez (`styles/theme/_dark.scss`, `:root` + `.dark`):
 | `--app-card-shadow` | hafif iki katmanlı gölge | `none` (ayrımı kenarlık yapar) |
 | `--app-menu-item-hover-bg` | `rgb(100 116 139 / 10%)` | `rgb(255 255 255 / 5%)` |
 | `--app-success` / `--app-danger` (boolean/tristate ikonları; açık kartta AA 3:1) | `rgb(22 163 74)` / `rgb(220 38 38)` | `rgb(74 222 128)` / `rgb(248 113 113)` |
+| `--app-link` (kart üzerinde tıklanabilir metin — `md`-altı hasta-adı düzenleme kontrolü; iki modda da AA 4.5:1, ham `--primary-color` açık kartta 2.5:1'de kalır) | `rgb(21 128 61)` | `var(--primary-color)` |
 | `--app-tag-{success,info,warning,danger}` (Tag zeminleri; açık = AA −700 seti, koyu = Lara'nın geçen tonları) | `rgb(21 128 61)` / `rgb(3 105 161)` / `rgb(194 65 12)` / `rgb(185 28 28)` | `rgb(74 222 128)` / `rgb(56 189 248)` / `rgb(251 146 60)` / `rgb(248 113 113)` |
 | `--app-tag-secondary-bg` / `-text` (Lara secondary Tag kuralı göndermez) | `rgb(82 82 91)` / `rgb(255 255 255)` | `rgb(212 212 216)` / `rgb(24 24 27)` |
 | `--app-checkmark` (işaretli checkbox ikonu — Lara dark koyu işaret gömer) | `rgb(255 255 255)` | aynı |
@@ -160,7 +161,24 @@ asla kabuk stilimizin üzerine taşmaz. Özel SCSS partial'ları kurallarını
 
 Yazı tipi **Inter**'dir (variable woff2, `styles/fonts/` içinde self-hosted —
 CDN yok); `latin-ext` Türkçe glifleri (ğ ş ı İ) kapsar. Taban boyut 14px'tir,
-`main.scss`'te kurulur. Render edilen dokümantasyon `@tailwindcss/typography`
+`main.scss`'te kurulur — ve aynı blokta **`md` kırılımının altında
+(`(width <= 767px)`) 12px'e iner**; böylece telefonlarda rem-tabanlı her şey
+(metin, PrimeReact dolgu ve genişlikleri, Tailwind boşlukları) tek kuraldan
+yoğunlaşır. Yanında `_prime-skin.scss`, aynı kırılımın altında her PrimeReact
+düğmesini Lara'nın küçük metrikleriyle çizer (tek `@media` bloğu — PrimeReact
+10'da preset/`definePreset` API'si yoktur; o v11'dir). Kırılım değerlerinin
+stil tarafında tek kanonik kaynağı vardır:
+`styles/utils/_breakpoints.scss` (`$bp-sm: 640px`, `$bp-md: 768px`,
+`$bp-lg: 1024px`, çıktı yok) — her SCSS media sorgusu bunlardan türetilir
+(örn. `(width <= #{$bp-md - 1px})` → 767px), asla sabit piksel değil;
+TypeScript tarafı tükettiği kırılımları (md, lg)
+`src/config/breakpoints.ts`'te yansıtır
+(`BREAKPOINTS` + türetilmiş `MEDIA` matchMedia string'leri). 12px kökte
+yapılan dokunma-hedefi denetimi, WCAG 2.2 asgarisi 24px CSS'in altında hiçbir
+şey bulmadı; `md`-altı hasta-adı düzenleme kontrolünün kendisi de bu tabana
+boyutlandırılır — tablo hücresini `min-h-8` asgarisiyle doldurur (2rem =
+12px kökte 24px; WCAG 2.5.8). Render edilen dokümantasyon
+`@tailwindcss/typography`
 eklentisini kullanır; her `--tw-prose-*` rengi `tailwind.config.ts` içinde
 tema değişkenlerine eşlenmiştir — içerik yüzeyinde sola hizalı, ~920px ile
 sınırlı — ve koyu modun hiçbir ek maliyet getirmediği bir yer daha

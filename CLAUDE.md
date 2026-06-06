@@ -170,6 +170,7 @@ src/
 ├── __test__/                node:test specs mirroring the source tree (§11); value imports relative, type-only via @/
 ├── config/
 │   ├── env.ts               Typed frozen env + validateRequiredEnvVars()
+│   ├── breakpoints.ts       BREAKPOINTS (md 768 / lg 1024) + derived MEDIA matchMedia strings — the ONLY TS source of breakpoint queries (§3.1)
 │   └── vite-env.d.ts        ImportMetaEnv augmentation
 ├── plugins/                 Third-party library configuration
 │   ├── primereact.ts        Provider value + COMPLETE TR locale (every key of PrimeReact's default locale incl. aria) + EN pins + Turkish overrides of the standard text filter modes + arrayContainsAny (§8; lib/filters.ts)
@@ -225,7 +226,7 @@ src/
 │   ├── tr.json
 │   └── en.json
 ├── styles/                  SCSS (SMACSS) + token aliases (§9)
-│   ├── main.scss            Entry: @use base/layout/module partials + primeicons @import, @layer tw-base/primereact/tw-components/tw-utilities order + Tailwind-in-layers + 14px base/antialiased (§9)
+│   ├── main.scss            Entry: @use base/layout/module partials + primeicons @import, @layer tw-base/primereact/tw-components/tw-utilities order + Tailwind-in-layers + 14px base (12px below md)/antialiased (§9)
 │   ├── base/_typography.scss  @font-face Inter (variable woff2, latin + latin-ext) (§9)
 │   ├── fonts/               Self-hosted Inter variable woff2 (latin + latin-ext) — no npm dep (§9)
 │   ├── images/pattern.png   Self-hosted PrimeVue/Atlantis pattern asset (licensed, like the Inter font) — fed to --glow-image (§9)
@@ -233,7 +234,8 @@ src/
 │   ├── layout/_sidebar.scss   .l-sidebar shell — TRANSPARENT (no surface/shadow), fixed 21rem, brand, grouped nav, 8px primary border-left accent; .l-sidebar-drawer mobile-panel overrides (§9)
 │   ├── layout/_topbar.scss    .l-topbar shell — transparent (start cluster, action chips, :focus-visible-only focus) (§9)
 │   ├── modules/_card.scss     .card the RAISED surface (card-bg + 1px border + faint shadow, radius 8px, padding 14px) (§9)
-│   ├── modules/_prime-skin.scss  Re-points baked PrimeReact surfaces (DataTable/paginator/inputs/dropdown panel) at the --surface-* vars (§9)
+│   ├── modules/_prime-skin.scss  Re-points baked PrimeReact surfaces (DataTable/paginator/inputs/dropdown panel) at the --surface-* vars + below-md small-button metrics (§9)
+│   ├── utils/_breakpoints.scss  $bp-sm/$bp-md/$bp-lg (640/768/1024px) — the ONLY SCSS source of breakpoint values (no output) (§9)
 │   ├── utils/_tokens.scss   SCSS aliases of the v10 theme vars + the app-* custom tokens (for component SCSS)
 │   └── theme/_dark.scss     THE neutral source (:root + .dark): zinc override of the Lara --surface-*/--gray-* scale + app-* tokens (ground/card/border now ALIAS --surface-*) + radii/width/--glow-* (§9)
 ├── types/
@@ -309,13 +311,17 @@ it never re-implements them.
   = a `toolbar` action slot + global search box (`aria-label`ed) +
   clear-filters button (resets search + column filters). Two-mode loading
   (initial / empty → `Loading`; background refetch → DataTable overlay).
-  Columns AUTO-FIT content above a fixed `72rem` table floor
-  (`tableStyle.minInlineSize` inside the wrapper — NOT a prop), so on narrow
-  viewports the table SCROLLS horizontally instead of crushing; a true mobile
-  layout is a separate later decision. The header is responsive: below `sm`
+  ALWAYS renders `size="small"` (inside the wrapper — never per-usage). At
+  `md`+ columns AUTO-FIT content above a fixed `72rem` table floor
+  (`tableStyle.minInlineSize` inside the wrapper — NOT a prop), so narrow
+  windows SCROLL horizontally instead of crushing; below `md`
+  (`useMediaQuery(MEDIA.belowMd)`) the wrapper DROPS the floor and
+  the app-wide density rules apply (12px root + small buttons, §9 §16). The
+  header is responsive: below `sm`
   the toolbar right-aligns and the search box stretches full-width with the
   clear button beside it; ≥ `sm` is the desktop layout. Responsive paginator
-  (`useMediaQuery`) with a `{first} - {last} / {total}` report. `emptyMessageKey` → `t()`. Props: `data`, `children`
+  (a compact, PageLinks-free template below `md` via the same `isBelowMd`
+  switch) with a `{first} - {last} / {total}` report. `emptyMessageKey` → `t()`. Props: `data`, `children`
   (columns), `dataKey`, `loading`, `toolbar`, `showSearchBox`,
   `globalFilterFields`, `defaultFilters`, controlled sort (`sortField` /
   `sortOrder` / `onSort`), `paginator`, `rows`, `rowsPerPageOptions`,
@@ -323,7 +329,11 @@ it never re-implements them.
   `emptyMessageKey`. Not its job: data fetching, page errors. No selection /
   expansion / grouping; NO row-click (decided in 1.3 — explicit row action
   buttons instead, in a frozen-right actions column whose opaque cell skin
-  lives in `_prime-skin.scss`). `buildInitialFilters` is the unit-tested pure
+  lives in `_prime-skin.scss`). Below `md` the patients list renders NO
+  actions column: the LEFT-frozen fullName cell is the edit control (a real
+  button on `--app-link`, aria via `patients.actions.editNamed`) and delete
+  moves to the edit-dialog footer (same `confirmDialog()` flow).
+  `buildInitialFilters` is the unit-tested pure
   core.
 - `AppDataTableFilters` — the shared menu-filter ELEMENT factories
   (PrimeReact 10 ships only an InputText default element — verified, 0
@@ -387,8 +397,13 @@ subsection label, §13.4), sorts by `menuOrder`, resolves labels via
 `/docs`, the chevron toggles, auto-open under `/docs`);
 `useNotify` (success/error/info; accepts ONLY a `TranslationKey` — a literal is a
 compile error, §8; the pure `normalizeErrorKey` in `useNotify.lib` maps unknown
-errors to `errors.unexpected`); `useMediaQuery` (matchMedia hook for responsive UI,
-e.g. AppDataTable's paginator).
+errors to `errors.unexpected`); `useMediaQuery` (matchMedia hook for responsive UI:
+AppDataTable's paginator, the below-`md` density/actions switches, the `lg`
+sidebar collapse. SINGLE-SOURCE RULE: the hook stays generic, but every call
+site passes a `MEDIA.*` constant from `config/breakpoints.ts` (md 768 /
+lg 1024; `belowMd` = ≤767px) — never an inline
+query literal; SCSS media queries derive from `styles/utils/_breakpoints.scss`
+(`$bp-sm/$bp-md/$bp-lg`) the same way).
 
 **Lib** (`src/lib`): `text` (Turkish normalise + collator), `date`
 (`formatDate`), `pickLocalized`, `route` (`getRouteHandle`).
@@ -693,6 +708,7 @@ literals live ONLY in these definitions (written as
 | `--app-card-shadow` | `0 1px 2px rgb(15 23 42 / 4%), 0 1px 3px rgb(15 23 42 / 6%)` | `none` |
 | `--app-menu-item-hover-bg` (sidebar hover/active overlay) | `rgb(100 116 139 / 10%)` | `rgb(255 255 255 / 5%)` |
 | `--app-success` / `--app-danger` (boolean/tristate icons; AA 3:1 on the light card) | `rgb(22 163 74)` / `rgb(220 38 38)` | `rgb(74 222 128)` / `rgb(248 113 113)` |
+| `--app-link` (clickable text on the card — the below-md name edit control; AA 4.5:1 both modes, raw primary fails light at 2.5:1) | `rgb(21 128 61)` | `var(--primary-color)` |
 | `--app-tag-{success,info,warning,danger}` (Tag backgrounds; light = AA −700 set, dark = Lara's passing hues) | `rgb(21 128 61)` / `rgb(3 105 161)` / `rgb(194 65 12)` / `rgb(185 28 28)` | `rgb(74 222 128)` / `rgb(56 189 248)` / `rgb(251 146 60)` / `rgb(248 113 113)` |
 | `--app-tag-secondary-bg` / `-text` (Lara ships NO secondary Tag rule) | `rgb(82 82 91)` / `rgb(255 255 255)` | `rgb(212 212 216)` / `rgb(24 24 27)` |
 | `--app-checkmark` (checked checkbox icon; Lara dark bakes a dark check) | `rgb(255 255 255)` | same |

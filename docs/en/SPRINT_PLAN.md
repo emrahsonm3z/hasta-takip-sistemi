@@ -616,6 +616,42 @@ project slugs → Vercel build env. `npm audit`: 0 vulnerabilities.
 
 ---
 
+### P.2 ✅ Mobile DataTable density (below-md)
+**Goal:** A denser, usable patient table below the `md` breakpoint (768px)
+without changing desktop behaviour.
+**As landed:** The DataTable always renders `size="small"` (inside
+`AppDataTable` — never per-usage). Breakpoints were centralized into single
+sources: `config/breakpoints.ts` (`BREAKPOINTS` md 768 / lg 1024 + derived
+`MEDIA` matchMedia strings — every `useMediaQuery` call site uses a
+constant, incl. the `lg` sidebar collapse) and
+`styles/utils/_breakpoints.scss` (`$bp-*` — every SCSS media query derives
+from them; no decimals, below-`md` is exactly `(width <= 767px)`). The
+paginator was harmonized to the same below-`md` flip (ONE mobile breakpoint
+— the former `sm` switch and its 640–767 seam are gone): below `md` the
+template drops the numbered PageLinks
+(`First/Prev/Report/Next/Last/RowsPerPageDropdown`); ≥ `md` keeps the full
+numbered template. The
+fullName column floor was trimmed 30% (16rem → 11.2rem). Below `md`
+(`MEDIA.belowMd`): the root font drops to 12px
+(`main.scss`, so everything rem-based densifies), every PrimeReact button
+takes Lara's small metrics (`_prime-skin.scss` `@media` block —
+`definePreset` is a v11 API absent from pinned v10, so the skin layer is the
+sanctioned mechanism), the `72rem` table floor is dropped, the frozen-right
+actions column is not rendered, the **left-frozen fullName cell becomes the
+edit control** (a real button on the new `--app-link` token: light
+`rgb(21 128 61)` ≈5.0:1 AA where raw primary fails at 2.5:1, dark
+`var(--primary-color)`; `aria-label` via the new `patients.actions.editNamed`
+key), and deletion moves into the edit-dialog footer (danger-outlined, edit
+mode only, reusing the same `confirmDialog()` flow and closing the dialog on
+success). Tap-target audit at the 12px root: nothing under 24px CSS
+(WCAG 2.2). ≥ `md` is unchanged.
+**Tests:** none new (no new pure logic; hooks/components excluded by the
+testing policy — manual QA matrix light/dark × 375/767/768px).
+**DoD:** + global DoD. Commits `feat(styles): …`, `feat(table): …`,
+`feat(patients): …`, `docs: …`.
+
+---
+
 ## Backlog / later (out of the case-study scope)
 
 - Patient detail route (`/patients/:patientId`) using the `build()` helper +

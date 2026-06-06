@@ -1,9 +1,9 @@
 # Patients Module
 
-This document describes the patient tracking feature. Honest status: **the
-data layer (1.1) and the list screen (1.2) are shipped** — the module loads,
-stores, lists, sorts, filters, and searches patient records. Add/edit/delete
-(1.3) is still planned and marked so at the bottom.
+This document describes the patient tracking feature. The module is **fully
+shipped**: the data layer (1.1), the list screen (1.2), and the add / edit /
+delete form (1.3) — it loads, stores, lists, sorts, filters, searches, and
+edits patient records.
 
 ---
 
@@ -18,14 +18,19 @@ src/modules/patients/
 │   ├── usePatients.ts         useQuery: read storage, seed once if empty
 │   └── usePatientMutations.ts add / update / remove + invalidate + toasts
 ├── components/
-│   └── PatientList.tsx        The 7-column list over AppDataTable
+│   ├── PatientList.tsx        The 15-column list over AppDataTable
+│   ├── PatientDialog.tsx      The create/edit dialog (AppDialog + PatientForm)
+│   ├── PatientForm.tsx        The Formik form, built from the Form* wrappers
+│   └── PatientTags.tsx        Shared severity Tags + dropdown option templates
 ├── constants/
 │   ├── patient-tag.constants.ts  status/priority → Tag severity maps
 │   └── query-keys.ts          patientKeys factory
 ├── lib/
+│   ├── patient-form.schema.ts mode-aware Yup schema
 │   ├── patient-list.lib.ts    buildStatusFilterOptions (pure, unit-tested)
-│   ├── patient.mapper.ts      raw row → typed PatientRecord (pure, unit-tested)
-│   └── patient-storage.lib.ts createPatientStorage core (pure, unit-tested)
+│   ├── patient-storage.lib.ts createPatientStorage core (pure, unit-tested)
+│   ├── patient.form.ts        form values ↔ model (pure, unit-tested)
+│   └── patient.mapper.ts      raw row → typed PatientRecord (pure, unit-tested)
 ├── models/
 │   └── patient.model.ts       PatientRecord + the four enum-like unions
 ├── pages/PatientsPage.tsx     Thin: usePatients → ErrorState | PatientList on a .card
@@ -241,12 +246,18 @@ The mechanics:
   filters are a labelled TriStateCheckbox (field name beside the box);
   boolean cells render success/danger icons (the Tag severity hues, exposed
   as `--app-success`/`--app-danger`). The fullName / note / tags columns
-  carry doubled min-widths (16 / 24 / 16rem); the rest auto-fit.
-- **Layout.** Columns auto-fit their content above the wrapper's fixed
-  `72rem` table floor; on narrow viewports the table scrolls horizontally
-  inside its region (the floor is what makes the scroll real instead of
-  crushed columns) — a true mobile layout (stacked/priority columns) is a
-  separate, later decision. Rows sit
+  carry widened min-widths (11.2 / 24 / 16rem); the rest auto-fit.
+- **Layout.** At `md` (768px) and above, columns auto-fit their content above
+  the wrapper's fixed `72rem` table floor; on narrow windows the table
+  scrolls horizontally inside its region (the floor is what makes the scroll
+  real instead of crushed columns). Below `md` the mobile density mode
+  applies: the root font drops to 12px (everything rem-based densifies) and
+  all buttons take small metrics (see the Styling doc); the wrapper drops the
+  table floor; the actions column is not rendered; and the **fullName cell —
+  frozen left, so it survives horizontal panning — becomes the edit control**:
+  a real button in the AA-safe link colour (`--app-link`), labelled
+  `patients.actions.editNamed` ("Edit: {{name}}"). Deletion moves into the
+  edit dialog's footer. Rows sit
   transparent on the card with hairline gridlines (no stripes).
 
 ---
@@ -283,11 +294,15 @@ and reverting an edit back to its initial values re-disables it.
 - **System fields.** `id` (`pat-` + UUID) and `createdAt` are generated on
   create; on edit they are preserved, as is the non-editable `notes` field.
   The pure `toPatientRecord(values, system)` merges them and is unit-tested.
-- **Row actions.** A frozen-right actions column (always visible under the
-  horizontal scroll; the frozen cells get an opaque card background with a
-  layered hover tint in `_prime-skin.scss`) with aria-labelled edit + delete
-  icon buttons. Edit opens the dialog pre-filled; delete runs
-  `confirmDialog()` naming the patient ("{{name}} silinsin mi?"), accept →
-  the remove mutation. There is NO row-click navigation (decided in 1.3).
+- **Row actions.** At `md` and above: a frozen-right actions column (always
+  visible under the horizontal scroll; the frozen cells get an opaque card
+  background with a layered hover tint in `_prime-skin.scss`) with
+  aria-labelled edit + delete icon buttons. Edit opens the dialog pre-filled;
+  delete runs `confirmDialog()` naming the patient ("{{name}} silinsin mi?"),
+  accept → the remove mutation. Below `md` the actions column is not
+  rendered: the left-frozen patient-name button opens the same edit dialog,
+  and the dialog footer gains a danger-outlined Delete button (edit mode
+  only) that runs the very same `confirmDialog()` flow and closes the dialog
+  on a confirmed delete. There is NO row-click navigation (decided in 1.3).
 - **Data.** Everything goes through `usePatientMutations` (storage →
   invalidate → toasts); the data layer was not touched.

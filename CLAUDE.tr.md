@@ -175,6 +175,7 @@ src/
 ├── __test__/                kaynak ağacını yansıtan node:test spec'leri (§11); value import'lar göreli, yalnız-tip @/ ile
 ├── config/
 │   ├── env.ts               Tipli donmuş env + validateRequiredEnvVars()
+│   ├── breakpoints.ts       BREAKPOINTS (md 768 / lg 1024) + türetilmiş MEDIA matchMedia string'leri — kırılım sorgularının TEK TS kaynağı (§3.1)
 │   └── vite-env.d.ts        ImportMetaEnv augmentation
 ├── plugins/                 Üçüncü-parti kütüphane konfigürasyonu
 │   ├── primereact.ts        Provider value + TAM TR locale (PrimeReact varsayılan locale'inin her anahtarı, aria dahil) + EN pinleri + standart metin filtre modlarının Türkçe override'ları + arrayContainsAny (§8; lib/filters.ts)
@@ -229,7 +230,7 @@ src/
 │   ├── tr.json
 │   └── en.json
 ├── styles/                  SCSS (SMACSS) + token alias'ları (§9)
-│   ├── main.scss            Giriş: base/layout/module partial'larını @use + primeicons @import, @layer tw-base/primereact/tw-components/tw-utilities sırası + katmanlarda Tailwind + 14px base/antialiased (§9)
+│   ├── main.scss            Giriş: base/layout/module partial'larını @use + primeicons @import, @layer tw-base/primereact/tw-components/tw-utilities sırası + katmanlarda Tailwind + 14px base (md altında 12px)/antialiased (§9)
 │   ├── base/_typography.scss  @font-face Inter (variable woff2, latin + latin-ext) (§9)
 │   ├── fonts/               Self-hosted Inter variable woff2 (latin + latin-ext) — npm bağımlılığı yok (§9)
 │   ├── images/pattern.png   Self-hosted PrimeVue/Atlantis pattern asset'i (lisanslı, Inter fontu gibi) — --glow-image'a verilir (§9)
@@ -237,7 +238,8 @@ src/
 │   ├── layout/_sidebar.scss   .l-sidebar kabuğu — TRANSPARAN (yüzey/gölge yok), sabit 21rem, brand, gruplu nav, 8px primary border-left aksanı; .l-sidebar-drawer mobil panel override'ları (§9)
 │   ├── layout/_topbar.scss    .l-topbar kabuğu — transparan (start cluster, aksiyon chip'leri, yalnız-:focus-visible odak) (§9)
 │   ├── modules/_card.scss     .card RAISED yüzey (card-bg + 1px border + hafif gölge, radius 8px, padding 14px) (§9)
-│   ├── modules/_prime-skin.scss  Pişmiş PrimeReact yüzeylerini (DataTable/paginator/input/dropdown paneli) --surface-* değişkenlerine yönlendirir (§9)
+│   ├── modules/_prime-skin.scss  Pişmiş PrimeReact yüzeylerini (DataTable/paginator/input/dropdown paneli) --surface-* değişkenlerine yönlendirir + md-altı küçük-düğme metrikleri (§9)
+│   ├── utils/_breakpoints.scss  $bp-sm/$bp-md/$bp-lg (640/768/1024px) — kırılım değerlerinin TEK SCSS kaynağı (çıktı yok) (§9)
 │   ├── utils/_tokens.scss   v10 tema değişkenlerinin + app-* özel token'larının SCSS alias'ları (bileşen SCSS'i için)
 │   └── theme/_dark.scss     NÖTR kaynak (:root + .dark): Lara --surface-*/--gray-* skalasının zinc override'ı + app-* token'ları (ground/card/border artık --surface-* ALIAS'ı) + radii/genişlik/--glow-* (§9)
 ├── types/
@@ -313,13 +315,17 @@ referans verir; asla yeniden uygulamaz.
   (aşağıda) ortak öğe verir. Header = bir `toolbar` aksiyon slotu + global
   arama kutusu (`aria-label`'lı) + filtre-temizle butonu (arama + kolon
   filtrelerini sıfırlar). İki-mod loading (ilk/boş → `Loading`; arka plan
-  refetch → DataTable overlay). Kolonlar sabit `72rem` tablo
-  tabanının ÜZERİNDE içeriğe göre sığar (wrapper içinde
-  `tableStyle.minInlineSize` — prop DEĞİL); dar ekranda tablo ezilmek yerine
-  yatay KAYAR; gerçek mobil yerleşim ayrı, sonraki karar. Header
+  refetch → DataTable overlay). HER ZAMAN `size="small"` ile çizilir
+  (wrapper'ın içinde — asla kullanım başına değil). `md`+ üzerinde kolonlar
+  sabit `72rem` tablo tabanının ÜZERİNDE içeriğe göre sığar (wrapper içinde
+  `tableStyle.minInlineSize` — prop DEĞİL); dar pencere ezilmek yerine
+  yatay KAYAR; `md` altında (`useMediaQuery(MEDIA.belowMd)`)
+  wrapper tabanı BIRAKIR ve uygulama-geneli yoğunluk kuralları devreye girer
+  (12px kök + küçük düğmeler, §9 §16). Header
   responsive'dir: `sm` altında toolbar sağa yaslanır, arama kutusu tam
   genişliğe uzar ve temizle düğmesi yanında durur; `sm` ve üstü masaüstü
-  yerleşimidir. Responsive paginator (`useMediaQuery`) + `{first} - {last} /
+  yerleşimidir. Responsive paginator (`md` altında, aynı `isBelowMd`
+  anahtarıyla kompakt, PageLinks'siz şablon) + `{first} - {last} /
   {total}` raporu. `emptyMessageKey` → `t()`. Prop'lar: `data`,
   `children` (kolonlar), `dataKey`, `loading`, `toolbar`, `showSearchBox`,
   `globalFilterFields`, `defaultFilters`, controlled sort (`sortField` /
@@ -328,7 +334,11 @@ referans verir; asla yeniden uygulamaz.
   `emptyMessageKey`. Görevi DEĞİL: veri çekme, sayfa hataları. Selection /
   expansion / grouping yok; satıra-tıkla YOK (1.3'te kararlaştırıldı —
   bunun yerine sağda dondurulmuş eylem kolonunda açık satır eylem düğmeleri;
-  opak dondurulmuş-hücre kaplaması `_prime-skin.scss`'te).
+  opak dondurulmuş-hücre kaplaması `_prime-skin.scss`'te). `md` altında hasta
+  listesi eylem kolonu ÇİZMEZ: SOLDA dondurulmuş fullName hücresi düzenleme
+  kontrolüdür (`--app-link` üzerinde gerçek bir düğme, aria
+  `patients.actions.editNamed` ile) ve silme, düzenleme dialog'unun altlığına
+  taşınır (aynı `confirmDialog()` akışı).
   `buildInitialFilters` unit-test'li saf çekirdektir.
 - `AppDataTableFilters` — ortak menü-filtre ÖĞE fabrikaları (PrimeReact 10
   yalnız InputText varsayılan öğesi gönderir — doğrulandı, diğer tipler için
@@ -394,7 +404,12 @@ eder — disclosure satırı `/docs`'a gider, chevron açar/kapar, `/docs` altı
 otomatik açık); `useNotify` (success/error/info; YALNIZ bir `TranslationKey` kabul eder —
 literal derleme hatasıdır, §8; `useNotify.lib`'deki saf `normalizeErrorKey`
 bilinmeyen hatayı `errors.unexpected`'e eşler); `useMediaQuery` (responsive UI için
-matchMedia hook'u, ör. AppDataTable paginator'ı).
+matchMedia hook'u: AppDataTable paginator'ı, `md`-altı yoğunluk/eylem
+anahtarları, `lg` sidebar collapse. TEK-KAYNAK KURALI: hook genel kalır ama
+her çağrı yeri `config/breakpoints.ts`'ten bir `MEDIA.*` sabiti geçirir
+(md 768 / lg 1024; `belowMd` = ≤767px) — asla
+satır-içi sorgu literal'i değil; SCSS media sorguları da aynı şekilde
+`styles/utils/_breakpoints.scss`'ten (`$bp-sm/$bp-md/$bp-lg`) türetilir).
 
 **Lib** (`src/lib`): `text` (Türkçe normalize + collator), `date` (`formatDate`),
 `pickLocalized`, `route` (`getRouteHandle`).
@@ -702,6 +717,7 @@ konvansiyonuna uymak için hex değil `rgb()` yazılır); her tüketici token'ı
 | `--app-card-shadow` | `0 1px 2px rgb(15 23 42 / 4%), 0 1px 3px rgb(15 23 42 / 6%)` | `none` |
 | `--app-menu-item-hover-bg` (sidebar hover/active overlay) | `rgb(100 116 139 / 10%)` | `rgb(255 255 255 / 5%)` |
 | `--app-success` / `--app-danger` (boolean/tristate ikonları; açık kartta AA 3:1) | `rgb(22 163 74)` / `rgb(220 38 38)` | `rgb(74 222 128)` / `rgb(248 113 113)` |
+| `--app-link` (kart üzerinde tıklanabilir metin — md-altı ad düzenleme kontrolü; iki modda AA 4.5:1, ham primary açıkta 2.5:1'de kalır) | `rgb(21 128 61)` | `var(--primary-color)` |
 | `--app-tag-{success,info,warning,danger}` (Tag zeminleri; açık = AA −700 seti, koyu = Lara'nın geçen tonları) | `rgb(21 128 61)` / `rgb(3 105 161)` / `rgb(194 65 12)` / `rgb(185 28 28)` | `rgb(74 222 128)` / `rgb(56 189 248)` / `rgb(251 146 60)` / `rgb(248 113 113)` |
 | `--app-tag-secondary-bg` / `-text` (Lara secondary Tag kuralı GÖNDERMEZ) | `rgb(82 82 91)` / `rgb(255 255 255)` | `rgb(212 212 216)` / `rgb(24 24 27)` |
 | `--app-checkmark` (işaretli checkbox ikonu; Lara dark koyu işaret gömer) | `rgb(255 255 255)` | aynı |
