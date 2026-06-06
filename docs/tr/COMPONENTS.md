@@ -42,9 +42,11 @@ altı standart metin modu Türkçe-duyarlı olacak şekilde global override
 edilir, özel `arrayContainsAny` tag herhangi-birini karşılar), bir toolbar
 yuvası, filtreleri temizleme düğmesi, iki yükleme modu (ilk → `Loading`; arka
 plan yenileme → tablonun overlay'i) ve küçük ekranlarda `useMediaQuery`
-üzerinden kompakt şablona geçen paginator. Kolonlar içeriğe göre sığar; dar
-ekranda tablo kendi bölgesi içinde yatay kayar — gerçek bir mobil yerleşim
-ayrı, sonraki bir karardır.
+üzerinden kompakt şablona geçen paginator. Kolonlar sabit `72rem` tablo tabanının
+üzerinde içeriğe göre sığar; dar ekranda tablo, kolonlarını ezmek yerine
+kendi bölgesi içinde yatay kayar — gerçek bir mobil yerleşim ayrı, sonraki
+bir karardır. Header responsive'dir: `sm` altında toolbar sağa yaslanır ve
+arama kutusu, yanındaki filtre-temizle düğmesiyle tam genişliğe uzar.
 
 Bir kolonun varsayılan InputText öğesinden fazlasına ihtiyacı olduğunda,
 `components/AppDataTableFilters.tsx`'teki ortak fabrikalar demo-standardı
@@ -112,6 +114,7 @@ placeholder derleme hatasıdır):
 | `FormCalendar` | Calendar | `minDate` |
 | `FormCheckbox` | Checkbox | satır içi yerleşim: kutu + etiket tek satırda (üstte etiket yok, hata yuvası yok) |
 | `FormChips` | Chips | |
+| `FormDirtyListener` | — (hiçbir şey çizmez) | Formik `dirty`'sini yukarı bildirir; sabit dialog altlığı bir şey değişene dek kaydetmeyi devre dışı bırakabilir |
 
 Doğrulama mesajları serileştirilmiş `{ key, values }` JSON'u olarak gelir
 (`plugins/yup.ts` yazar) ve çizim anında çevrilir:

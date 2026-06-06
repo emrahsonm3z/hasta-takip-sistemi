@@ -242,9 +242,11 @@ The mechanics:
   boolean cells render success/danger icons (the Tag severity hues, exposed
   as `--app-success`/`--app-danger`). The fullName / note / tags columns
   carry doubled min-widths (16 / 24 / 16rem); the rest auto-fit.
-- **Layout.** Columns auto-fit their content; on narrow viewports the table
-  scrolls horizontally inside its region — expected behaviour; a true mobile
-  layout (stacked/priority columns) is a separate, later decision. Rows sit
+- **Layout.** Columns auto-fit their content above the wrapper's fixed
+  `72rem` table floor; on narrow viewports the table scrolls horizontally
+  inside its region (the floor is what makes the scroll real instead of
+  crushed columns) — a true mobile layout (stacked/priority columns) is a
+  separate, later decision. Rows sit
   transparent on the card with hairline gridlines (no stripes).
 
 ---
@@ -257,7 +259,9 @@ max-height `min(750px, 70vh)`, pinned header + footer with only the content
 scrolling, 75vw/95vw responsive breakpoints). Only three things differ by
 mode: the title ("Yeni Hasta" / "Hasta Düzenle"), the initial values
 (`createEmptyFormValues()` / `toFormValues(record)`), and the submit target
-(add / update mutation).
+(add / update mutation). The footer Kaydet is DISABLED until the form is
+dirty (`FormDirtyListener` → `disabled={!dirty}`): create starts disabled,
+and reverting an edit back to its initial values re-disables it.
 
 - **Form.** Built ONLY from the shared `Form*` wrappers. Sections (uppercase
   muted heading + hairline, i18n `patients.form.sections.*`): patient info
