@@ -4,6 +4,7 @@ import { Outlet, useLocation, useMatches } from 'react-router-dom'
 
 import { Loading } from '@/components/Loading'
 import { useMediaQuery } from '@/composables/useMediaQuery'
+import { MEDIA } from '@/config/breakpoints'
 import { getRouteHandle } from '@/lib/route'
 
 import { AppSidebar } from './AppSidebar'
@@ -13,7 +14,7 @@ export function AppLayout() {
   const { t } = useTranslation()
   const matches = useMatches()
   const location = useLocation()
-  const isDesktop = useMediaQuery('(min-width: 1024px)')
+  const isDesktop = useMediaQuery(MEDIA.minLg)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const contentScrollRef = useRef<HTMLElement>(null)
