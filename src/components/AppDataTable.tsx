@@ -12,6 +12,7 @@ import { InputText } from 'primereact/inputtext'
 
 import { Loading } from '@/components/Loading'
 import { useMediaQuery } from '@/composables/useMediaQuery'
+import { MEDIA } from '@/config/breakpoints'
 import type { TranslationKey } from '@/types/i18n.types'
 
 import { buildInitialFilters } from './AppDataTable.lib'
@@ -37,9 +38,10 @@ interface AppDataTableProps<T extends object> {
   emptyMessageKey?: TranslationKey
 }
 
-const MOBILE_PAGINATOR_TEMPLATE = 'PrevPageLink CurrentPageReport NextPageLink'
+const MOBILE_PAGINATOR_TEMPLATE =
+  'FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown'
 const DESKTOP_PAGINATOR_TEMPLATE =
-  'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown CurrentPageReport'
+  'FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown'
 
 export function AppDataTable<T extends object>({
   data,
@@ -62,7 +64,7 @@ export function AppDataTable<T extends object>({
   emptyMessageKey = 'common.noResults',
 }: AppDataTableProps<T>) {
   const { t } = useTranslation()
-  const isMobile = useMediaQuery('(max-width: 640px)')
+  const isBelowMd = useMediaQuery(MEDIA.belowMd)
   const [filters, setFilters] = useState<DataTableFilterMeta>(() =>
     buildInitialFilters(FilterMatchMode.CONTAINS, defaultFilters, showSearchBox),
   )
@@ -124,7 +126,7 @@ export function AppDataTable<T extends object>({
       rows={rows}
       rowsPerPageOptions={rowsPerPageOptions}
       paginatorTemplate={
-        isMobile ? MOBILE_PAGINATOR_TEMPLATE : DESKTOP_PAGINATOR_TEMPLATE
+        isBelowMd ? MOBILE_PAGINATOR_TEMPLATE : DESKTOP_PAGINATOR_TEMPLATE
       }
       currentPageReportTemplate="{first} - {last} / {totalRecords}"
       filters={filters}
@@ -140,7 +142,8 @@ export function AppDataTable<T extends object>({
       onSort={onSort}
       removableSort
       scrollable
-      tableStyle={{ minInlineSize: '72rem' }}
+      tableStyle={isBelowMd ? undefined : { minInlineSize: '72rem' }}
+      size="small"
       rowHover={rowHover}
       stripedRows={stripedRows}
       rowClassName={rowClass}
