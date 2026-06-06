@@ -84,11 +84,12 @@ export function AppDataTable<T extends object>({
   }
 
   const header = (
-    <div className="flex flex-wrap items-center gap-2">
-      {toolbar}
-      <div className="ml-auto flex items-center gap-2">
+    <div className="flex flex-wrap items-center gap-4">
+      {toolbar ? <div className="ml-auto sm:ml-0">{toolbar}</div> : null}
+      <div className="ml-auto flex w-full items-center gap-2 sm:w-auto">
         {showSearchBox ? (
           <InputText
+            className="w-full sm:w-auto"
             value={globalValue}
             placeholder={t('common.search')}
             aria-label={t('common.search')}
@@ -98,6 +99,7 @@ export function AppDataTable<T extends object>({
           />
         ) : null}
         <Button
+          className="shrink-0"
           icon="pi pi-filter-slash"
           severity="secondary"
           outlined
@@ -138,6 +140,7 @@ export function AppDataTable<T extends object>({
       onSort={onSort}
       removableSort
       scrollable
+      tableStyle={{ minInlineSize: '72rem' }}
       rowHover={rowHover}
       stripedRows={stripedRows}
       rowClassName={rowClass}
