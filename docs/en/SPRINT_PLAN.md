@@ -523,7 +523,7 @@ owner decision, no LICENSE file exists to mirror).
 **Tests:** (reuse the registry-integrity test.)
 **DoD:** + global DoD. Commit `docs: refresh stale references and rescope sprint 2`.
 
-### 2.2 ⬜ Test suite to priority bar (rescoped — Sprint 2 audit)
+### 2.2 ✅ Test suite to priority bar (rescoped — Sprint 2 audit)
 **Goal:** Close the last pure-logic gaps. (The original MSW/`src/test/setup`/
 colocated wording predated the §11 node-only decision; the priority targets it
 listed — mapper, `pickLocalized`, `formatDate`, Turkish normalise/collator, the
@@ -534,9 +534,19 @@ specs across 18 files under `src/__test__/`.)
 `useMenu.lib` docs-children grouping (drop either if found covered indirectly).
 **Files:** `src/__test__/lib/date.test.ts`, `src/__test__/composables/useMenu.lib.test.ts`.
 **Acceptance:** `npm test` green and deterministic; no DOM/network harness.
-**Tests:** this task is tests.
-**DoD:** + global DoD; `TESTING.md` reflects reality. Commit
-`test: cover the remaining pure-logic branches`.
+**As landed:** BOTH micro-spec candidates were coverage-gated and DROPPED —
+`formatDate` invalid-`Date` exercises the already-covered `isValid()` guard
+(an input-shape variant, not a branch), and the `useMenu.lib` docs-children
+grouping (children sort + `subsectionKey` → `sectionLabel`, incl. the
+negative case) is directly asserted by the existing four specs. Outcome: 0
+new specs; the suite stands at 18 files / 88 specs. `TESTING.md` reality
+check passed with zero edits. The §17 sweep was clean except 14 dead locale
+entries (`common.{edit,add,clear,confirm,close,back,actions}` ×2 files; a
+computed-key sweep confirmed no dynamic `common.*` construction) — removed,
+with the test placeholder keys retargeted. Sprint 2 complete.
+**Tests:** this task is tests (outcome: none needed).
+**DoD:** + global DoD. Commits `chore(i18n): remove dead locale keys`,
+`docs: close out the sprint 2 test bar`.
 
 ### 2.3 ✅ Accessibility pass + final polish + first release
 **Goal:** Clear the a11y floor, do a final review, and cut the first release.
