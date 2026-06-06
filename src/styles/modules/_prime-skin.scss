@@ -143,9 +143,14 @@
     padding: 0.75rem;
   }
 
-  .p-checkbox .p-checkbox-box {
+  .p-checkbox:not(.p-highlight) .p-checkbox-box {
     background: $surface-ground;
     border-color: $surface-border;
+  }
+
+  .p-checkbox.p-highlight .p-checkbox-box .p-checkbox-icon,
+  .p-checkbox.p-highlight .p-checkbox-box svg {
+    color: $app-checkmark;
   }
 
   .app-tristate.is-true .p-checkbox-box {
