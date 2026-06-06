@@ -22,9 +22,11 @@ export function FormInputNumber({
 
   return (
     <FormField name={name} labelKey={labelKey}>
-      {({ id, invalid }) => (
+      {({ id, invalid, errorId }) => (
         <InputNumber
           inputId={id}
+          aria-invalid={invalid}
+          aria-describedby={errorId}
           value={field.value}
           placeholder={placeholderKey ? t(placeholderKey) : undefined}
           invalid={invalid}
