@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.0](https://github.com/emrahsonm3z/hasta-takip-sistemi/compare/v0.7.1...v0.8.0) (2026-06-06)
+
+
+### Features
+
+* **monitoring:** errors-only sentry with a pure noise filter ([3a1331a](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/3a1331ac6b605bcb55815e7ea20ca13fb78eaff1))
+
 ## [0.7.1](https://github.com/emrahsonm3z/hasta-takip-sistemi/compare/v0.7.0...v0.7.1) (2026-06-06)
 
 
