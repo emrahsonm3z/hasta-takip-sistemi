@@ -540,7 +540,7 @@ yansılanacak LICENSE dosyası yok).
 **Test:** (registry-bütünlük testini yeniden kullan.)
 **DoD:** + global DoD. Commit `docs: refresh stale references and rescope sprint 2`.
 
-### 2.2 ⬜ Test paketini öncelik çıtasına getir (yeniden kapsamlandı — Sprint 2 denetimi)
+### 2.2 ✅ Test paketini öncelik çıtasına getir (yeniden kapsamlandı — Sprint 2 denetimi)
 **Hedef:** Son saf-mantık boşluklarını kapat. (Özgün MSW/`src/test/setup`/
 colocate ifadesi §11 yalnız-node kararından önceydi; saydığı öncelik hedefleri —
 mapper, `pickLocalized`, `formatDate`, Türkçe normalize/collator, depolama saf
@@ -552,9 +552,20 @@ altında 18 dosyada 88 spec.)
 herhangi biri düşürülür).
 **Dosyalar:** `src/__test__/lib/date.test.ts`, `src/__test__/composables/useMenu.lib.test.ts`.
 **Kabul:** `npm test` yeşil ve deterministik; DOM/ağ harness'i yok.
-**Test:** bu görevin kendisi testtir.
-**DoD:** + global DoD; `TESTING.md` gerçeği yansıtır. Commit
-`test: cover the remaining pure-logic branches`.
+**Yapılan:** HER İKİ mikro-spec adayı da kapsama denetiminden geçirilip
+DÜŞÜRÜLDÜ — `formatDate` geçersiz-`Date`, zaten kapsanan `isValid()`
+korumasını çalıştırır (dal değil, girdi-şekli varyantı); `useMenu.lib`
+doküman-çocukları gruplaması (çocuk sıralama + `subsectionKey` →
+`sectionLabel`, olumsuz durum dahil) mevcut dört spec'te doğrudan
+doğrulanıyor. Sonuç: 0 yeni spec; paket 18 dosya / 88 spec'te durur.
+`TESTING.md` gerçeklik kontrolü sıfır düzenlemeyle geçti. §17 taraması, 14
+ölü locale girdisi dışında temizdi (`common.{edit,add,clear,confirm,close,
+back,actions}` ×2 dosya; hesaplanmış-anahtar taraması dinamik `common.*`
+kurulumu olmadığını doğruladı) — kaldırıldı, test yer-tutucu anahtarları
+yeniden hedeflendi. Sprint 2 tamamlandı.
+**Test:** bu görevin kendisi testtir (sonuç: gerek kalmadı).
+**DoD:** + global DoD. Commit'ler `chore(i18n): remove dead locale keys`,
+`docs: close out the sprint 2 test bar`.
 
 ### 2.3 ✅ Erişilebilirlik geçişi + son rötuş
 **Hedef:** a11y zeminini geç ve son incelemeyi yap.
