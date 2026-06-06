@@ -29,7 +29,9 @@ export function validateRequiredEnvVars(source: Record<string, unknown> = rawEnv
 }
 
 const apiUrlValue = rawEnv.VITE_API_URL
+const sentryDsnValue = rawEnv.VITE_SENTRY_DSN
 
 export const env = Object.freeze({
   apiUrl: typeof apiUrlValue === 'string' ? apiUrlValue : '',
+  sentryDsn: typeof sentryDsnValue === 'string' ? sentryDsnValue : '',
 })

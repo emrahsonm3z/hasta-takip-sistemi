@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
+import { captureException } from '@sentry/react'
 
 import { FatalError } from './FatalError'
 
@@ -21,7 +22,13 @@ export class AppErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, info: ErrorInfo): void {
-    console.error('Unhandled render error:', error, info.componentStack)
+    if (import.meta.env.PROD) {
+      captureException(error, {
+        contexts: { react: { componentStack: info.componentStack } },
+      })
+    } else {
+      console.error('Unhandled render error:', error, info.componentStack)
+    }
   }
 
   render(): ReactNode {
