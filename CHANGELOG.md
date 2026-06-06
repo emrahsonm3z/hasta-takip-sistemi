@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.7.0](https://github.com/emrahsonm3z/hasta-takip-sistemi/compare/v0.6.0...v0.7.0) (2026-06-06)
+
+
+### Features
+
+* **form:** disable submit until the form is dirty ([68fcfcb](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/68fcfcb7b8f9105e23e40584ca7633a36461683f))
+
+
+### Bug Fixes
+
+* **layout:** mobile topbar alignment and table horizontal-scroll min-width ([c998e9d](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/c998e9df1ade16217b647ae7e91c8a6ba2dc86bd))
+* **styles:** show the checkbox checked state ([a18b52c](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/a18b52ca01af317a47b2f6e22753a28bfb47688d))
+
 ## [0.6.0](https://github.com/emrahsonm3z/hasta-takip-sistemi/compare/v0.5.0...v0.6.0) (2026-06-05)
 
 
