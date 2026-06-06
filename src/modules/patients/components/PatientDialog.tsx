@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { FormikProps } from 'formik'
 import { Button } from 'primereact/button'
@@ -35,6 +35,7 @@ export function PatientDialog({
 }: PatientDialogProps) {
   const { t } = useTranslation()
   const formikRef = useRef<FormikProps<PatientFormValues>>(null)
+  const [dirty, setDirty] = useState(false)
 
   const initialValues = useMemo(
     () => (mode === 'edit' && patient ? toFormValues(patient) : createEmptyFormValues()),
@@ -69,6 +70,7 @@ export function PatientDialog({
           <Button
             type="button"
             label={t('common.save')}
+            disabled={!dirty}
             loading={saving}
             onClick={() => {
               void formikRef.current?.submitForm()
@@ -84,6 +86,7 @@ export function PatientDialog({
         initialValues={initialValues}
         formikRef={formikRef}
         onSubmit={handleSubmit}
+        onDirtyChange={setDirty}
       />
     </AppDialog>
   )
