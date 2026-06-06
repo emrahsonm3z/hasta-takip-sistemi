@@ -634,6 +634,41 @@ zafiyet.
 
 ---
 
+### P.2 ✅ Mobil tablo yoğunluğu (md-altı)
+**Hedef:** Masaüstü davranışını değiştirmeden, `md` kırılımının (768px)
+altında daha yoğun, kullanılabilir bir hasta tablosu.
+**Yapılan:** DataTable her zaman `size="small"` ile çizilir (`AppDataTable`
+içinde — asla kullanım başına değil). Kırılımlar tek kaynaklarda
+merkezîleştirildi: `config/breakpoints.ts` (`BREAKPOINTS` md 768 / lg 1024 +
+türetilmiş `MEDIA` matchMedia string'leri — her `useMediaQuery` çağrısı bir
+sabit kullanır, `lg` sidebar collapse dahil) ve
+`styles/utils/_breakpoints.scss` (`$bp-*` — her SCSS media sorgusu bunlardan
+türetilir; ondalık yok, `md`-altı tam olarak `(width <= 767px)`). Paginator
+aynı `md`-altı geçişe uyumlandı (TEK mobil kırılım — eski `sm` anahtarı ve
+640–767 dikişi kalktı): `md` altında şablon numaralı PageLinks'i bırakır
+(`İlk/Önceki/Rapor/Sonraki/Son/RowsPerPageDropdown`); `md` ve üzeri tam
+numaralı şablonu korur. fullName
+kolon tabanı %30 daraltıldı (16rem → 11.2rem). `md` altında
+(`MEDIA.belowMd`): kök yazı boyutu 12px'e iner
+(`main.scss`; rem-tabanlı her şey yoğunlaşır), her PrimeReact düğmesi
+Lara'nın küçük metriklerini alır (`_prime-skin.scss` `@media` bloğu —
+`definePreset` v11 API'sidir, pinli v10'da yoktur; onaylı mekanizma skin
+katmanıdır), `72rem` tablo tabanı bırakılır, sağda dondurulmuş eylem kolonu
+çizilmez, **solda dondurulmuş fullName hücresi düzenleme kontrolü olur**
+(yeni `--app-link` token'ında gerçek bir düğme: açıkta `rgb(21 128 61)`
+≈5.0:1 AA — ham primary 2.5:1'de kalır —, koyuda `var(--primary-color)`;
+`aria-label` yeni `patients.actions.editNamed` anahtarıyla) ve silme,
+düzenleme dialog'unun altlığına taşınır (danger-outlined, yalnız düzenleme
+modu; aynı `confirmDialog()` akışını kullanır ve başarıda dialog'u kapatır).
+12px kökte dokunma-hedefi denetimi: 24px CSS altında hiçbir şey (WCAG 2.2).
+`md` ve üzeri değişmedi.
+**Testler:** yeni yok (yeni saf mantık yok; hook/bileşenler test politikası
+dışı — manuel QA matrisi açık/koyu × 375/767/768px).
+**DoD:** + global DoD. Commit'ler `feat(styles): …`, `feat(table): …`,
+`feat(patients): …`, `docs: …`.
+
+---
+
 ## Backlog / sonra (vaka çalışması kapsamı dışı)
 
 - `build()` yardımcısı + dinamik `title` handle kullanan hasta detay route'u

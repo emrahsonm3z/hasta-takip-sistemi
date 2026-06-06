@@ -41,11 +41,19 @@ filters apply ONLY on Apply — and the per-type match-mode dropdown; the six
 standard text modes are globally overridden to be Turkish-aware, and the
 custom `arrayContainsAny` covers tag any-of), a toolbar slot, a clear-filters
 button, two loading modes (initial → `Loading`; background refetch → the
-table's overlay), and a paginator that switches to a compact template on
-small screens via `useMediaQuery`. Columns auto-fit their content above a
-fixed `72rem` table floor, so on narrow viewports the table scrolls
-horizontally inside its region instead of crushing its columns — a true
-mobile layout is a separate, later decision. The header is responsive: below
+table's overlay), and a paginator that drops the numbered PageLinks below
+`md` — the same `isBelowMd` switch as the density mode: on phones the
+template is the compact `First/Prev/Report/Next/Last` set plus the
+rows-per-page dropdown; at `md` and above the full numbered template
+renders. The table always renders at PrimeReact's
+small size (`size="small"` inside the wrapper — call sites never set it). At
+`md` (768px) and above, columns auto-fit their content above a fixed `72rem`
+table floor, so on narrow windows the table scrolls horizontally inside its
+region instead of crushing its columns. Below `md` the wrapper drops that
+floor (columns shrink to their own minimums) and the app-wide density rules
+take over — 12px root size and small buttons, see the Styling doc; the
+patients list additionally swaps its row actions for a tap-friendly pattern
+(see the patients module doc). The header is responsive: below
 `sm` the toolbar right-aligns and the search box stretches full-width with
 the clear-filters button beside it.
 
@@ -189,7 +197,7 @@ chips (see the Languages and Styling docs for what they drive).
 | --- | --- | --- |
 | `useMenu` | `composables/useMenu.ts` | Single menu source — builds groups (and the docs children) from route constants |
 | `useNotify` | `composables/useNotify.ts` | Key-only toast API |
-| `useMediaQuery` | `composables/useMediaQuery.ts` | `matchMedia` hook (paginator, sidebar breakpoints) |
+| `useMediaQuery` | `composables/useMediaQuery.ts` | `matchMedia` hook — generic, but every call site passes a `MEDIA.*` constant from `config/breakpoints.ts` (never an inline query literal) |
 | `normalizeTurkish` / `compareTurkish` / `turkishIncludes` / `sortRowsByTurkishValue` | `lib/text.ts` | Turkish-aware normalise / collator sort / contains / row sorting |
 | `turkishStartsWith` … `turkishNotEquals` / `arrayContainsAny` | `lib/filters.ts` | Pure predicates behind the Turkish-overridden standard text modes + tag any-of |
 | `formatDate` | `lib/date.ts` | The only date formatter (Day.js, active locale) |
