@@ -9,7 +9,13 @@ export function NotFound() {
   return (
     <div role="alert" className="p-6">
       <h1 className="text-xl font-semibold text-text">{t('errors.notFound')}</h1>
-      <Link to={PATIENT_ROUTES.LIST.path} className="mt-2 inline-block text-primary">
+      <p className="mt-2 max-w-prose text-sm text-text-secondary">
+        {t('errors.notFoundDetail')}
+      </p>
+      <Link
+        to={PATIENT_ROUTES.LIST.path}
+        className="mt-4 inline-block font-medium text-primary"
+      >
         {t('patients.title')}
       </Link>
     </div>

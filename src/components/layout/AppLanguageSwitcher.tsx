@@ -8,7 +8,7 @@ export function AppLanguageSwitcher() {
   return (
     <button
       type="button"
-      aria-label={t('common.language')}
+      aria-label={t('common.languageSwitch')}
       onClick={() => void i18n.changeLanguage(next)}
       className="l-topbar-iconbtn l-topbar-chip text-sm font-semibold text-text"
     >
