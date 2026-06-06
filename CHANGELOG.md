@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.9.0](https://github.com/emrahsonm3z/hasta-takip-sistemi/compare/v0.8.0...v0.9.0) (2026-06-06)
+
+
+### Features
+
+* **patients:** mobile name-edit control and dialog-footer delete ([e090d06](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/e090d06ee1c24269c5cab20ffee76c1e51984528))
+* **styles:** densify below-md and centralize SCSS breakpoint media queries ([438247a](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/438247a357a579d8cf96d1d71f715944f0227f49))
+* **table:** small size, below-md width floor and compact paginator on one breakpoint ([2062c4f](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/2062c4f194d382889e1d39bd9df4d190da57a6ed))
+
 ## [0.8.0](https://github.com/emrahsonm3z/hasta-takip-sistemi/compare/v0.7.1...v0.8.0) (2026-06-06)
 
 
