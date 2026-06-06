@@ -1,5 +1,10 @@
 {
   "name": "hasta-takip-sistemi",
+  "description": "Bilingual (TR/EN) patient tracking panel — React 18 + PrimeReact case study",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/emrahsonm3z/hasta-takip-sistemi.git"
+  },
   "private": true,
   "version": "0.7.0",
   "type": "module",
