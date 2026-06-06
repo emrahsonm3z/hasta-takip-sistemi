@@ -413,7 +413,12 @@ export function PatientList({
         filterElement={createdAtFilterElement}
         body={(patient: PatientListRow) => formatDate(patient.createdAt)}
       />
-      <Column frozen alignFrozen="right" body={actionsBody} />
+      <Column
+        frozen
+        alignFrozen="right"
+        header={<span className="sr-only">{t('patients.actions.header')}</span>}
+        body={actionsBody}
+      />
     </AppDataTable>
   )
 }

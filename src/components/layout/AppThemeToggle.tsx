@@ -20,7 +20,9 @@ export function AppThemeToggle() {
       icon={mode === 'dark' ? 'pi pi-sun' : 'pi pi-moon'}
       text
       rounded
-      aria-label={t('common.theme')}
+      aria-label={t(
+        mode === 'dark' ? 'common.themeToggleToLight' : 'common.themeToggleToDark',
+      )}
       onClick={toggle}
       pt={{
         root: { className: 'l-topbar-iconbtn l-topbar-chip' },
