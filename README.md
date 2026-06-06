@@ -1,22 +1,48 @@
 # Hasta Takip Sistemi
 
+> Tek sayfalık, iki dilli bir poliklinik hasta paneli — modern React ile,
+> gerçek bir ürün özeniyle geliştirilmiş bir case study.
+
+**Canlı demo:** <https://hasta-takip-sistemi.vercel.app>
+
+https://github.com/user-attachments/assets/f342a767-a135-4385-8302-7e8bf83b882a
+
+_Tanıtım videosu (GitHub üzerinde oynatılır)._
+
 ---
 
 ## Bu nedir?
 
-**Hasta Takip Sistemi**, bir poliklinik hasta randevu ve takip panelidir
-(Abisena / Panates teknik case study'si). Hasta kayıtları salt-okunur bir
-API'den bir kez yüklenir; ekleme, düzenleme ve silme tarayıcı tarafında
-çalışır ve `localStorage`'da kalıcıdır. Arayüz tamamen iki dillidir
-(Türkçe / İngilizce) ve açık/koyu tema destekler.
+**Hasta Takip Sistemi**, bir poliklinikte hastaları ve randevuları yönetmek
+için tasarlanmış tek sayfalık bir paneldir; Abisena / Panates teknik case
+study'si olarak geliştirildi.
 
-Veri sahte (mock) veridir — `localStorage` kalıcılığı bu case study için
-bilinçli bir tercihtir, gerçek hasta verisi için bir desen değildir.
+Hasta kayıtları salt-okunur bir API'den bir kez çekilir. Ekleme, düzenleme ve
+silme işlemleri tamamen tarayıcıda yapılır ve `localStorage` sayesinde kalıcı
+olur. Arayüz baştan sona iki dillidir (Türkçe ve İngilizce) ve açık/koyu tema
+seçeneği sunar.
 
-Ayrıntılı dokümantasyon uygulamanın içinde yaşar: kenar menüsündeki
-**Dokümanlar** girişi, `docs/{en,tr}/` altındaki iki dilli markdown
-dokümanlarını render eder. Ajan-yönelimli operasyonel kurallar `CLAUDE.md`
-dosyasındadır.
+Veriler gerçek değil, örnek (mock) verilerdir. `localStorage` ile kalıcılık bu
+case study'ye özgü bilinçli bir tercihtir; gerçek bir hasta uygulamasında bu
+yaklaşım örnek alınmamalıdır.
+
+Ayrıntılı dokümantasyon uygulamanın içindedir: kenar menüsündeki **Dokümanlar**
+bölümü, `docs/{en,tr}/` altındaki iki dilli dosyaları gösterir. Yapay zekâ
+ajanlarına yönelik operasyonel kurallar ise `CLAUDE.md` dosyasında bulunur.
+
+---
+
+## Özellikler
+
+- **Hasta listesi:** 15 sütunlu, Türkçe alfabesine göre doğru sıralanan bir
+  tablo; sütun başlığından sıralama ve menüden filtreleme (Uygula düğmesiyle).
+- **Kayıt işlemleri:** Hasta ekleme, düzenleme ve silme; ekleme ile düzenleme
+  için ayrı doğrulama kuralları.
+- **İki dil, iki tema:** Türkçe / İngilizce arayüz ve açık / koyu tema.
+- **Uygulama içi dokümantasyon:** İki dilli ve gezilebilir bir doküman
+  görüntüleyici.
+- **Erişilebilirlik:** WCAG AA düzeyinde temel erişilebilirlik desteği.
+- **Hata izleme:** Yayın ortamında Sentry ile hata izleme (ücretsiz plan).
 
 ---
 
@@ -37,6 +63,7 @@ dosyasındadır.
 | i18n | react-i18next (TR / EN) + PrimeReact Locale API |
 | Tarihler | Day.js (aktif locale) |
 | Doküman görüntüleme | react-markdown + remark-gfm + rehype-highlight |
+| Hata izleme | Sentry (`@sentry/react`, yalnız production) |
 | Sürümleme | release-please (Conventional Commits) |
 | Test | Node 24 yerleşik test koşucusu (`node --test`) |
 | Deploy | Vercel |
@@ -59,6 +86,10 @@ npm ci
 cp .env.example .env
 npm run dev
 ```
+
+Çalıştırmadan önce `.env` dosyasındaki `VITE_API_URL` değerini seed veri
+kaynağına ayarlayın; yoksa uygulama, bozuk bir arayüz yerine anlaşılır bir
+yapılandırma-hatası ekranı gösterir.
 
 Uygulama `http://localhost:5173` adresinde açılır.
 
@@ -95,19 +126,19 @@ gösterir.
 
 ## Mimari özet
 
-Modüler yapı: her özellik `src/modules/` altında kendi bağımsız klasöründe
-yaşar ve tek kapısı olan bir barrel (`index.ts`) ile dışa açılır. Kesişen
-altyapı global katmanlardadır.
+Yapı modülerdir: her özellik `src/modules/` altında kendi bağımsız klasöründe
+durur ve dışarıya tek bir giriş noktasından (`index.ts`) açılır. Birden çok
+özelliği ilgilendiren altyapı ise global katmanlarda toplanır.
 
 ```
 src/
 ├── modules/
-│   ├── patients/   Hasta takibi (rota + sayfa; veri katmanı Sprint 1.1)
+│   ├── patients/   Hasta takibi: tam CRUD (liste, ekle/düzenle/sil) + mode-aware form doğrulama
 │   └── docs/       Uygulama-içi doküman görüntüleyici
 ├── components/     Global UI (App* wrapper'lar, form alanları, kabuk)
 ├── composables/    useMenu, useNotify, useMediaQuery
 ├── lib/            Saf yardımcılar (Türkçe metin, tarih, pickLocalized)
-├── plugins/        PrimeReact, tema, React Query, Day.js, i18n, Yup config
+├── plugins/        PrimeReact, tema, React Query, Day.js, i18n, Yup, Sentry config
 ├── router/         createBrowserRouter (layout + modül rotaları + 404)
 ├── locales/        tr.json + en.json (anahtar eşliği test-zorunlu)
 └── styles/         SCSS (SMACSS) + tema token'ları
