@@ -64,6 +64,7 @@
     "actions": {
       "add": "Yeni Hasta",
       "edit": "Düzenle",
+      "editNamed": "Düzenle: {{name}}",
       "delete": "Sil",
       "header": "İşlemler"
     },
