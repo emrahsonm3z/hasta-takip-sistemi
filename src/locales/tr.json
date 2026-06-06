@@ -3,13 +3,7 @@
     "save": "Kaydet",
     "cancel": "İptal",
     "delete": "Sil",
-    "edit": "Düzenle",
-    "add": "Ekle",
     "search": "Ara",
-    "clear": "Temizle",
-    "confirm": "Onayla",
-    "close": "Kapat",
-    "back": "Geri",
     "yes": "Evet",
     "no": "Hayır",
     "loading": "Yükleniyor…",
@@ -19,8 +13,7 @@
     "clearFilters": "Filtreleri temizle",
     "languageSwitch": "İngilizce diline geç",
     "themeToggleToLight": "Açık temaya geç",
-    "themeToggleToDark": "Koyu temaya geç",
-    "actions": "İşlemler"
+    "themeToggleToDark": "Koyu temaya geç"
   },
   "errors": {
     "config": {
