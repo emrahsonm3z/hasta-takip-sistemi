@@ -1,3 +1,4 @@
+@use 'utils/breakpoints' as *;
 @use 'theme/dark';
 @use 'base/motion';
 @use 'base/typography';
@@ -15,6 +16,12 @@
   html {
     background-color: var(--app-background);
     font-size: 14px;
+  }
+
+  @media (width <= #{$bp-md - 1px}) {
+    html {
+      font-size: 12px;
+    }
   }
 
   body {

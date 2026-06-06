@@ -1,3 +1,4 @@
+@use '../utils/breakpoints' as *;
 @use '../utils/tokens' as *;
 
 @layer tw-components {
@@ -26,7 +27,7 @@
     overflow-y: auto;
   }
 
-  @media (width >= 1024px) {
+  @media (width >= #{$bp-lg}) {
     .l-content {
       margin-inline-start: calc(var(--app-sidebar-width) + 1rem);
       transition: margin-inline-start 0.3s cubic-bezier(0, 0, 0.2, 1);
