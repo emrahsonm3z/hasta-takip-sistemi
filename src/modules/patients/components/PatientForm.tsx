@@ -6,6 +6,7 @@ import {
   FormCalendar,
   FormCheckbox,
   FormChips,
+  FormDirtyListener,
   FormDropdown,
   FormInputNumber,
   FormInputText,
@@ -28,6 +29,7 @@ interface PatientFormProps {
   initialValues: PatientFormValues
   formikRef: Ref<FormikProps<PatientFormValues>>
   onSubmit: (values: PatientFormValues) => void
+  onDirtyChange: (dirty: boolean) => void
 }
 
 function FormSectionHeading({ labelKey }: { labelKey: TranslationKey }) {
@@ -47,6 +49,7 @@ export function PatientForm({
   initialValues,
   formikRef,
   onSubmit,
+  onDirtyChange,
 }: PatientFormProps) {
   const { t } = useTranslation()
   const validationSchema = useMemo(() => buildPatientFormSchema(mode), [mode])
@@ -67,6 +70,7 @@ export function PatientForm({
     >
       {({ values }) => (
         <Form noValidate>
+          <FormDirtyListener onDirtyChange={onDirtyChange} />
           <div className="grid grid-cols-1 gap-x-4 gap-y-3 md:grid-cols-2">
             <FormSectionHeading labelKey="patients.form.sections.info" />
             <div className="md:col-span-2">
