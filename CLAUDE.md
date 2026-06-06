@@ -176,6 +176,8 @@ src/
 │   ├── theme.ts             Lara Green light/dark theme.css?url + applyTheme/setThemeMode over <link id="app-theme"> (§9; core deprecated/empty, icons via main.scss)
 │   ├── theme.lib.ts         Pure theme-swap logic (resolveThemeMode/applyThemeMode); no ?url, unit-tested under node:test
 │   ├── react-query.ts       QueryClient defaults (§10)
+│   ├── sentry.ts            Errors-only Sentry init (prod + DSN only; tracesSampleRate 0, no Replay; release hasta-takip-sistemi@version)
+│   ├── sentry.lib.ts        Pure shouldDropErrorEvent noise filter (ResizeObserver loops, extension frames; unit-tested)
 │   ├── dayjs.ts             Day.js plugins + tr/en locale + setDayjsLocale (§8)
 │   ├── i18n.ts              react-i18next init + PrimeReact + Day.js bridge (§8)
 │   └── yup.ts               yup.setLocale() → i18n message keys (§8, §3.1)
@@ -336,10 +338,15 @@ it never re-implements them.
   error boundaries, which catch unexpected bugs).
 - `RouteErrorBoundary` — React Router `errorElement` (`useRouteError`);
   `isRouteErrorResponse` 404 → `errors.notFound`, else `errors.unexpected`, with a
-  home link (dev shows the error message).
+  home link (dev shows the error message). Non-404 errors are reported to
+  Sentry once (prod only).
 - `AppErrorBoundary` — class boundary mounted **outermost** (just inside
   `StrictMode`, wrapping the providers) → `FatalError`; catches render crashes
-  anywhere below.
+  anywhere below and reports them to Sentry in prod (console in dev). Sentry
+  PII guard: never put field VALUES in thrown messages (keys/counts only),
+  and if a patient ID ever enters a route/URL (the backlog detail route),
+  breadcrumb URL scrubbing becomes required. Expected data errors
+  (`ErrorState`) and 404s are deliberately NOT captured.
 - `FatalError`, `ConfigErrorScreen` — fallback screens that BOTH use the
   react-i18next **singleton** (`i18n.t`) + plain JSX (no PrimeReact, no hook) so
   they survive a crashed or pre-provider tree. `FatalError` = the AppErrorBoundary

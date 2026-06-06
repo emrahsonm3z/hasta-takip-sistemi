@@ -180,6 +180,8 @@ src/
 │   ├── primereact.ts        Provider value + TAM TR locale (PrimeReact varsayılan locale'inin her anahtarı, aria dahil) + EN pinleri + standart metin filtre modlarının Türkçe override'ları + arrayContainsAny (§8; lib/filters.ts)
 │   ├── theme.ts             Lara Green light/dark theme.css?url + applyTheme/setThemeMode, <link id="app-theme"> üzerinden (§9)
 │   ├── react-query.ts       QueryClient varsayılanları (§10)
+│   ├── sentry.ts            Yalnız-hatalar Sentry init (yalnız prod + DSN; tracesSampleRate 0, Replay yok; release hasta-takip-sistemi@version)
+│   ├── sentry.lib.ts        Saf shouldDropErrorEvent gürültü filtresi (ResizeObserver döngüleri, eklenti frame'leri; birim-testli)
 │   ├── dayjs.ts             Day.js eklentileri + tr/en locale + setDayjsLocale (§8)
 │   ├── i18n.ts              react-i18next init + PrimeReact + Day.js köprüsü (§8)
 │   └── yup.ts               yup.setLocale() → i18n mesaj anahtarları (§8, §3.1)
@@ -342,9 +344,15 @@ referans verir; asla yeniden uygulamaz.
   bug'ları yakalayan error boundary'lerden ayrıdır).
 - `RouteErrorBoundary` — React Router `errorElement` (`useRouteError`);
   `isRouteErrorResponse` 404 → `errors.notFound`, değilse `errors.unexpected`, ana
-  sayfa link'i ile (dev hata mesajını gösterir).
+  sayfa link'i ile (dev hata mesajını gösterir). 404-dışı hatalar Sentry'ye
+  bir kez raporlanır (yalnız prod).
 - `AppErrorBoundary` — **en dışta** mount edilen class boundary (`StrictMode`'un hemen
-  içinde, provider'ları sarar) → `FatalError`; altındaki her render çökmesini yakalar.
+  içinde, provider'ları sarar) → `FatalError`; altındaki her render çökmesini yakalar
+  ve prod'da Sentry'ye raporlar (dev'de console). Sentry PII korkuluğu: fırlatılan
+  mesajlara asla alan DEĞERİ koyma (yalnız anahtar/sayı) ve bir hasta ID'si bir
+  route/URL'ye girerse (backlog'taki detay route'u) breadcrumb URL temizliği
+  zorunlu olur. Beklenen veri hataları (`ErrorState`) ve 404'ler BİLEREK
+  yakalanmaz.
 - `FatalError`, `ConfigErrorScreen` — HER İKİSİ de react-i18next **singleton**'ını
   (`i18n.t`) + düz JSX (PrimeReact/hook yok) kullanan fallback ekranları; böylece
   çökmüş veya provider-öncesi ağaçta da çalışırlar. `FatalError` = AppErrorBoundary

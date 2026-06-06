@@ -31,6 +31,7 @@ src/
 │   ├── theme.lib.ts         Pure theme-swap logic (unit-tested)
 │   ├── react-query.ts       QueryClient defaults
 │   ├── dayjs.ts             Day.js plugins + tr/en locales
+│   ├── sentry.ts            Errors-only Sentry init (prod + DSN only; pure noise filter in sentry.lib.ts)
 │   ├── i18n.ts              react-i18next init + PrimeReact + Day.js bridge
 │   └── yup.ts               yup.setLocale() → i18n message keys
 ├── router/
@@ -171,6 +172,25 @@ The Dokümanlar entry additionally nests the registered documents as children.
    `QueryClientProvider` → `PrimeReactProvider` → `AppToastProvider` → `App`.
 
 ---
+
+## Error monitoring (Sentry, errors-only)
+
+Production builds report unexpected errors to Sentry when `VITE_SENTRY_DSN`
+is set (free Developer tier: errors only — `tracesSampleRate: 0`, no Session
+Replay, no profiling). The init lives in `plugins/sentry.ts`, imported first
+in `main.tsx`; a pure `shouldDropErrorEvent` filter (unit-tested) drops
+ResizeObserver loop noise and browser-extension frames. The two existing
+error boundaries report what they catch (render crashes; non-404 route
+errors) — expected data errors and 404s are deliberately not captured.
+PII guards: `sendDefaultPii: false`; CRUD lives in `localStorage`, which the
+SDK never reads; thrown messages carry keys/counts, never field values — and
+if a patient ID ever enters a route/URL (the backlog detail route),
+breadcrumb URL scrubbing becomes required. Source-map upload
+(`@sentry/vite-plugin`) is double-gated on `SENTRY_AUTH_TOKEN`: without the
+token the build neither uploads nor emits `.map` files; the plugin's release
+name matches the SDK's (`hasta-takip-sistemi@<version>`) so uploaded maps
+symbolicate against the events. The DSN and the auth token are owner-managed
+(Vercel env) and never live in the repo.
 
 ## Configuration
 

@@ -595,6 +595,27 @@ target-naming aria-labels.
 
 ---
 
+## Post-case-study (owner-requested)
+
+### P.1 ✅ Sentry error tracking (errors-only, free tier)
+**Goal:** Production error visibility within the free Developer tier (5k
+errors/mo) — no tracing, no Replay, no profiling.
+**As landed:** `plugins/sentry.ts` (imported first in `main.tsx`) inits
+`@sentry/react` only in prod with a DSN (`VITE_SENTRY_DSN`, optional env —
+the app boots without it); `tracesSampleRate: 0`, `sendDefaultPii: false`,
+release `hasta-takip-sistemi@<version>` from package.json via a Vite define.
+The pure `shouldDropErrorEvent` filter (4 specs → suite at 92) drops
+ResizeObserver loop noise + extension frames. Captures wired into the
+existing boundaries (render crashes; non-404 route errors) — no new UI, no
+new strings; expected data errors and 404s not captured. Source-map upload
+double-gated on `SENTRY_AUTH_TOKEN` (no token → no upload AND no emitted
+`.map` files; CI gate green without secrets); the plugin release name matches
+the SDK's exactly. Owner-managed: DSN → Vercel prod env; auth token + org +
+project slugs → Vercel build env. `npm audit`: 0 vulnerabilities.
+**DoD:** + global DoD. Commits `feat(monitoring): …`, `build: …`, `docs: …`.
+
+---
+
 ## Backlog / later (out of the case-study scope)
 
 - Patient detail route (`/patients/:patientId`) using the `build()` helper +

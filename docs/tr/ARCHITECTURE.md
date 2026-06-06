@@ -30,6 +30,7 @@ src/
 │   ├── theme.lib.ts         Saf tema-takas mantığı (birim-testli)
 │   ├── react-query.ts       QueryClient varsayılanları
 │   ├── dayjs.ts             Day.js eklentileri + tr/en locale'leri
+│   ├── sentry.ts            Yalnız-hatalar Sentry init (yalnız prod + DSN; saf gürültü filtresi sentry.lib.ts'te)
 │   ├── i18n.ts              react-i18next init + PrimeReact + Day.js köprüsü
 │   └── yup.ts               yup.setLocale() → i18n mesaj anahtarları
 ├── router/
@@ -169,6 +170,26 @@ girdisi ayrıca kayıtlı dokümanları çocuk olarak iç içe taşır.
    `QueryClientProvider` → `PrimeReactProvider` → `AppToastProvider` → `App`.
 
 ---
+
+## Hata izleme (Sentry, yalnız-hatalar)
+
+Production build'leri, `VITE_SENTRY_DSN` ayarlandığında beklenmeyen hataları
+Sentry'ye raporlar (ücretsiz Developer katmanı: yalnız hatalar —
+`tracesSampleRate: 0`, Session Replay yok, profiling yok). Init,
+`main.tsx`'te ilk import edilen `plugins/sentry.ts`'te yaşar; saf (birim
+testli) `shouldDropErrorEvent` filtresi ResizeObserver döngü gürültüsünü ve
+tarayıcı-eklentisi frame'lerini düşürür. Mevcut iki error boundary
+yakaladıklarını raporlar (render çökmeleri; 404-dışı route hataları) —
+beklenen veri hataları ve 404'ler bilerek yakalanmaz. PII korkulukları:
+`sendDefaultPii: false`; CRUD `localStorage`'da yaşar ve SDK onu asla okumaz;
+fırlatılan mesajlar anahtar/sayı taşır, asla alan değeri taşımaz — ve bir
+hasta ID'si bir route/URL'ye girerse (backlog'taki detay route'u) breadcrumb
+URL temizliği zorunlu olur. Kaynak-haritası yüklemesi (`@sentry/vite-plugin`)
+`SENTRY_AUTH_TOKEN` üzerinde çift kapılıdır: token yokken build ne yükler ne
+de `.map` dosyası üretir; eklentinin release adı SDK'nınkiyle eşleşir
+(`hasta-takip-sistemi@<version>`), böylece yüklenen haritalar olaylara karşı
+sembolize olur. DSN ve auth token sahip tarafından yönetilir (Vercel env) ve
+asla repoda yaşamaz.
 
 ## Yapılandırma
 
