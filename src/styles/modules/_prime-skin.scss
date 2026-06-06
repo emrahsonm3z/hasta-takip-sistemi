@@ -219,6 +219,27 @@
     color: $text-color;
   }
 
+  .p-tag.p-tag-success {
+    background: $app-tag-success;
+  }
+
+  .p-tag.p-tag-info {
+    background: $app-tag-info;
+  }
+
+  .p-tag.p-tag-warning {
+    background: $app-tag-warning;
+  }
+
+  .p-tag.p-tag-danger {
+    background: $app-tag-danger;
+  }
+
+  .p-tag.p-tag-secondary {
+    background: $app-tag-secondary-bg;
+    color: $app-tag-secondary-text;
+  }
+
   .p-dialog {
     border: 1px solid $surface-border;
     border-radius: $app-radius-dialog;
