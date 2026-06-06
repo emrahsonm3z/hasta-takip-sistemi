@@ -1,3 +1,4 @@
+import '@/plugins/sentry'
 import '@/plugins/i18n'
 import '@/plugins/yup'
 import '@/styles/main.scss'
