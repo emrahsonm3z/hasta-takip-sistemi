@@ -42,9 +42,12 @@ standard text modes are globally overridden to be Turkish-aware, and the
 custom `arrayContainsAny` covers tag any-of), a toolbar slot, a clear-filters
 button, two loading modes (initial → `Loading`; background refetch → the
 table's overlay), and a paginator that switches to a compact template on
-small screens via `useMediaQuery`. Columns auto-fit their content; on narrow
-viewports the table scrolls horizontally inside its region — a true mobile
-layout is a separate, later decision.
+small screens via `useMediaQuery`. Columns auto-fit their content above a
+fixed `72rem` table floor, so on narrow viewports the table scrolls
+horizontally inside its region instead of crushing its columns — a true
+mobile layout is a separate, later decision. The header is responsive: below
+`sm` the toolbar right-aligns and the search box stretches full-width with
+the clear-filters button beside it.
 
 Where a column needs more than the default InputText element, the shared
 factories in `components/AppDataTableFilters.tsx` supply the demo-standard
@@ -112,6 +115,7 @@ placeholder is a compile error):
 | `FormCalendar` | Calendar | `minDate` |
 | `FormCheckbox` | Checkbox | inline layout: box + label on one row (no stacked label, no error slot) |
 | `FormChips` | Chips | |
+| `FormDirtyListener` | — (renders nothing) | reports Formik `dirty` upward so a pinned dialog footer can disable its submit until something changes |
 
 Validation messages arrive as serialized `{ key, values }` JSON (written by
 `plugins/yup.ts`) and are translated at render time:

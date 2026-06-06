@@ -497,6 +497,22 @@ frozen cells`, `docs: …`.
 
 ---
 
+### 1.4 ✅ Sprint-2-öncesi düzeltme paketi
+**Hedef:** Sprint 2'den önce sahibin bildirdiği dört sorunun düzeltilmesi.
+**Yapılan:** checkbox işaretli durumu yeniden görünür (koşulsuz zinc kutu
+kuralı artık `:not(.p-highlight)` kapsamlı; işaretli onay işareti yeni
+mod-değişmez `--app-checkmark` token'ıyla HER İKİ temada açık renge
+zorlandı — Lara dark koyu işaret gömer); dialog kaydetmesi yeni global
+`FormDirtyListener` ile Formik `dirty`'sine kapılandı (oluşturma devre dışı
+başlar); mobil topbar düzeltildi (`.l-topbar-start`'a `flex:1` +
+`min-inline-size:0`, başlık artık kısaltılıyor, responsive boşluklar);
+AppDataTable header'ı `sm` altında responsive (toolbar sağa yaslı, tam
+genişlik arama) ve sabit `72rem` tablo tabanı — dar ekran kolonları ezmek
+yerine yatay kayar (kodu 1.2'nin belgelenmiş yatay-kaydırma niyetiyle
+yeniden hizalar). Yeni saf-mantık test yok (CSS/bağlama); 88/88 yeşil kalır.
+
+---
+
 ## Sprint 2 — Dokümantasyon, testler, erişilebilirlik, release
 
 Sonuç: docs etlenir, öncelikli test paketi yerinde, a11y doğrulanır ve ilk

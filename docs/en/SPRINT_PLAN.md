@@ -481,6 +481,22 @@ frozen cells`, `docs: …`.
 
 ---
 
+### 1.4 ✅ Pre-Sprint-2 fix batch
+**Goal:** Four owner-reported issues fixed before Sprint 2.
+**As landed:** checkbox checked state visible again (the unconditional zinc
+box rule now scoped `:not(.p-highlight)`; the checked checkmark forced light
+in BOTH themes via the new mode-invariant `--app-checkmark` token — Lara dark
+bakes a dark check); dialog submit gated on Formik `dirty` via the new global
+`FormDirtyListener` (create starts disabled); mobile topbar fixed
+(`.l-topbar-start` gets `flex:1` + `min-inline-size:0` so the title
+truncates, responsive gaps); AppDataTable header responsive below `sm`
+(toolbar right-aligned, full-width search) and a fixed `72rem` table floor so
+narrow viewports scroll horizontally instead of crushing columns (realigns
+the code with the documented 1.2 horizontal-scroll intent). No new pure-logic
+tests (CSS/wiring); 88/88 stay green.
+
+---
+
 ## Sprint 2 — Documentation, tests, accessibility, release
 
 Outcome: docs fleshed out, the priority test suite in place, a11y verified, and

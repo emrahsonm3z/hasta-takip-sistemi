@@ -243,9 +243,10 @@ Mekanik:
   tonları, `--app-success`/`--app-danger` olarak token'landı). fullName /
   note / tags kolonları iki katına çıkarılmış min-genişlik taşır (16 / 24 /
   16rem); kalanı içeriğe göre sığar.
-- **Yerleşim.** Kolonlar içeriğe göre sığar; dar ekranda tablo kendi bölgesi
-  içinde yatay kayar — beklenen davranış; gerçek bir mobil yerleşim
-  (istifli/öncelikli kolonlar) ayrı, sonraki bir karardır. Satırlar kartın
+- **Yerleşim.** Kolonlar, wrapper'ın sabit `72rem` tablo tabanının üzerinde
+  içeriğe göre sığar; dar ekranda tablo kendi bölgesi içinde yatay kayar
+  (kaydırmayı ezilmiş kolonlar yerine gerçek kılan bu tabandır) — gerçek bir
+  mobil yerleşim (istifli/öncelikli kolonlar) ayrı, sonraki bir karardır. Satırlar kartın
   üzerinde transparan, ince ızgara çizgileriyle oturur (şerit yok).
 
 ---
@@ -259,6 +260,9 @@ başlık + altlık ve yalnız içeriğin kaydığı yapı, 75vw/95vw responsive
 kırılımları). Moda göre yalnız üç şey değişir: başlık ("Yeni Hasta" / "Hasta
 Düzenle"), başlangıç değerleri (`createEmptyFormValues()` /
 `toFormValues(record)`) ve gönderim hedefi (ekleme / güncelleme mutation'ı).
+Altlıktaki Kaydet, form dirty olana dek DEVRE DIŞIDIR (`FormDirtyListener` →
+`disabled={!dirty}`): oluşturma devre dışı başlar; düzenlemeyi başlangıç
+değerlerine geri almak yeniden devre dışı bırakır.
 
 - **Form.** YALNIZ ortak `Form*` sarmalayıcılarından kurulur. Bölümler (büyük
   harfli soluk başlık + ince çizgi, i18n `patients.form.sections.*`): hasta

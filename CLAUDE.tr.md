@@ -73,7 +73,10 @@ Sections: <CLAUDE.md §referansları>   ·   Paths: <dokunulan ana yollar>
 Next: <mevcut/sıradaki alt-madde — bağlam olmadan başlamaya yetecek kadar net>
 ```
 
-_(Devam eden aktif iş yok.)_
+### Active: Sprint-2-öncesi düzeltme paketi (checkbox durumu, dirty kaydet, mobil iskelet) · branch: fix/pre-sprint-2-batch · status: in-progress
+
+Sections: §3.1 §8 §9 §16 · Paths: src/components/\*\*, src/styles/{layout,modules}/\*, src/modules/patients/components/\*
+Next: commit-öncesi diff incelemesi (dört konu da uygulandı)
 
 ## 1. Proje Genel Bakış
 
@@ -311,10 +314,14 @@ referans verir; asla yeniden uygulamaz.
   (aşağıda) ortak öğe verir. Header = bir `toolbar` aksiyon slotu + global
   arama kutusu (`aria-label`'lı) + filtre-temizle butonu (arama + kolon
   filtrelerini sıfırlar). İki-mod loading (ilk/boş → `Loading`; arka plan
-  refetch → DataTable overlay). Kolonlar içeriğe göre SIĞAR; dar ekranda
-  `scrollable` yatay kaydırma beklenen davranıştır (gerçek mobil yerleşim
-  ayrı, sonraki karar); responsive paginator (`useMediaQuery`) + `{first} -
-  {last} / {total}` raporu. `emptyMessageKey` → `t()`. Prop'lar: `data`,
+  refetch → DataTable overlay). Kolonlar sabit `72rem` tablo
+  tabanının ÜZERİNDE içeriğe göre sığar (wrapper içinde
+  `tableStyle.minInlineSize` — prop DEĞİL); dar ekranda tablo ezilmek yerine
+  yatay KAYAR; gerçek mobil yerleşim ayrı, sonraki karar. Header
+  responsive'dir: `sm` altında toolbar sağa yaslanır, arama kutusu tam
+  genişliğe uzar ve temizle düğmesi yanında durur; `sm` ve üstü masaüstü
+  yerleşimidir. Responsive paginator (`useMediaQuery`) + `{first} - {last} /
+  {total}` raporu. `emptyMessageKey` → `t()`. Prop'lar: `data`,
   `children` (kolonlar), `dataKey`, `loading`, `toolbar`, `showSearchBox`,
   `globalFilterFields`, `defaultFilters`, controlled sort (`sortField` /
   `sortOrder` / `onSort`), `paginator`, `rows`, `rowsPerPageOptions`,
@@ -353,7 +360,9 @@ referans verir; asla yeniden uygulamaz.
   Ekstralar: `FormDropdown` generic'tir ve `optionTemplate` alır (seçeneği VE
   seçili değeri çizer — ör. severity Tag'leri); `FormCalendar` `minDate`
   alır; `FormCheckbox` satır içi çizer (kutu + etiket tek satır, hata yuvası
-  yok).
+  yok); `FormDirtyListener` (Formik içinde çizilir) `dirty`'yi bildirir,
+  böylece dialog altlığı kaydetmeyi kapılayabilir (`disabled={!dirty}` —
+  PatientDialog deseni; oluşturma ilk değişikliğe dek devre dışı başlar).
 - `AppDialog` — her uygulama dialog'unun geçtiği dialog kabuğu
   (boyutlandırma BURADA yaşar: 800px masaüstü taban, `min(750px, 70vh)`
   max-yükseklik, 12px yarıçap token'ı, 960→75vw / 640→95vw kırılımları):
@@ -688,6 +697,7 @@ konvansiyonuna uymak için hex değil `rgb()` yazılır); her tüketici token'ı
 | `--app-card-shadow` | `0 1px 2px rgb(15 23 42 / 4%), 0 1px 3px rgb(15 23 42 / 6%)` | `none` |
 | `--app-menu-item-hover-bg` (sidebar hover/active overlay) | `rgb(100 116 139 / 10%)` | `rgb(255 255 255 / 5%)` |
 | `--app-success` / `--app-danger` (boolean ikonları; = Tag severity tonları) | `rgb(34 197 94)` / `rgb(239 68 68)` | `rgb(74 222 128)` / `rgb(248 113 113)` |
+| `--app-checkmark` (işaretli checkbox ikonu; Lara dark koyu işaret gömer) | `rgb(255 255 255)` | aynı |
 | `--app-radius-card` / `-item` | `8px` / `8px` | aynı |
 | `--app-radius-sidebar` / `-drawer` (masaüstü panel / mobil drawer sağ köşeleri) | `16px` / `16px` | aynı |
 | `--app-sidebar-width` | `21rem` (sidebar genişliği; içerik offset'i `+ 1rem` = 22rem) | aynı |

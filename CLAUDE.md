@@ -68,7 +68,10 @@ Sections: <CLAUDE.md §refs>   ·   Paths: <key paths touched>
 Next: <the current/next sub-item — specific enough to start without context>
 ```
 
-_(No active work in progress.)_
+### Active: Pre-Sprint-2 fix batch (checkbox state, dirty submit, mobile chrome) · branch: fix/pre-sprint-2-batch · status: in-progress
+
+Sections: §3.1 §8 §9 §16 · Paths: src/components/\*\*, src/styles/{layout,modules}/\*, src/modules/patients/components/\*
+Next: pre-commit diff review (all four issues implemented)
 
 ## 1. Project Overview
 
@@ -307,10 +310,13 @@ it never re-implements them.
   = a `toolbar` action slot + global search box (`aria-label`ed) +
   clear-filters button (resets search + column filters). Two-mode loading
   (initial / empty → `Loading`; background refetch → DataTable overlay).
-  Columns AUTO-FIT content; `scrollable` horizontal scroll is the expected
-  narrow-viewport behaviour (a true mobile layout is a separate later
-  decision); responsive paginator (`useMediaQuery`) with a `{first} - {last} /
-  {total}` report. `emptyMessageKey` → `t()`. Props: `data`, `children`
+  Columns AUTO-FIT content above a fixed `72rem` table floor
+  (`tableStyle.minInlineSize` inside the wrapper — NOT a prop), so on narrow
+  viewports the table SCROLLS horizontally instead of crushing; a true mobile
+  layout is a separate later decision. The header is responsive: below `sm`
+  the toolbar right-aligns and the search box stretches full-width with the
+  clear button beside it; ≥ `sm` is the desktop layout. Responsive paginator
+  (`useMediaQuery`) with a `{first} - {last} / {total}` report. `emptyMessageKey` → `t()`. Props: `data`, `children`
   (columns), `dataKey`, `loading`, `toolbar`, `showSearchBox`,
   `globalFilterFields`, `defaultFilters`, controlled sort (`sortField` /
   `sortOrder` / `onSort`), `paginator`, `rows`, `rowsPerPageOptions`,
@@ -349,7 +355,9 @@ it never re-implements them.
   Extras: `FormDropdown` is generic with `optionTemplate` (renders the option
   AND the selected value — e.g. severity Tags); `FormCalendar` takes
   `minDate`; `FormCheckbox` renders inline (box + label one row, no error
-  slot).
+  slot); `FormDirtyListener` (render inside Formik) reports `dirty` so a
+  dialog footer can gate its submit (`disabled={!dirty}` — the
+  PatientDialog pattern; create starts disabled until first change).
 - `AppDialog` — the dialog shell every app dialog routes through (sizing
   lives HERE: 800px desktop base, max-height `min(750px, 70vh)`, 12px radius
   token, breakpoints 960→75vw / 640→95vw): pinned header + `footer` slot
@@ -681,6 +689,7 @@ literals live ONLY in these definitions (written as
 | `--app-card-shadow` | `0 1px 2px rgb(15 23 42 / 4%), 0 1px 3px rgb(15 23 42 / 6%)` | `none` |
 | `--app-menu-item-hover-bg` (sidebar hover/active overlay) | `rgb(100 116 139 / 10%)` | `rgb(255 255 255 / 5%)` |
 | `--app-success` / `--app-danger` (boolean icons; = the Tag severity hues) | `rgb(34 197 94)` / `rgb(239 68 68)` | `rgb(74 222 128)` / `rgb(248 113 113)` |
+| `--app-checkmark` (checked checkbox icon; Lara dark bakes a dark check) | `rgb(255 255 255)` | same |
 | `--app-radius-card` / `-item` | `8px` / `8px` | same |
 | `--app-radius-sidebar` / `-drawer` (desktop panel / mobile drawer right corners) | `16px` / `16px` | same |
 | `--app-sidebar-width` | `21rem` (sidebar width; content offset is `+ 1rem` = 22rem) | same |
