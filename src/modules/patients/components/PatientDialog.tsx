@@ -4,6 +4,8 @@ import type { FormikProps } from 'formik'
 import { Button } from 'primereact/button'
 
 import { AppDialog } from '@/components/AppDialog'
+import { useMediaQuery } from '@/composables/useMediaQuery'
+import { MEDIA } from '@/config/breakpoints'
 
 import {
   createEmptyFormValues,
@@ -23,6 +25,7 @@ interface PatientDialogProps {
   saving: boolean
   onHide: () => void
   onSave: (patient: PatientRecord) => void
+  onDelete?: () => void
 }
 
 export function PatientDialog({
@@ -32,10 +35,13 @@ export function PatientDialog({
   saving,
   onHide,
   onSave,
+  onDelete,
 }: PatientDialogProps) {
   const { t } = useTranslation()
+  const isBelowMd = useMediaQuery(MEDIA.belowMd)
   const formikRef = useRef<FormikProps<PatientFormValues>>(null)
   const [dirty, setDirty] = useState(false)
+  const showDelete = mode === 'edit' && isBelowMd && onDelete !== undefined
 
   const initialValues = useMemo(
     () => (mode === 'edit' && patient ? toFormValues(patient) : createEmptyFormValues()),
@@ -59,23 +65,40 @@ export function PatientDialog({
       visible={visible}
       header={t(mode === 'create' ? 'patients.form.addTitle' : 'patients.form.editTitle')}
       footer={
-        <div className="flex justify-end gap-2">
-          <Button
-            type="button"
-            label={t('common.cancel')}
-            severity="secondary"
-            outlined
-            onClick={onHide}
-          />
-          <Button
-            type="button"
-            label={t('common.save')}
-            disabled={!dirty}
-            loading={saving}
-            onClick={() => {
-              void formikRef.current?.submitForm()
-            }}
-          />
+        <div
+          className={
+            showDelete
+              ? 'flex items-center justify-between gap-2'
+              : 'flex justify-end gap-2'
+          }
+        >
+          {showDelete ? (
+            <Button
+              type="button"
+              label={t('common.delete')}
+              severity="danger"
+              outlined
+              onClick={onDelete}
+            />
+          ) : null}
+          <div className="flex justify-end gap-2">
+            <Button
+              type="button"
+              label={t('common.cancel')}
+              severity="secondary"
+              outlined
+              onClick={onHide}
+            />
+            <Button
+              type="button"
+              label={t('common.save')}
+              disabled={!dirty}
+              loading={saving}
+              onClick={() => {
+                void formikRef.current?.submitForm()
+              }}
+            />
+          </div>
         </div>
       }
       onHide={onHide}

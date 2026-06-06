@@ -56,10 +56,12 @@ export default function PatientsPage() {
       rejectLabel: t('common.cancel'),
       acceptClassName: 'p-button-danger',
       accept: () => {
-        removePatient.mutate(id)
+        removePatient.mutate(id, { onSuccess: closeDialog })
       },
     })
   }
+
+  const editingPatient = dialog?.mode === 'edit' ? dialog.patient : null
 
   return (
     <div className="card p-4">
@@ -79,6 +81,13 @@ export default function PatientsPage() {
         saving={addPatient.isPending || updatePatient.isPending}
         onHide={closeDialog}
         onSave={handleSave}
+        onDelete={
+          editingPatient
+            ? () => {
+                handleDelete(editingPatient.id)
+              }
+            : undefined
+        }
       />
       <ConfirmDialog />
     </div>

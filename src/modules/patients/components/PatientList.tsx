@@ -13,6 +13,8 @@ import {
   createMultiSelectFilterElement,
   createNumericFilterElement,
 } from '@/components/AppDataTableFilters'
+import { useMediaQuery } from '@/composables/useMediaQuery'
+import { MEDIA } from '@/config/breakpoints'
 import { formatDate } from '@/lib/date'
 import { pickLocalized } from '@/lib/pickLocalized'
 import { compareTurkish, sortRowsByTurkishValue } from '@/lib/text'
@@ -105,6 +107,24 @@ const vaccinatedBody = (patient: PatientListRow) => (
   <YesNoIcon value={patient.isVaccinated} />
 )
 
+function createFullNameEditBody(
+  buildEditLabel: (name: string) => string,
+  onEdit: (id: string) => void,
+) {
+  return (row: PatientListRow) => (
+    <button
+      type="button"
+      className="flex min-h-8 w-full items-center text-start font-medium text-link hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-link"
+      aria-label={buildEditLabel(row.fullName)}
+      onClick={() => {
+        onEdit(row.id)
+      }}
+    >
+      {row.fullName}
+    </button>
+  )
+}
+
 function createActionsBody(
   editLabel: string,
   deleteLabel: string,
@@ -175,6 +195,7 @@ export function PatientList({
   onDeletePatient,
 }: PatientListProps) {
   const { t, i18n } = useTranslation()
+  const isBelowMd = useMediaQuery(MEDIA.belowMd)
 
   const rows = useMemo(
     () =>
@@ -251,6 +272,10 @@ export function PatientList({
     onEditPatient,
     onDeletePatient,
   )
+  const fullNameEditBody = createFullNameEditBody(
+    (name) => t('patients.actions.editNamed', { name }),
+    onEditPatient,
+  )
 
   const tagsFilterElement = useMemo(
     () =>
@@ -287,7 +312,10 @@ export function PatientList({
         sortFunction={fullNameSort}
         filter
         filterPlaceholder={t('filters.textPlaceholder')}
-        style={{ minInlineSize: '16rem' }}
+        style={{ minInlineSize: '11.2rem' }}
+        frozen={isBelowMd}
+        alignFrozen="left"
+        body={isBelowMd ? fullNameEditBody : undefined}
       />
       <Column
         field="department"
@@ -413,12 +441,14 @@ export function PatientList({
         filterElement={createdAtFilterElement}
         body={(patient: PatientListRow) => formatDate(patient.createdAt)}
       />
-      <Column
-        frozen
-        alignFrozen="right"
-        header={<span className="sr-only">{t('patients.actions.header')}</span>}
-        body={actionsBody}
-      />
+      {!isBelowMd && (
+        <Column
+          frozen
+          alignFrozen="right"
+          header={<span className="sr-only">{t('patients.actions.header')}</span>}
+          body={actionsBody}
+        />
+      )}
     </AppDataTable>
   )
 }
