@@ -556,7 +556,7 @@ herhangi biri düşürülür).
 **DoD:** + global DoD; `TESTING.md` gerçeği yansıtır. Commit
 `test: cover the remaining pure-logic branches`.
 
-### 2.3 ⬜ Erişilebilirlik geçişi + son rötuş
+### 2.3 ✅ Erişilebilirlik geçişi + son rötuş
 **Hedef:** a11y zeminini geç ve son incelemeyi yap.
 **Bağımlılık:** 2.1, 2.2
 **Alt-adımlar (yeniden kapsamlandı — Sprint 2 denetimi):** `eslint-plugin-jsx-a11y`
@@ -581,6 +581,21 @@ aria dahil tamamen yerelleştirilmiş; iki tema da kontrast geçer; §17 karşı
 (Sürümler release-please ile sürekli akar — 0.7.0 zaten etiketli; ayrı bir "ilk
 sürüm" adımı yoktur. Özgün opsiyonel klavye-etkileşim DOM testi §11 gereği
 düşürüldü.)
+**Yapılan:** altı gömülü-api aria anahtarı denetlendi — `selectAll`/`unselectAll`
+hiç çizilmiyor (seçim kolonu yok); çizilen dördü `AppPrimeReactProvider`'daki
+global PassThrough ile yerelleştirilmiş olarak yeniden sağlandı
+(`column.filterMenuButton` tek nötr etiket alır — `aria-expanded`/
+`aria-haspopup`/`aria-controls` zaten yerleşik — operatör + match-mode
+Dropdown'ları kendilerininkini iç `input` PT hedefiyle alır). `FormField`
+hata yuvası nazik canlı bölge (`id`/`aria-describedby`/`aria-invalid`, beş
+girdi wrapper'ında). Eylem kolonunda sr-only i18n başlık. `base/_motion.scss`,
+`prefers-reduced-motion` altında animasyon/geçişleri sıfırlar. Kontrast: açık
+temanın TÜM Tag seti AA'da başarısızdı (2.28–3.76:1), yalnız warning değil —
+token'lanmış −700 setiyle düzeltildi (5.02–6.47:1) + yeni secondary Tag çifti
+(açık 7.73:1, koyu 11.99:1 — Lara hiç secondary kuralı göndermez; cancelled/
+normal birincil yeşil çiziliyordu); açık ikon token'ları −600'e taşındı
+(metin-dışı ≥3:1). 404 sayfası açıklayıcı satır kazandı; tema/dil düğmeleri
+durumlu, hedefi adlandıran aria-label'lar aldı.
 **Test:** yok (manuel a11y QA; locale parite testi yeni anahtarları korur).
 **DoD:** + global DoD. Commit `fix: accessibility and final polish`.
 

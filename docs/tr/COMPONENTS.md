@@ -103,7 +103,9 @@ ortak `.p-dialog` zinc kaplamasını miras alır.
 Formik'e bağlı altı alan tek bir kabuğu (`FormField`) paylaşır: i18n etiketini
 çizer, `htmlFor`/`id` bağlar (etiketsiz girdi yok), Yup hatalarını çözer ve
 SABİT tek satırlık mesaj yuvası ayırır — beliren bir hata alttaki alanları
-asla kaydırmaz. Tüm alanlar tipli `placeholderKey` kabul eder (düz literal
+asla kaydırmaz; yuva, `aria-describedby` + `aria-invalid` ile girdiye bağlı
+nazik bir canlı bölgedir (`aria-live`; PrimeReact'in `invalid` prop'u tek
+başına ARIA üretmez). Tüm alanlar tipli `placeholderKey` kabul eder (düz literal
 placeholder derleme hatasıdır):
 
 | Alan | Sardığı | Ekstra |

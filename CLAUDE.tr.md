@@ -693,7 +693,9 @@ konvansiyonuna uymak için hex değil `rgb()` yazılır); her tüketici token'ı
 | `--app-card-border` | `var(--surface-border)` → zinc-200 | `var(--surface-border)` → zinc-700 |
 | `--app-card-shadow` | `0 1px 2px rgb(15 23 42 / 4%), 0 1px 3px rgb(15 23 42 / 6%)` | `none` |
 | `--app-menu-item-hover-bg` (sidebar hover/active overlay) | `rgb(100 116 139 / 10%)` | `rgb(255 255 255 / 5%)` |
-| `--app-success` / `--app-danger` (boolean ikonları; = Tag severity tonları) | `rgb(34 197 94)` / `rgb(239 68 68)` | `rgb(74 222 128)` / `rgb(248 113 113)` |
+| `--app-success` / `--app-danger` (boolean/tristate ikonları; açık kartta AA 3:1) | `rgb(22 163 74)` / `rgb(220 38 38)` | `rgb(74 222 128)` / `rgb(248 113 113)` |
+| `--app-tag-{success,info,warning,danger}` (Tag zeminleri; açık = AA −700 seti, koyu = Lara'nın geçen tonları) | `rgb(21 128 61)` / `rgb(3 105 161)` / `rgb(194 65 12)` / `rgb(185 28 28)` | `rgb(74 222 128)` / `rgb(56 189 248)` / `rgb(251 146 60)` / `rgb(248 113 113)` |
+| `--app-tag-secondary-bg` / `-text` (Lara secondary Tag kuralı GÖNDERMEZ) | `rgb(82 82 91)` / `rgb(255 255 255)` | `rgb(212 212 216)` / `rgb(24 24 27)` |
 | `--app-checkmark` (işaretli checkbox ikonu; Lara dark koyu işaret gömer) | `rgb(255 255 255)` | aynı |
 | `--app-radius-card` / `-item` | `8px` / `8px` | aynı |
 | `--app-radius-sidebar` / `-drawer` (masaüstü panel / mobil drawer sağ köşeleri) | `16px` / `16px` | aynı |

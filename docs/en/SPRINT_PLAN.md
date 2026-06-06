@@ -538,7 +538,7 @@ specs across 18 files under `src/__test__/`.)
 **DoD:** + global DoD; `TESTING.md` reflects reality. Commit
 `test: cover the remaining pure-logic branches`.
 
-### 2.3 ⬜ Accessibility pass + final polish + first release
+### 2.3 ✅ Accessibility pass + final polish + first release
 **Goal:** Clear the a11y floor, do a final review, and cut the first release.
 **Depends on:** 2.1, 2.2
 **Sub-steps (rescoped — Sprint 2 audit):** run `eslint-plugin-jsx-a11y` clean;
@@ -565,6 +565,21 @@ popup is fully localized incl. aria; both themes pass contrast; §17 checklist
 satisfied. (Releases flow continuously via release-please — 0.7.0 is already
 tagged; there is no separate "first release" step. The original optional
 keyboard-interaction DOM test is dropped per §11.)
+**As landed:** the six inlined-api aria keys audited — `selectAll`/`unselectAll`
+never render (no selection column); the four that do are re-supplied localized
+via global PassThrough in `AppPrimeReactProvider` (`column.filterMenuButton`
+gets one neutral label — `aria-expanded`/`aria-haspopup`/`aria-controls` are
+already native — and the operator + match-mode Dropdowns get theirs via the
+nested `input` PT target). `FormField` error slot is a polite live region
+(`id`/`aria-describedby`/`aria-invalid` across the five input wrappers). The
+actions column has an sr-only i18n header. `base/_motion.scss` zeroes
+animations/transitions under `prefers-reduced-motion`. Contrast: the ENTIRE
+light Tag set failed AA (2.28–3.76:1), not just warning — fixed with the
+tokenized −700 set (5.02–6.47:1) + the new secondary Tag pair (light 7.73:1,
+dark 11.99:1 — Lara ships no secondary rule at all, so cancelled/normal were
+rendering primary green); light icon tokens moved to −600 (≥3:1 non-text).
+404 page gained an explanatory line; theme/language toggles got stateful,
+target-naming aria-labels.
 **Tests:** none (manual a11y QA; locale parity guards the new keys).
 **DoD:** + global DoD. Commit `fix: accessibility and final polish`.
 
