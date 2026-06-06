@@ -35,18 +35,23 @@ src/
 │   └── yup.ts               yup.setLocale() → i18n message keys
 ├── router/
 │   └── index.tsx            createBrowserRouter: layout + module routes + 404
-├── components/              Global UI (App* wrappers, form fields, error screens)
-│   ├── form/                Formik↔PrimeReact field wrappers
+├── components/              Global UI: AppDataTable (+ AppDataTableFilters), AppDialog,
+│   │                        AppPrimeReactProvider (locale bridge), AppToastProvider, error screens
+│   ├── form/                Formik↔PrimeReact field wrappers (6 fields + FormField shell
+│   │                        + FormDirtyListener)
 │   └── layout/              AppLayout, AppSidebar, AppTopbar, AppLogo, …
 ├── composables/             useMenu, useNotify, useMediaQuery (+ pure .lib cores)
-├── lib/                     Global pure helpers: text, date, pickLocalized, route
+├── lib/                     Global pure helpers: text, date, filters, pickLocalized, route
 ├── locales/                 tr.json + en.json (same key set, test-enforced)
 ├── styles/                  SCSS (SMACSS) + token aliases
 ├── types/                   Route handle + TranslationKey typing
 ├── __test__/                node:test specs mirroring the source tree
 └── modules/
-    ├── patients/            Patient tracking (data layer shipped; screens land in 1.2/1.3)
-    │   ├── api/  composables/  constants/  lib/  models/  pages/
+    ├── patients/            Patient tracking (complete: list + add/edit/delete)
+    │   ├── api/  composables/  constants/  models/  pages/
+    │   ├── components/      PatientList, PatientForm, PatientDialog, PatientTags
+    │   ├── lib/             patient.mapper, patient.form, patient-form.schema,
+    │   │                    patient-list.lib, patient-storage.lib
     │   ├── routes.tsx
     │   └── index.ts
     └── docs/                This documentation viewer (see its own doc)

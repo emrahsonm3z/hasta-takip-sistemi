@@ -34,18 +34,23 @@ src/
 │   └── yup.ts               yup.setLocale() → i18n mesaj anahtarları
 ├── router/
 │   └── index.tsx            createBrowserRouter: layout + modül rotaları + 404
-├── components/              Global UI (App* wrapper'lar, form alanları, hata ekranları)
-│   ├── form/                Formik↔PrimeReact alan wrapper'ları
+├── components/              Global UI: AppDataTable (+ AppDataTableFilters), AppDialog,
+│   │                        AppPrimeReactProvider (locale köprüsü), AppToastProvider, hata ekranları
+│   ├── form/                Formik↔PrimeReact alan wrapper'ları (6 alan + FormField kabuğu
+│   │                        + FormDirtyListener)
 │   └── layout/              AppLayout, AppSidebar, AppTopbar, AppLogo, …
 ├── composables/             useMenu, useNotify, useMediaQuery (+ saf .lib çekirdekleri)
-├── lib/                     Global saf yardımcılar: text, date, pickLocalized, route
+├── lib/                     Global saf yardımcılar: text, date, filters, pickLocalized, route
 ├── locales/                 tr.json + en.json (aynı anahtar kümesi, test-zorunlu)
 ├── styles/                  SCSS (SMACSS) + token alias'ları
 ├── types/                   Route handle + TranslationKey tipleri
 ├── __test__/                Kaynak ağacını aynalayan node:test spec'leri
 └── modules/
-    ├── patients/            Hasta takibi (veri katmanı gönderildi; ekranlar 1.2/1.3'te)
-    │   ├── api/  composables/  constants/  lib/  models/  pages/
+    ├── patients/            Hasta takibi (tamamlandı: liste + ekle/düzenle/sil)
+    │   ├── api/  composables/  constants/  models/  pages/
+    │   ├── components/      PatientList, PatientForm, PatientDialog, PatientTags
+    │   ├── lib/             patient.mapper, patient.form, patient-form.schema,
+    │   │                    patient-list.lib, patient-storage.lib
     │   ├── routes.tsx
     │   └── index.ts
     └── docs/                Bu doküman görüntüleyici (kendi dokümanına bakın)
