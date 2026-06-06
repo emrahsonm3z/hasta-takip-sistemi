@@ -612,6 +612,28 @@ durumlu, hedefi adlandıran aria-label'lar aldı.
 
 ---
 
+## Vaka-çalışması-sonrası (sahip talebi)
+
+### P.1 ✅ Sentry hata izleme (yalnız-hatalar, ücretsiz katman)
+**Hedef:** Ücretsiz Developer katmanı içinde production hata görünürlüğü
+(5k hata/ay) — tracing yok, Replay yok, profiling yok.
+**Yapılan:** `plugins/sentry.ts` (`main.tsx`'te ilk import) `@sentry/react`'i
+yalnız prod'da ve DSN varken başlatır (`VITE_SENTRY_DSN`, opsiyonel env —
+uygulama onsuz açılır); `tracesSampleRate: 0`, `sendDefaultPii: false`,
+release `hasta-takip-sistemi@<version>` (package.json'dan Vite define ile).
+Saf `shouldDropErrorEvent` filtresi (4 spec → paket 92'de) ResizeObserver
+döngü gürültüsünü + eklenti frame'lerini düşürür. Yakalama mevcut
+boundary'lere bağlandı (render çökmeleri; 404-dışı route hataları) — yeni UI
+yok, yeni string yok; beklenen veri hataları ve 404'ler yakalanmaz.
+Kaynak-haritası yüklemesi `SENTRY_AUTH_TOKEN` üzerinde çift kapılı (token
+yok → yükleme YOK ve üretilen `.map` YOK; CI gate sırsız yeşil); eklentinin
+release adı SDK'nınkiyle birebir eşleşir. Sahip yönetir: DSN → Vercel prod
+env; auth token + org + proje slug'ları → Vercel build env. `npm audit`: 0
+zafiyet.
+**DoD:** + global DoD. Commit'ler `feat(monitoring): …`, `build: …`, `docs: …`.
+
+---
+
 ## Backlog / sonra (vaka çalışması kapsamı dışı)
 
 - `build()` yardımcısı + dinamik `title` handle kullanan hasta detay route'u

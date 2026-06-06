@@ -69,6 +69,7 @@ Uygulama `http://localhost:5173` adresinde açılır.
 | Değişken | Zorunlu | Amaç |
 | --- | --- | --- |
 | `VITE_API_URL` | evet | Salt-okunur hasta veri kaynağı (tek seferlik seed) |
+| `VITE_SENTRY_DSN` | hayır | Sentry hata izleme (yalnız production; boşsa kapalı) |
 
 `.env` gitignore'dadır; `.env.example` her zorunlu değişkeni belgeler. Eksik
 bir değişken, bozuk bir uygulama yerine net bir yapılandırma-hatası ekranı
