@@ -502,7 +502,7 @@ tests (CSS/wiring); 88/88 stay green.
 Outcome: docs fleshed out, the priority test suite in place, a11y verified, and
 the first tagged release.
 
-### 2.1 ⬜ Complete modules/PATIENTS.md + content review pass
+### 2.1 ✅ Complete modules/PATIENTS.md + content review pass
 **Goal:** (Rescoped — 0.11 absorbed the full-content rewrite.) After Sprint 1
 lands, replace the "planned" markers in `modules/PATIENTS.md` with the shipped
 data layer + UI (real code), and run a content review pass over all docs
@@ -511,43 +511,62 @@ against the code (flag/fix any drift).
 **Files:** `docs/{en,tr}/modules/PATIENTS.md`, drift fixes across `docs/{en,tr}/`.
 **Acceptance:** PATIENTS.md documents the shipped module with nothing marked
 planned; no doc↔code drift anywhere; registry intact.
+**As landed:** the PATIENTS.md planned-markers half shipped with 1.3; this pass
+closed the content-review half — ARCHITECTURE directory trees refreshed
+(AppDialog, AppDataTableFilters, AppPrimeReactProvider, FormDirtyListener,
+PatientTags, the complete patients module), the STYLING token table gained the
+1.3/1.4 tokens (`--app-success/-danger/-checkmark`, `--app-radius-dialog`),
+2.2/2.3 rescoped per the Sprint 2 audit (MSW out per §11; stale/shipped items
+retired), the Active Work entry the 1.4 docs commit failed to delete was
+removed, and package.json gained description + repository (license deferred —
+owner decision, no LICENSE file exists to mirror).
 **Tests:** (reuse the registry-integrity test.)
-**DoD:** + global DoD. Commit `docs: complete the patients module documentation`.
+**DoD:** + global DoD. Commit `docs: refresh stale references and rescope sprint 2`.
 
-### 2.2 ⬜ Test suite to priority bar
-**Goal:** Solidify the priority targets (§11) and MSW setup beyond the unit tests
-already landed with features.
+### 2.2 ⬜ Test suite to priority bar (rescoped — Sprint 2 audit)
+**Goal:** Close the last pure-logic gaps. (The original MSW/`src/test/setup`/
+colocated wording predated the §11 node-only decision; the priority targets it
+listed — mapper, `pickLocalized`, `formatDate`, Turkish normalise/collator, the
+storage pure core, the lint rule — already shipped with their features: 88
+specs across 18 files under `src/__test__/`.)
 **Depends on:** Sprint 1 complete
-**Sub-steps:** finalize MSW handlers + test setup; ensure coverage of pure `lib/`
-(mapper, `pickLocalized`, `formatDate`, Turkish normalise/collator), composable
-CRUD-on-storage + seed-once behaviour, and the custom lint rule (`RuleTester`);
-add any missing `*.test.ts(x)` colocated files; fix flakes.
-**Files:** `src/test/setup.ts`, `src/test/msw/*`, colocated `*.test.ts(x)`.
-**Acceptance:** `npm test` green and deterministic; priority targets covered; no
-real network in tests.
+**Sub-steps:** ≤2 micro-specs — `formatDate` invalid-`Date` input;
+`useMenu.lib` docs-children grouping (drop either if found covered indirectly).
+**Files:** `src/__test__/lib/date.test.ts`, `src/__test__/composables/useMenu.lib.test.ts`.
+**Acceptance:** `npm test` green and deterministic; no DOM/network harness.
 **Tests:** this task is tests.
 **DoD:** + global DoD; `TESTING.md` reflects reality. Commit
-`test: complete priority test suite and msw setup`.
+`test: cover the remaining pure-logic branches`.
 
 ### 2.3 ⬜ Accessibility pass + final polish + first release
 **Goal:** Clear the a11y floor, do a final review, and cut the first release.
 **Depends on:** 2.1, 2.2
-**Sub-steps:** run `eslint-plugin-jsx-a11y` clean; verify labelled fields,
-icon-button `aria-label`s, dialog focus trap + return + `aria-labelledby`,
-table header ARIA, `<html lang>` sync; check both themes for WCAG AA contrast;
-responsive sanity check; final self-review against §17; merge the
-release-please Release PR to tag the first version.
+**Sub-steps (rescoped — Sprint 2 audit):** run `eslint-plugin-jsx-a11y` clean;
+TRANSLATE the DataTable filter-popup aria-labels that bypass the locale (the
+bundle's inlined api copy hardcodes English for `showFilterMenu`,
+`hideFilterMenu`, `filterOperator`, `filterConstraint`, `selectAll`,
+`unselectAll` — fix via global PassThrough from `AppPrimeReactProvider`,
+covering EVERY key the filter popup actually renders, operator and constraint
+included, not only the toggle button); wire `aria-invalid` +
+`aria-describedby` + a polite live region into the `FormField` error slot
+(PrimeReact's `invalid` emits no `aria-invalid`); give the actions column an
+i18n header; add a `prefers-reduced-motion` block for the shell transitions;
+verify dialog focus return, sidebar focus-visible rings, `<html lang>` sync;
+check both themes for WCAG AA contrast — if the warning severity Tag fails,
+SURFACE the proposed token/hue before changing it (visual decision); final
+self-review against §17.
 **Files:** small fixes across components as needed.
 **Deferred UI polish (carried from 0.6/0.7):** 404 page copy/wording;
 `AppThemeToggle` icon direction (sun-vs-moon convention); switcher/icon-button
-`aria-label` phrasing pass; `FormCheckbox` label-beside layout (currently
-label-above like the other Form\* wrappers).
-**Acceptance:** jsx-a11y clean; keyboard-only add/edit/delete works; both themes
-pass contrast; §17 checklist satisfied; first version tagged with a generated
-CHANGELOG.
-**Tests:** keyboard-interaction test for the dialog flow (optional but preferred).
-**DoD:** + global DoD. Commit `fix: accessibility and final polish` (then merge
-the Release PR).
+`aria-label` phrasing pass. (`FormCheckbox` label-beside layout: SHIPPED in
+1.3.)
+**Acceptance:** jsx-a11y clean; keyboard-only add/edit/delete works; the filter
+popup is fully localized incl. aria; both themes pass contrast; §17 checklist
+satisfied. (Releases flow continuously via release-please — 0.7.0 is already
+tagged; there is no separate "first release" step. The original optional
+keyboard-interaction DOM test is dropped per §11.)
+**Tests:** none (manual a11y QA; locale parity guards the new keys).
+**DoD:** + global DoD. Commit `fix: accessibility and final polish`.
 
 ---
 

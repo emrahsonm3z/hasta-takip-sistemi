@@ -518,7 +518,7 @@ yeniden hizalar). Yeni saf-mantık test yok (CSS/bağlama); 88/88 yeşil kalır.
 Sonuç: docs etlenir, öncelikli test paketi yerinde, a11y doğrulanır ve ilk
 etiketli sürüm çıkar.
 
-### 2.1 ⬜ modules/PATIENTS.md'yi tamamla + içerik gözden geçirme turu
+### 2.1 ✅ modules/PATIENTS.md'yi tamamla + içerik gözden geçirme turu
 **Hedef:** (Yeniden kapsamlandı — tam içerik yazımını 0.11 üstlendi.) Sprint 1
 indikten sonra `modules/PATIENTS.md`'deki "planlı" işaretlerini gönderilmiş veri
 katmanı + UI ile (gerçek kod) değiştir ve tüm dokümanlar üzerinde koda karşı bir
@@ -528,44 +528,61 @@ içerik gözden geçirme turu yap (her drift'i işaretle/düzelt).
 drift düzeltmeleri.
 **Kabul:** PATIENTS.md gönderilmiş modülü belgeler, hiçbir şey planlı işaretli
 değil; hiçbir yerde doc↔kod drift yok; registry sağlam.
+**Yapılan:** PATIENTS.md planlı-işaretleri yarısı 1.3 ile indi; bu geçiş içerik
+incelemesi yarısını kapattı — ARCHITECTURE dizin ağaçları tazelendi (AppDialog,
+AppDataTableFilters, AppPrimeReactProvider, FormDirtyListener, PatientTags, tam
+patients modülü), STYLING token tablosu 1.3/1.4 token'larını aldı
+(`--app-success/-danger/-checkmark`, `--app-radius-dialog`), 2.2/2.3 Sprint 2
+denetimine göre yeniden kapsamlandı (§11 gereği MSW dışarı; bayat/inmiş öğeler
+emekli), 1.4 docs commit'inin silmeyi atladığı Active Work girdisi kaldırıldı
+ve package.json description + repository aldı (lisans ertelendi — sahip kararı;
+yansılanacak LICENSE dosyası yok).
 **Test:** (registry-bütünlük testini yeniden kullan.)
-**DoD:** + global DoD. Commit `docs: complete the patients module documentation`.
+**DoD:** + global DoD. Commit `docs: refresh stale references and rescope sprint 2`.
 
-### 2.2 ⬜ Test paketini öncelik çıtasına getir
-**Hedef:** Öncelik hedeflerini (§11) ve MSW kurulumunu, özelliklerle birlikte zaten
-inen unit testlerin ötesinde sağlamlaştır.
+### 2.2 ⬜ Test paketini öncelik çıtasına getir (yeniden kapsamlandı — Sprint 2 denetimi)
+**Hedef:** Son saf-mantık boşluklarını kapat. (Özgün MSW/`src/test/setup`/
+colocate ifadesi §11 yalnız-node kararından önceydi; saydığı öncelik hedefleri —
+mapper, `pickLocalized`, `formatDate`, Türkçe normalize/collator, depolama saf
+çekirdeği, lint kuralı — özellikleriyle birlikte zaten indi: `src/__test__/`
+altında 18 dosyada 88 spec.)
 **Bağımlılık:** Sprint 1 tamamlanmış
-**Alt-adımlar:** MSW handler'larını + test setup'ı sonlandır; saf `lib/`'i (mapper,
-`pickLocalized`, `formatDate`, Türkçe normalize/collator), composable
-CRUD-on-storage + seed-bir-kez davranışını ve custom lint kuralını (`RuleTester`)
-kapsadığından emin ol; eksik colocate `*.test.ts(x)` dosyalarını ekle; flake'leri
-düzelt.
-**Dosyalar:** `src/test/setup.ts`, `src/test/msw/*`, colocate `*.test.ts(x)`.
-**Kabul:** `npm test` yeşil ve deterministik; öncelik hedefleri kapsandı; testte
-gerçek ağ yok.
+**Alt-adımlar:** ≤2 mikro-spec — `formatDate` geçersiz-`Date` girdisi;
+`useMenu.lib` doküman-çocukları gruplaması (dolaylı kapsandığı görülürse
+herhangi biri düşürülür).
+**Dosyalar:** `src/__test__/lib/date.test.ts`, `src/__test__/composables/useMenu.lib.test.ts`.
+**Kabul:** `npm test` yeşil ve deterministik; DOM/ağ harness'i yok.
 **Test:** bu görevin kendisi testtir.
 **DoD:** + global DoD; `TESTING.md` gerçeği yansıtır. Commit
-`test: complete priority test suite and msw setup`.
+`test: cover the remaining pure-logic branches`.
 
-### 2.3 ⬜ Erişilebilirlik geçişi + son rötuş + ilk release
-**Hedef:** a11y zeminini geç, son incelemeyi yap ve ilk sürümü çıkar.
+### 2.3 ⬜ Erişilebilirlik geçişi + son rötuş
+**Hedef:** a11y zeminini geç ve son incelemeyi yap.
 **Bağımlılık:** 2.1, 2.2
-**Alt-adımlar:** `eslint-plugin-jsx-a11y` temiz çalıştır; etiketli alanları,
-ikon-buton `aria-label`'larını, dialog focus trap + return + `aria-labelledby`,
-tablo header ARIA, `<html lang>` senkronunu doğrula; iki temayı WCAG AA kontrast
-için kontrol et; responsive akıl-sağlığı kontrolü; §17'ye karşı son self-review;
-ilk sürümü etiketlemek için release-please Release PR'ını merge et.
+**Alt-adımlar (yeniden kapsamlandı — Sprint 2 denetimi):** `eslint-plugin-jsx-a11y`
+temiz çalıştır; locale'i atlayan DataTable filtre-popup aria-label'larını ÇEVİR
+(bundle'ın gömülü api kopyası `showFilterMenu`, `hideFilterMenu`,
+`filterOperator`, `filterConstraint`, `selectAll`, `unselectAll` için İngilizceyi
+sabitler — `AppPrimeReactProvider`'dan global PassThrough ile düzelt; yalnız
+açma düğmesi değil, popup'ın gerçekten çizdiği HER anahtar, operatör ve kısıt
+dahil); `FormField` hata yuvasına `aria-invalid` + `aria-describedby` + nazik
+canlı bölge bağla (PrimeReact `invalid`'i `aria-invalid` üretmez); eylem
+kolonuna i18n başlık ver; kabuk geçişleri için `prefers-reduced-motion` bloğu
+ekle; dialog focus dönüşünü, kenar çubuğu focus-visible halkalarını,
+`<html lang>` senkronunu doğrula; iki temayı WCAG AA kontrast için kontrol et —
+warning severity Tag başarısız olursa değiştirmeden ÖNCE önerilen token/tonu
+SUN (görsel karar); §17'ye karşı son self-review.
 **Dosyalar:** gerektikçe bileşenlerde küçük düzeltmeler.
 **Ertelenen UI rötuşu (0.6/0.7'den taşındı):** 404 sayfası metni/ifadesi;
 `AppThemeToggle` ikon yönü (sun-vs-moon konvansiyonu); switcher/ikon-buton
-`aria-label` ifade geçişi; `FormCheckbox` label-yanında düzeni (şu an diğer Form\*
-wrapper'ları gibi label-üstte).
-**Kabul:** jsx-a11y temiz; yalnız-klavye add/edit/delete çalışır; iki tema da
-kontrast geçer; §17 kontrol listesi karşılanır; ilk sürüm üretilmiş CHANGELOG ile
-etiketlenir.
-**Test:** dialog akışı için klavye-etkileşim testi (opsiyonel ama tercih edilir).
-**DoD:** + global DoD. Commit `fix: accessibility and final polish` (sonra Release
-PR'ı merge et).
+`aria-label` ifade geçişi. (`FormCheckbox` label-yanında düzeni: 1.3'te İNDİ.)
+**Kabul:** jsx-a11y temiz; yalnız-klavye add/edit/delete çalışır; filtre popup'ı
+aria dahil tamamen yerelleştirilmiş; iki tema da kontrast geçer; §17 karşılanır.
+(Sürümler release-please ile sürekli akar — 0.7.0 zaten etiketli; ayrı bir "ilk
+sürüm" adımı yoktur. Özgün opsiyonel klavye-etkileşim DOM testi §11 gereği
+düşürüldü.)
+**Test:** yok (manuel a11y QA; locale parite testi yeni anahtarları korur).
+**DoD:** + global DoD. Commit `fix: accessibility and final polish`.
 
 ---
 

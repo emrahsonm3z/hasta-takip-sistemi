@@ -94,7 +94,10 @@ her mod için bir kez (`styles/theme/_dark.scss`, `:root` + `.dark`):
 | `--app-card-border` | `var(--surface-border)` → zinc-200 | `var(--surface-border)` → zinc-700 |
 | `--app-card-shadow` | hafif iki katmanlı gölge | `none` (ayrımı kenarlık yapar) |
 | `--app-menu-item-hover-bg` | `rgb(100 116 139 / 10%)` | `rgb(255 255 255 / 5%)` |
+| `--app-success` / `--app-danger` (boolean ikonları; Tag severity tonları) | `rgb(34 197 94)` / `rgb(239 68 68)` | `rgb(74 222 128)` / `rgb(248 113 113)` |
+| `--app-checkmark` (işaretli checkbox ikonu — Lara dark koyu işaret gömer) | `rgb(255 255 255)` | aynı |
 | `--app-radius-card/-item` | `8px` | aynı |
+| `--app-radius-dialog` | `12px` | aynı |
 | `--app-radius-sidebar/-drawer` | `16px` | aynı |
 | `--app-sidebar-width` | `21rem` | aynı |
 | `--glow-image` / `--glow-blend` | dekoratif desen + blend modu | aynı |

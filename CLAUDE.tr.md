@@ -73,10 +73,7 @@ Sections: <CLAUDE.md §referansları>   ·   Paths: <dokunulan ana yollar>
 Next: <mevcut/sıradaki alt-madde — bağlam olmadan başlamaya yetecek kadar net>
 ```
 
-### Active: Sprint-2-öncesi düzeltme paketi (checkbox durumu, dirty kaydet, mobil iskelet) · branch: fix/pre-sprint-2-batch · status: in-progress
-
-Sections: §3.1 §8 §9 §16 · Paths: src/components/\*\*, src/styles/{layout,modules}/\*, src/modules/patients/components/\*
-Next: commit-öncesi diff incelemesi (dört konu da uygulandı)
+_(Devam eden aktif iş yok.)_
 
 ## 1. Proje Genel Bakış
 

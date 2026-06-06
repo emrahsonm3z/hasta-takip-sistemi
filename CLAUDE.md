@@ -68,10 +68,7 @@ Sections: <CLAUDE.md §refs>   ·   Paths: <key paths touched>
 Next: <the current/next sub-item — specific enough to start without context>
 ```
 
-### Active: Pre-Sprint-2 fix batch (checkbox state, dirty submit, mobile chrome) · branch: fix/pre-sprint-2-batch · status: in-progress
-
-Sections: §3.1 §8 §9 §16 · Paths: src/components/\*\*, src/styles/{layout,modules}/\*, src/modules/patients/components/\*
-Next: pre-commit diff review (all four issues implemented)
+_(No active work in progress.)_
 
 ## 1. Project Overview
 
