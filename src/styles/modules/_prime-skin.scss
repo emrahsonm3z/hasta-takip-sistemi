@@ -1,3 +1,4 @@
+@use '../utils/breakpoints' as *;
 @use '../utils/tokens' as *;
 
 @layer tw-components {
@@ -291,5 +292,16 @@
   .p-chips .p-chips-multiple-container .p-chips-token {
     background: $surface-100;
     color: $text-color;
+  }
+
+  @media (width <= #{$bp-md - 1px}) {
+    .p-button {
+      font-size: 0.875rem;
+      padding: 0.6563rem 1.0938rem;
+    }
+
+    .p-button .p-button-icon {
+      font-size: 0.875rem;
+    }
   }
 }

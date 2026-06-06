@@ -30,6 +30,7 @@ export default {
         'app-ground': 'var(--app-ground)',
         success: 'var(--app-success)',
         danger: 'var(--app-danger)',
+        link: 'var(--app-link)',
       },
       width: {
         sidebar: 'var(--app-sidebar-width)',

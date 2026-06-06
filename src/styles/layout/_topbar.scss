@@ -1,3 +1,4 @@
+@use '../utils/breakpoints' as *;
 @use '../utils/tokens' as *;
 
 @layer tw-components {
@@ -23,7 +24,7 @@
     margin-inline-start: auto;
   }
 
-  @media (width >= 640px) {
+  @media (width >= #{$bp-sm}) {
     .l-topbar-start {
       gap: 1.5rem;
     }
