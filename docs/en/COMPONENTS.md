@@ -104,7 +104,9 @@ route through it (it has its own accept/reject API) — it inherits the shared
 Six Formik-connected fields share one shell (`FormField`) that renders the
 i18n label, wires `htmlFor`/`id` (no unlabelled inputs), resolves Yup errors,
 and reserves a FIXED one-line message slot so an appearing error never shifts
-the fields below. All fields accept a typed `placeholderKey` (a raw literal
+the fields below; the slot is a polite live region (`aria-live`) wired to the
+input via `aria-describedby` + `aria-invalid` (PrimeReact's `invalid` prop
+alone emits no ARIA). All fields accept a typed `placeholderKey` (a raw literal
 placeholder is a compile error):
 
 | Field | Wraps | Extras |
