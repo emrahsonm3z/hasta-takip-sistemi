@@ -18,9 +18,11 @@ export function FormChips({ name, labelKey, placeholderKey }: FormChipsProps) {
 
   return (
     <FormField name={name} labelKey={labelKey}>
-      {({ id, invalid }) => (
+      {({ id, invalid, errorId }) => (
         <Chips
           inputId={id}
+          aria-invalid={invalid}
+          aria-describedby={errorId}
           value={field.value ?? []}
           placeholder={placeholderKey ? t(placeholderKey) : undefined}
           invalid={invalid}

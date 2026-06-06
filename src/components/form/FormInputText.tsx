@@ -18,9 +18,11 @@ export function FormInputText({ name, labelKey, placeholderKey }: FormInputTextP
 
   return (
     <FormField name={name} labelKey={labelKey}>
-      {({ id, invalid }) => (
+      {({ id, invalid, errorId }) => (
         <InputText
           id={id}
+          aria-invalid={invalid}
+          aria-describedby={errorId}
           value={field.value ?? ''}
           placeholder={placeholderKey ? t(placeholderKey) : undefined}
           invalid={invalid}

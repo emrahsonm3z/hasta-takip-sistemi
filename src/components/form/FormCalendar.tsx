@@ -24,9 +24,11 @@ export function FormCalendar({
 
   return (
     <FormField name={name} labelKey={labelKey}>
-      {({ id, invalid }) => (
+      {({ id, invalid, errorId }) => (
         <Calendar
           inputId={id}
+          aria-invalid={invalid}
+          aria-describedby={errorId}
           value={field.value}
           placeholder={placeholderKey ? t(placeholderKey) : undefined}
           minDate={minDate}

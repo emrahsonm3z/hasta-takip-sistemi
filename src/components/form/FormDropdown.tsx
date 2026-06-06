@@ -35,9 +35,11 @@ export function FormDropdown<V>({
 
   return (
     <FormField name={name} labelKey={labelKey}>
-      {({ id, invalid }) => (
+      {({ id, invalid, errorId }) => (
         <Dropdown
           inputId={id}
+          aria-invalid={invalid}
+          aria-describedby={errorId}
           value={field.value}
           options={options}
           invalid={invalid}
