@@ -11,7 +11,7 @@ const translate = (key: TranslationKey): string => {
     'docs.title': 'Dokümanlar',
     'menu.section.general': 'Genel',
     'menu.section.modules': 'Modüller',
-    'common.actions': 'İşlemler',
+    'common.noResults': 'İşlemler',
   }
   return labels[key] ?? key
 }
@@ -64,7 +64,7 @@ test('buildMenu sorts children by menuOrder and resolves their labels', () => {
       children: [
         {
           key: 'second',
-          titleKey: 'common.actions',
+          titleKey: 'common.noResults',
           path: '/docs/second',
           icon: 'pi pi-tag',
           menuOrder: 2,
@@ -120,7 +120,7 @@ test('buildMenu orders sections by sectionOrder', () => {
       path: '/docs',
       icon: 'pi pi-book',
       menuOrder: 1,
-      sectionKey: 'common.actions',
+      sectionKey: 'common.noResults',
       sectionOrder: 2,
     },
     {
@@ -138,7 +138,7 @@ test('buildMenu orders sections by sectionOrder', () => {
 
   assert.deepEqual(
     groups.map((group) => group.key),
-    ['menu.section.general', 'common.actions'],
+    ['menu.section.general', 'common.noResults'],
   )
   assert.deepEqual(
     groups.map((group) => group.items.map((item) => item.key)),
