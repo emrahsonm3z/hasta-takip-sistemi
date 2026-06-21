@@ -1,6 +1,6 @@
 import { Fragment, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { NavLink, useLocation } from 'react-router-dom'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import { Sidebar } from 'primereact/sidebar'
 
 import { useMenu } from '@/composables/useMenu'
@@ -94,12 +94,20 @@ function SidebarDisclosure({ item, onNavigate }: SidebarDisclosureProps) {
 }
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
+  const { t } = useTranslation()
   const groups = useMenu()
 
   return (
     <>
       <div className="l-sidebar-brand">
-        <AppLogo />
+        <Link
+          to="/"
+          onClick={onNavigate}
+          aria-label={t('common.homeBrand')}
+          className="inline-flex items-center rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        >
+          <AppLogo />
+        </Link>
       </div>
       <nav className="l-sidebar-nav">
         {groups.map((group) => (
