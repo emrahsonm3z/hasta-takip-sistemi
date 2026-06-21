@@ -55,8 +55,12 @@ src/
     │   │                    patient-list.lib, patient-storage.lib
     │   ├── routes.tsx
     │   └── index.ts
-    └── docs/                This documentation viewer (see its own doc)
-        ├── components/  composables/  constants/  lib/  pages/
+    ├── docs/                This documentation viewer (see its own doc)
+    │   ├── components/  composables/  constants/  lib/  pages/
+    │   ├── routes.tsx
+    │   └── index.ts
+    └── showcase/            Standalone presentation page (see its own doc)
+        ├── components/  composables/  constants/  pages/
         ├── routes.tsx
         └── index.ts
 ```
@@ -141,12 +145,21 @@ modules/{m}/routes.tsx  →  modules/{m}/index.ts  →  router/index.tsx  →  u
 The full route tree today:
 
 ```
-/                  → redirect to /patients
+/                  → ShowcasePage (home — standalone presentation, own slim layout)
 /patients          → PatientsPage
 /docs              → DocsOverviewPage (documentation index)
 /docs/:slug        → DocViewerPage (one document)
+/showcase          → redirect to / (legacy path)
 *                  → NotFound (404)
 ```
+
+`/` is the application **home**: it renders the showcase through its own slim
+`ShowcaseLayout` (theme + language toggles, demo/GitHub links, no sidebar) —
+**not** the patient `AppLayout` shell. The patient app's routes (`/patients`,
+`/docs`) stay under `AppLayout`; the legacy `/showcase` path redirects to `/`.
+The showcase is kept off the sidebar menu and the docs registry. All the
+app-root providers (PrimeReact + Lara theme, i18n, Toast, React Query) sit
+above the router, so the home route inherits them unchanged.
 
 Every route carries a typed `handle` (`AppRouteHandle`): a `titleKey` resolved
 through i18n, or a `title(match)` function for dynamic titles (the docs viewer
