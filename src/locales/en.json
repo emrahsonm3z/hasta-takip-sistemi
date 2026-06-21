@@ -13,7 +13,8 @@
     "clearFilters": "Clear filters",
     "languageSwitch": "Switch language to Turkish",
     "themeToggleToLight": "Switch to the light theme",
-    "themeToggleToDark": "Switch to the dark theme"
+    "themeToggleToDark": "Switch to the dark theme",
+    "homeBrand": "Patient Tracking System — Home"
   },
   "errors": {
     "config": {
@@ -202,5 +203,118 @@
       "modules": "Modules"
     },
     "toggleSubmenu": "Toggle submenu"
+  },
+  "showcase": {
+    "meta": {
+      "title": "Patient Tracking System — Showcase"
+    },
+    "nav": {
+      "label": "Sections",
+      "overview": "Overview",
+      "features": "What it does",
+      "preview": "Live Preview",
+      "architecture": "Architecture & Tech",
+      "quality": "Quality & Accessibility",
+      "devops": "How it Ships",
+      "closing": "Closing"
+    },
+    "topbar": {
+      "demo": "Live demo",
+      "github": "GitHub"
+    },
+    "cta": {
+      "demo": "Live demo",
+      "github": "View on GitHub",
+      "docs": "Documentation"
+    },
+    "hero": {
+      "eyebrow": "Patient Tracking System · Case Study",
+      "title": "A clinic's pulse, on one screen.",
+      "subtitle": "A single-page panel for managing patients and appointments — bilingual, light and dark, built with real product care."
+    },
+    "features": {
+      "title": "What it does",
+      "lead": "Add, edit and delete patients; sort a 15-column table by the Turkish alphabet and filter from the menu. Every change persists in the browser.",
+      "underHood": "Data is fetched once from a read-only API; localStorage and a smart cache do the rest.",
+      "items": {
+        "list": {
+          "title": "Patient list",
+          "description": "15 columns, correct Turkish sorting, menu filtering."
+        },
+        "records": {
+          "title": "Records",
+          "description": "Add, edit and delete — each with its own validation rules."
+        },
+        "bilingual": {
+          "title": "Two languages",
+          "description": "The whole interface in Turkish and English; switches with one click."
+        },
+        "theme": {
+          "title": "Light / dark theme",
+          "description": "An easy-on-the-eyes theme that remembers your choice."
+        },
+        "docs": {
+          "title": "In-app documentation",
+          "description": "A bilingual, browsable documentation viewer."
+        },
+        "monitoring": {
+          "title": "Error monitoring",
+          "description": "Sentry catches silent errors in production."
+        }
+      }
+    },
+    "preview": {
+      "title": "Live preview",
+      "lead": "Not a screenshot — the real component. Sort, filter, search.",
+      "underHood": "Every behavior here comes from one AppDataTable wrapper; Turkish-aware sort and filter are built in.",
+      "disclaimer": "These records are entirely fictional; they contain no real patient data."
+    },
+    "architecture": {
+      "title": "Architecture & technology",
+      "lead": "Each feature lives in its own self-contained module; shared parts gather in one place. A structure that stays readable as it grows.",
+      "underHood": "Layers are strictly ordered — api → models → lib → composables → components — and each module is reached only through its single public entry point; shared UI always goes through the App* wrappers.",
+      "layersCaption": "Layer order",
+      "layers": {
+        "api": "Talks to the data source (read/write)",
+        "models": "Defines the data's types and rules",
+        "lib": "Shared helper functions",
+        "composables": "Reusable logic (React hooks)",
+        "components": "The interface the user sees"
+      },
+      "layersNote": "Each layer depends only on the one beneath it, so the structure stays clean as the project grows.",
+      "stackCaption": "Technology stack"
+    },
+    "quality": {
+      "title": "Quality & accessibility",
+      "lead": "Quality rests on automated gates, not good intentions. Accessibility wasn't bolted on — it was designed in.",
+      "underHood": "Strict TypeScript, no any; ESLint + Stylelint + Prettier; 92 pure-logic tests; color contrast meets WCAG AA in both themes.",
+      "badges": {
+        "strict": "Strict TypeScript · no any",
+        "lint": "ESLint + Stylelint + Prettier",
+        "noComments": "Custom “no comments” lint rule",
+        "tests": "92 pure-logic tests",
+        "parity": "Locale key-parity test",
+        "a11y": "jsx-a11y accessibility floor",
+        "contrast": "WCAG AA contrast in both themes"
+      }
+    },
+    "devops": {
+      "title": "How it ships",
+      "lead": "Every change takes the same disciplined path: automated checks, review, automated versioning, automated release.",
+      "underHood": "The CI gate runs validate → test → build → npm audit on every PR; nothing reaches main without green. Versions and the changelog are generated automatically by release-please.",
+      "sentryNote": "Monitoring is production-only and errors-only; no personal data is collected.",
+      "steps": {
+        "commit": "Commit",
+        "ci": "CI gate",
+        "review": "Review",
+        "deploy": "Vercel deploy",
+        "release": "Auto release"
+      }
+    },
+    "closing": {
+      "title": "A small case study, real product discipline.",
+      "lead": "The data is sample; the care is real. The same attention to detail is ready for your product, too.",
+      "version": "Version"
+    }
   }
 }

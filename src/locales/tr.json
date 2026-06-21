@@ -13,7 +13,8 @@
     "clearFilters": "Filtreleri temizle",
     "languageSwitch": "İngilizce diline geç",
     "themeToggleToLight": "Açık temaya geç",
-    "themeToggleToDark": "Koyu temaya geç"
+    "themeToggleToDark": "Koyu temaya geç",
+    "homeBrand": "Hasta Takip Sistemi — Anasayfa"
   },
   "errors": {
     "config": {
@@ -202,5 +203,118 @@
       "modules": "Modüller"
     },
     "toggleSubmenu": "Alt menüyü aç/kapat"
+  },
+  "showcase": {
+    "meta": {
+      "title": "Hasta Takip Sistemi — Tanıtım"
+    },
+    "nav": {
+      "label": "Bölümler",
+      "overview": "Genel Bakış",
+      "features": "Ne Yapar",
+      "preview": "Canlı Önizleme",
+      "architecture": "Mimari & Teknoloji",
+      "quality": "Kalite & Erişilebilirlik",
+      "devops": "Üretim Süreci",
+      "closing": "Kapanış"
+    },
+    "topbar": {
+      "demo": "Canlı demo",
+      "github": "GitHub"
+    },
+    "cta": {
+      "demo": "Canlı demo",
+      "github": "GitHub'da incele",
+      "docs": "Dokümanlar"
+    },
+    "hero": {
+      "eyebrow": "Hasta Takip Sistemi · Vaka Çalışması",
+      "title": "Polikliniğin nabzı, tek bir ekranda.",
+      "subtitle": "Hastaları ve randevuları yöneten; iki dilli, açık ve koyu temalı, gerçek bir ürün titizliğiyle hazırlanmış tek sayfalık panel."
+    },
+    "features": {
+      "title": "Ne yapar?",
+      "lead": "Hasta ekleyin, düzenleyin, silin; 15 sütunluk tabloda Türkçe alfabesine göre sıralayın, menüden filtreleyin. Yaptığınız her değişiklik tarayıcıda kalıcı olur.",
+      "underHood": "Veriler salt-okunur bir API'den yalnızca bir kez çekilir; gerisini localStorage ve akıllı önbellek yürütür.",
+      "items": {
+        "list": {
+          "title": "Hasta listesi",
+          "description": "15 sütun, Türkçe-doğru sıralama, menüden filtreleme."
+        },
+        "records": {
+          "title": "Kayıt işlemleri",
+          "description": "Ekleme, düzenleme ve silme; her biri kendi doğrulama kurallarıyla."
+        },
+        "bilingual": {
+          "title": "İki dil",
+          "description": "Tüm arayüz Türkçe ve İngilizce; tek tıkla değişir."
+        },
+        "theme": {
+          "title": "Açık / koyu tema",
+          "description": "Göz yormayan, tercihinizi hatırlayan tema."
+        },
+        "docs": {
+          "title": "Uygulama-içi dokümanlar",
+          "description": "İki dilli, gezilebilir doküman görüntüleyici."
+        },
+        "monitoring": {
+          "title": "Hata izleme",
+          "description": "Yayında sessiz hataları Sentry yakalar."
+        }
+      }
+    },
+    "preview": {
+      "title": "Canlı önizleme",
+      "lead": "Ekran görüntüsü değil — gerçek bileşenin ta kendisi. Sıralayın, filtreleyin, arayın.",
+      "underHood": "Tablodaki tüm davranış tek bir AppDataTable sarmalayıcısından gelir; Türkçe-duyarlı sıralama ve filtreleme yerleşiktir.",
+      "disclaimer": "Buradaki kayıtlar tamamen örnektir; gerçek hasta verisi içermez."
+    },
+    "architecture": {
+      "title": "Mimari ve teknoloji",
+      "lead": "Her özellik kendi bağımsız modülünde yer alır; ortak parçalar tek bir yerde toplanır. Büyürken dağılmayan, okunması kolay bir yapı.",
+      "underHood": "Katmanlar net sıralı: api → models → lib → composables → bileşenler. Modüller yalnızca tek kapıdan konuşur; ortak arayüz her zaman App* sarmalayıcılardan geçer.",
+      "layersCaption": "Katman sırası",
+      "layers": {
+        "api": "Veri kaynağıyla konuşur (okuma/yazma)",
+        "models": "Verinin tiplerini ve kurallarını tanımlar",
+        "lib": "Ortak yardımcı işlevler",
+        "composables": "Yeniden kullanılabilir mantık (React hook'ları)",
+        "components": "Kullanıcının gördüğü arayüz"
+      },
+      "layersNote": "Her katman yalnızca altındakine dayanır; böylece proje büyürken yapı karışmaz.",
+      "stackCaption": "Teknoloji yığını"
+    },
+    "quality": {
+      "title": "Kalite ve erişilebilirlik",
+      "lead": "Kalite iyi niyete değil, otomatik kapılara bağlı. Erişilebilirlik sonradan eklenmedi, baştan tasarlandı.",
+      "underHood": "Strict TypeScript, any yasak; ESLint + Stylelint + Prettier; 92 saf-mantık testi; renk kontrastları her iki temada WCAG AA.",
+      "badges": {
+        "strict": "Strict TypeScript · any yasak",
+        "lint": "ESLint + Stylelint + Prettier",
+        "noComments": "Özel “yorum yok” lint kuralı",
+        "tests": "92 saf-mantık testi",
+        "parity": "Locale anahtar eşliği testi",
+        "a11y": "jsx-a11y erişilebilirlik tabanı",
+        "contrast": "Her iki temada WCAG AA kontrast"
+      }
+    },
+    "devops": {
+      "title": "Üretim süreci",
+      "lead": "Her değişiklik aynı disiplinli yoldan geçer: otomatik kontroller, gözden geçirme, otomatik sürümleme ve otomatik yayın.",
+      "underHood": "CI kapısı her PR'da validate → test → build → npm audit koşar; yeşil olmadan hiçbir şey main'e giremez. Sürümler ve değişiklik günlüğü release-please ile otomatik üretilir.",
+      "sentryNote": "İzleme yalnızca yayında ve yalnızca hatalar için; kişisel veri toplanmaz.",
+      "steps": {
+        "commit": "Commit",
+        "ci": "CI kapısı",
+        "review": "Gözden geçirme",
+        "deploy": "Vercel yayın",
+        "release": "Otomatik sürüm"
+      }
+    },
+    "closing": {
+      "title": "Küçük bir vaka çalışması, gerçek bir ürün disiplini.",
+      "lead": "Veriler örnek; özen gerçek. Detaylara gösterilen bu titizlik, sizin ürününüze de hazır.",
+      "version": "Sürüm"
+    }
   }
 }
