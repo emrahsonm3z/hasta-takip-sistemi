@@ -652,6 +652,46 @@ testing policy — manual QA matrix light/dark × 375/767/768px).
 
 ---
 
+### P.3 ✅ Project showcase page (`/showcase`)
+**Goal:** A standalone, modern single-page showcase presenting the whole
+project — aimed at a non-technical owner while earning a technical reviewer's
+respect — without touching the patient application shell.
+**As landed:** A new `showcase` module that is the application **home**: in
+`router/index.tsx` the index route `/` renders the showcase through its own slim
+`ShowcaseLayout` (the patient routes stay under a pathless `AppLayout` route),
+and the legacy `/showcase` path redirects to `/`. The full-bleed top bar carries
+the brand mark (→ `/`), a "Live demo" link (→ `/patients`), a GitHub link, and
+the **same** `AppLanguageSwitcher` + `AppThemeToggle` chips the app shell uses
+(demo/GitHub collapse to icon-only below `md`); kept off `useMenu` and the
+sidebar, while its module doc (`SHOWCASE.md`) is registered in the docs registry
+like every other. All app-root providers sit above the router, so the home route
+inherits PrimeReact + theme + i18n + Toast + React Query unchanged (verified with
+the live table, language switch, and theme toggle). Seven stacked sections
+(Overview hero, What it does, Live preview, Architecture & tech, Quality &
+accessibility, How it ships, Closing), each with a plain-language lead plus a
+compact "under the hood" line and badges. The Architecture section renders the
+five layers (`api → models → lib → composables → components`) as a plain-language
+stack — each a mono chip + a one-line description with a downward dependency cue
+and a caption — instead of bare words. A sticky right-hand scroll-spy TOC at
+`lg+` (`MEDIA.minLg`), single column below; `useScrollSpy` tracks the active
+section by scroll position with a near-bottom fallback so all seven activate,
+plus a click-lock so a clicked item sticks; smooth scroll falls back to instant
+under `prefers-reduced-motion`. The live-preview section embeds a **real**
+`AppDataTable` fed six **invented** sample rows (no real patient data) with
+Turkish-aware sort + two menu filters + search; `AppDataTable` gained an optional
+`tableMinWidth` prop (default `72rem`, so the patients table is byte-for-byte
+unchanged) and the preview passes `100%` to fit without horizontal scroll. Copy
+is fully bilingual (`showcase.*`, TR/EN parity), switchable from the top bar,
+rendered Turkish by default. (The hero metric counters from an earlier draft
+were removed at owner request.)
+**Tests:** none new (presentational; `useScrollSpy` is impure DOM, excluded by
+the testing policy — manual QA: home renders at `/`, `/showcase` redirects, all
+7 sections reachable/active, preview fits, language/theme switch, no console
+errors). Suite stands at **92 specs across 19 files**.
+**DoD:** + global DoD. Commits `feat(showcase): …` (×3), `docs: …`.
+
+---
+
 ## Backlog / later (out of the case-study scope)
 
 - Patient detail route (`/patients/:patientId`) using the `build()` helper +

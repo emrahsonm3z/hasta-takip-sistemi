@@ -669,6 +669,47 @@ dışı — manuel QA matrisi açık/koyu × 375/767/768px).
 
 ---
 
+### P.3 ✅ Proje tanıtım sayfası (`/showcase`)
+**Amaç:** Tüm projeyi sunan, bağımsız ve modern bir tek sayfalık tanıtım —
+teknik olmayan bir sahibe hitap ederken teknik incelemecinin de saygısını
+kazanan — hasta uygulama kabuğuna dokunmadan.
+**Nasıl indi:** Uygulamanın **ana sayfası** olan yeni bir `showcase` modülü:
+`router/index.tsx` içinde index rotası `/` tanıtımı kendi ince
+`ShowcaseLayout`'u üzerinden render eder (hasta rotaları yolsuz bir `AppLayout`
+rotası altında kalır) ve eski `/showcase` yolu `/`'e yönlendirir. Tam-genişlik
+üst çubuk marka işaretini (→ `/`), bir "Canlı demo" bağlantısını (→ `/patients`),
+bir GitHub bağlantısını ve uygulama kabuğunun kullandığı **aynı**
+`AppLanguageSwitcher` + `AppThemeToggle` çiplerini taşır (`md` altında demo/GitHub
+yalnızca-simgeye iner); `useMenu`'dan ve kenar menüden uzak tutulur, modül
+dokümanı (`SHOWCASE.md`) ise her modül gibi doküman registry'sine kayıtlıdır. Tüm
+uygulama-kökü provider'ları router'ın üstünde durduğundan, ana rota PrimeReact +
+tema + i18n + Toast + React Query'yi olduğu gibi devralır (canlı tablo, dil
+değişimi ve tema düğmesiyle doğrulandı). Yedi yığılı bölüm (Genel Bakış hero, Ne
+Yapar, Canlı Önizleme, Mimari ve Teknoloji, Kalite ve Erişilebilirlik, Üretim
+Süreci, Kapanış); her biri sade bir değer cümlesi artı kısa bir "kaputun altı"
+satırı ve rozetler taşır. Mimari bölümü beş katmanı
+(`api → models → lib → composables → components`) sade dilli bir yığın olarak
+gösterir — her biri mono çip + tek satır açıklama, aşağı yönlü bağımlılık imi ve
+bir altyazıyla — çıplak kelimeler yerine. `lg+`'de sağda sabit bir scroll-spy
+TOC (`MEDIA.minLg`), altında tek sütun; `useScrollSpy` aktif bölümü kaydırma
+konumundan izler, alt-yakını yedeğiyle yedi bölüm de aktif olur, tıklama-kilidi
+ile tıklanan öğe yapışır; yumuşak kaydırma `prefers-reduced-motion` altında
+anlık atlamaya döner. Canlı önizleme bölümü **gerçek** bir `AppDataTable` gömer;
+altı **uydurma** örnek satırla (gerçek hasta verisi yok) Türkçe-duyarlı
+sıralama + iki menü filtresi + arama; `AppDataTable` opsiyonel bir
+`tableMinWidth` prop'u kazandı (varsayılan `72rem`, yani hasta tablosu
+bit-bit değişmez) ve önizleme yatay kayma olmadan sığması için `100%` geçer.
+Metin tümüyle iki dilli (`showcase.*`, TR/EN eşlik), üst çubuktan değiştirilebilir,
+varsayılan Türkçe. (Önceki taslaktaki hero metrik sayaçları sahip talebiyle
+kaldırıldı.)
+**Testler:** yeni yok (sunum amaçlı; `useScrollSpy` saf-olmayan DOM, test
+politikasınca hariç — elle QA: ana sayfa `/`'de açılır, `/showcase` yönlendirir,
+7 bölüm de erişilebilir/aktif, önizleme sığar, dil/tema değişir, konsol hatası
+yok). Paket **19 dosyada 92 spec**'te durur.
+**DoD:** + global DoD. Commit'ler `feat(showcase): …` (×3), `docs: …`.
+
+---
+
 ## Backlog / sonra (vaka çalışması kapsamı dışı)
 
 - `build()` yardımcısı + dinamik `title` handle kullanan hasta detay route'u

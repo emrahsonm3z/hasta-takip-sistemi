@@ -54,8 +54,12 @@ src/
     │   │                    patient-list.lib, patient-storage.lib
     │   ├── routes.tsx
     │   └── index.ts
-    └── docs/                Bu doküman görüntüleyici (kendi dokümanına bakın)
-        ├── components/  composables/  constants/  lib/  pages/
+    ├── docs/                Bu doküman görüntüleyici (kendi dokümanına bakın)
+    │   ├── components/  composables/  constants/  lib/  pages/
+    │   ├── routes.tsx
+    │   └── index.ts
+    └── showcase/            Bağımsız tanıtım sayfası (kendi dokümanına bakın)
+        ├── components/  composables/  constants/  pages/
         ├── routes.tsx
         └── index.ts
 ```
@@ -139,12 +143,21 @@ modules/{m}/routes.tsx  →  modules/{m}/index.ts  →  router/index.tsx  →  u
 Bugünkü tam rota ağacı:
 
 ```
-/                  → /patients'a yönlendirme
+/                  → ShowcasePage (ana sayfa — bağımsız tanıtım, kendi ince layout'u)
 /patients          → PatientsPage
 /docs              → DocsOverviewPage (dokümantasyon indeksi)
 /docs/:slug        → DocViewerPage (tek doküman)
+/showcase          → /'e yönlendirme (eski yol)
 *                  → NotFound (404)
 ```
+
+`/` uygulamanın **ana sayfasıdır**: tanıtımı kendi ince `ShowcaseLayout`'u
+üzerinden render eder (tema + dil düğmeleri, demo/GitHub bağlantıları, kenar
+menü yok) — hasta `AppLayout` kabuğu **değil**. Hasta uygulamasının rotaları
+(`/patients`, `/docs`) `AppLayout` altında kalır; eski `/showcase` yolu `/`'e
+yönlendirir. Tanıtım kenar menüden ve doküman registry'sinden uzak tutulur.
+Tüm uygulama-kökü provider'ları (PrimeReact + Lara teması, i18n, Toast, React
+Query) router'ın üstünde durduğundan, ana rota onları olduğu gibi devralır.
 
 Her rota tipli bir `handle` taşır (`AppRouteHandle`): i18n üzerinden çözülen
 bir `titleKey` ya da dinamik başlıklar için bir `title(match)` fonksiyonu

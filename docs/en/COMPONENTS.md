@@ -49,7 +49,11 @@ renders. The table always renders at PrimeReact's
 small size (`size="small"` inside the wrapper — call sites never set it). At
 `md` (768px) and above, columns auto-fit their content above a fixed `72rem`
 table floor, so on narrow windows the table scrolls horizontally inside its
-region instead of crushing its columns. Below `md` the wrapper drops that
+region instead of crushing its columns. That floor is the `tableMinWidth`
+prop (default `72rem`, so the patients table is unchanged); a call site with
+only a few columns can pass a smaller value — the showcase live preview
+passes `100%` so its five columns fill the width with no horizontal scroll.
+Below `md` the wrapper drops that
 floor (columns shrink to their own minimums) and the app-wide density rules
 take over — 12px root size and small buttons, see the Styling doc; the
 patients list additionally swaps its row actions for a tap-friendly pattern
@@ -85,6 +89,7 @@ interface AppDataTableProps<T extends object> {
   rowHover?: boolean
   stripedRows?: boolean
   emptyMessageKey?: TranslationKey  // default 'common.noResults'
+  tableMinWidth?: string            // default '72rem' — the md+ table floor
 }
 ```
 
@@ -187,7 +192,9 @@ the nested Dokümanlar sub-menu and the mobile drawer), the topbar
 scroll region — the `<main>` element. The window itself never scrolls; on
 route change the content region scrolls back to the top. `AppLogo` is the
 brand mark; `AppLanguageSwitcher` and `AppThemeToggle` are the two topbar
-chips (see the Languages and Styling docs for what they drive).
+chips (see the Languages and Styling docs for what they drive). The showcase
+home page reuses both chips in its own slim top bar (see the Showcase module
+doc), so language and theme are switchable there too.
 
 ---
 

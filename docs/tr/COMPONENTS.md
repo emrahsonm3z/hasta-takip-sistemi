@@ -49,8 +49,11 @@ PrimeReact'in
 küçük boyutuyla çizilir (`size="small"` wrapper'ın içindedir — çağrı yerleri
 asla vermez). `md` (768px) ve üzerinde kolonlar sabit `72rem` tablo tabanının
 üzerinde içeriğe göre sığar; dar pencerede tablo, kolonlarını ezmek yerine
-kendi bölgesi içinde yatay kayar. `md` altında wrapper bu tabanı bırakır
-(kolonlar kendi minimumlarına iner) ve uygulama-geneli yoğunluk kuralları
+kendi bölgesi içinde yatay kayar. Bu taban `tableMinWidth` prop'udur
+(varsayılan `72rem`, yani hasta tablosu değişmez); az kolonlu bir çağrı yeri
+daha küçük bir değer geçebilir — tanıtım canlı önizlemesi `100%` geçer, böylece
+beş kolon yatay kaymadan genişliği doldurur. `md` altında wrapper bu tabanı
+bırakır (kolonlar kendi minimumlarına iner) ve uygulama-geneli yoğunluk kuralları
 devreye girer — 12px kök boyut ve küçük düğmeler, Stil dokümanına bakın;
 hasta listesi ayrıca satır eylemlerini dokunmaya-uygun desenle değiştirir
 (hasta modülü dokümanına bakın). Header responsive'dir: `sm` altında toolbar
@@ -85,6 +88,7 @@ interface AppDataTableProps<T extends object> {
   rowHover?: boolean
   stripedRows?: boolean
   emptyMessageKey?: TranslationKey  // varsayılan 'common.noResults'
+  tableMinWidth?: string            // varsayılan '72rem' — md+ tablo tabanı
 }
 ```
 
@@ -188,7 +192,9 @@ hamburger, sayfa başlığı, dil + tema çipleri) ve tek kaydırma bölgesi —
 `<main>` öğesi. Pencerenin kendisi asla kaymaz; rota değişiminde içerik
 bölgesi en üste döner. `AppLogo` marka işaretidir; `AppLanguageSwitcher` ve
 `AppThemeToggle` iki üst çubuk çipidir (ne sürdükleri için Diller ve Stil
-dokümanlarına bakın).
+dokümanlarına bakın). Tanıtım ana sayfası bu iki çipi kendi ince üst çubuğunda
+yeniden kullanır (Tanıtım modülü dokümanına bakın), böylece dil ve tema orada
+da değiştirilebilir.
 
 ---
 
