@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.10.0](https://github.com/emrahsonm3z/hasta-takip-sistemi/compare/v0.9.0...v0.10.0) (2026-06-21)
+
+
+### Features
+
+* **showcase:** project showcase as the application home page ([ab6c784](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/ab6c78467fc339d79a21ed35d62fb29e5f9f1d72))
+* **table:** make AppDataTable min-width floor overridable via tableMinWidth ([dd8bdc6](https://github.com/emrahsonm3z/hasta-takip-sistemi/commit/dd8bdc64b492a3726bd32a189c82d858255df49c))
+
 ## [0.9.0](https://github.com/emrahsonm3z/hasta-takip-sistemi/compare/v0.8.0...v0.9.0) (2026-06-06)
 
 
