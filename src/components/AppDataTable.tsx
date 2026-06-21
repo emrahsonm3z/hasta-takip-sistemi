@@ -36,6 +36,7 @@ interface AppDataTableProps<T extends object> {
   rowHover?: boolean
   stripedRows?: boolean
   emptyMessageKey?: TranslationKey
+  tableMinWidth?: string
 }
 
 const MOBILE_PAGINATOR_TEMPLATE =
@@ -62,6 +63,7 @@ export function AppDataTable<T extends object>({
   rowHover = true,
   stripedRows = false,
   emptyMessageKey = 'common.noResults',
+  tableMinWidth = '72rem',
 }: AppDataTableProps<T>) {
   const { t } = useTranslation()
   const isBelowMd = useMediaQuery(MEDIA.belowMd)
@@ -142,7 +144,7 @@ export function AppDataTable<T extends object>({
       onSort={onSort}
       removableSort
       scrollable
-      tableStyle={isBelowMd ? undefined : { minInlineSize: '72rem' }}
+      tableStyle={isBelowMd ? undefined : { minInlineSize: tableMinWidth }}
       size="small"
       rowHover={rowHover}
       stripedRows={stripedRows}
